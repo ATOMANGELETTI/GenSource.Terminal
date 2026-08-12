@@ -1,0 +1,1 @@
+1. Changed hard links and paths to relative paths in the project
