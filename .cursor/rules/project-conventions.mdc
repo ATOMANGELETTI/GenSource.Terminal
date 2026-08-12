@@ -1,0 +1,20 @@
+---
+description: Core GenSource.Template conventions — paths, placeholders, Windows packaging
+alwaysApply: true
+---
+
+# Project conventions
+
+- Treat tracked empty files as intentional placeholders. Fill them in place;
+  do not invent parallel files or folders that duplicate the layout.
+- Keep tooling config under `src/configs/` (Vite, Vitest, Playwright, ESLint,
+  tsconfigs). Do not recreate those configs at the repo root.
+- Preserve the `src-tauri/src/mdoels/` directory name unless explicitly asked
+  to rename it (pre-existing typo; renaming breaks `mod` paths).
+- Packaging is Windows-first (`src-tauri/nsis/`, `other/utilities/7zr.exe`).
+- Prefer Node `.mjs` for agent/hook scripts over Bash/Python.
+
+```text
+❌ BAD: create vite.config.ts at repo root
+✅ GOOD: edit src/configs/vite.config.ts
+```

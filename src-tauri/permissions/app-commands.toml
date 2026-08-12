@@ -1,0 +1,13 @@
+[[permission]]
+identifier = "allow-app-commands"
+description = "Custom GenSource Template IPC commands (settings, window, quit)."
+commands.allow = [
+  "greet",
+  "get_app_info",
+  "get_settings",
+  "reload_settings",
+  "get_keybindings",
+  "open_configs_folder",
+  "hide_main_window",
+  "quit_app",
+]

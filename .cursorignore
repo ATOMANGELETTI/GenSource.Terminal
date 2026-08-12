@@ -1,0 +1,11 @@
+﻿# Dependencies & build outputs
+node_modules/
+dist/
+src-tauri/target/
+src-tauri/gen/
+
+# Large local tooling binaries
+other/utilities/7z.exe
+
+# NotePads - Development Notes
+other/documents/notepads/

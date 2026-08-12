@@ -1,0 +1,132 @@
+/* Shared flat menu look used by the titlebar menu, content-area menu, and
+   the tray flyout window. Flat by design: a single 1px border, a flat
+   surface fill, and hover backgrounds only — never a box-shadow, gradient,
+   or bevel. */
+
+.context-menu {
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  min-width: 220px;
+  padding: 4px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.context-menu__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px 6px;
+  margin-bottom: 2px;
+  border-bottom: 1px solid var(--border);
+}
+
+.context-menu__header-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.context-menu__header-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--success);
+  flex-shrink: 0;
+}
+
+.context-menu__header-version {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.context-menu__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 12.5px;
+  text-align: left;
+  cursor: default;
+}
+
+.context-menu__item:hover:not(:disabled):not(.context-menu__item--disabled) {
+  background-color: var(--hover);
+}
+
+.context-menu__item:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.context-menu__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+
+.context-menu__label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.context-menu__shortcut {
+  flex-shrink: 0;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+}
+
+.context-menu__item--muted {
+  color: var(--text-muted);
+}
+
+.context-menu__item--muted .context-menu__icon {
+  color: var(--text-muted);
+}
+
+.context-menu__item--destructive {
+  color: var(--danger);
+}
+
+.context-menu__item--destructive .context-menu__icon,
+.context-menu__item--destructive .context-menu__shortcut {
+  color: var(--danger);
+}
+
+.context-menu__item--disabled,
+.context-menu__item:disabled {
+  color: var(--text-muted);
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.context-menu__separator {
+  height: 1px;
+  margin: 4px 6px;
+  background-color: var(--border);
+}

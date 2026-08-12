@@ -1,0 +1,55 @@
+/* Bundled Nerd Fonts from public/fonts/nerdfonts/ (Regular + Bold).
+   Family names match settings.json `fontFamily` keys. */
+
+@font-face {
+  font-family: "Terminus";
+  src: url("/fonts/nerdfonts/terminus/TerminessNerdFont-Regular.ttf")
+    format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Terminus";
+  src: url("/fonts/nerdfonts/terminus/TerminessNerdFont-Bold.ttf")
+    format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Ubuntu";
+  src: url("/fonts/nerdfonts/ubuntu/UbuntuNerdFont-Regular.ttf")
+    format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Ubuntu";
+  src: url("/fonts/nerdfonts/ubuntu/UbuntuNerdFont-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fira Code";
+  src: url("/fonts/nerdfonts/firacode/FiraCodeNerdFont-Regular.ttf")
+    format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fira Code";
+  src: url("/fonts/nerdfonts/firacode/FiraCodeNerdFont-Bold.ttf")
+    format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}

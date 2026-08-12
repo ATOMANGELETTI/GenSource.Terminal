@@ -1,0 +1,8 @@
+{
+    // Pinned editor tabs minimal icon-only styling
+    "workbench.editor.pinnedTabSizing": "compact",
+    "workbench.editor.pinnedTabsOnSeparateRow": true,
+    "workbench.editor.preventPinnedEditorClose": "keyboardAndMouse",
+    "workbench.editor.highlightModifiedTabs": true,
+    "workbench.editor.showIcons": true
+}

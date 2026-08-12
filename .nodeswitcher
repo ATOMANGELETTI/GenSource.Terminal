@@ -1,0 +1,16 @@
+{
+  "backend": "nvm",
+  "current": "26.6.0",
+  "history": [
+    {
+      "backend": "nvm",
+      "selected_at": "2026-08-10T07:16:16.256Z",
+      "version": "26.2.0"
+    },
+    {
+      "backend": "nvm",
+      "selected_at": "2026-08-10T11:44:44.761Z",
+      "version": "26.6.0"
+    }
+  ]
+}

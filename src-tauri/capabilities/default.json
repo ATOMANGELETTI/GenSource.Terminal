@@ -1,0 +1,41 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Main window: chrome, store, clipboard, opener, updater. Dangerous kitchen-sink plugins (shell/http/sql/upload/websocket) are not granted by default — add them in a fork-specific capability when needed.",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "core:window:allow-start-dragging",
+    "core:window:allow-minimize",
+    "core:window:allow-maximize",
+    "core:window:allow-unmaximize",
+    "core:window:allow-toggle-maximize",
+    "core:window:allow-close",
+    "core:window:allow-show",
+    "core:window:allow-hide",
+    "core:window:allow-set-title",
+    "core:window:allow-set-focus",
+    "core:window:allow-is-maximized",
+    "core:window:allow-is-visible",
+    "core:app:default",
+    "core:event:default",
+    "core:menu:default",
+    "core:tray:default",
+    "core:webview:allow-set-webview-zoom",
+
+    "allow-app-commands",
+
+    "log:default",
+    "fs:default",
+    "fs:allow-app-read",
+    "fs:allow-app-write",
+    "fs:scope-app-recursive",
+    "dialog:default",
+    "store:default",
+    "opener:default",
+    "notification:default",
+    "os:default",
+    "clipboard-manager:default",
+    "updater:default"
+  ]
+}

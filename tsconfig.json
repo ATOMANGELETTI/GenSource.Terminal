@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "strict": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "files": [],
+  "references": [
+    { "path": "./src/configs/tsconfig.app.json" },
+    { "path": "./src/configs/tsconfig.build.json" },
+    { "path": "./src/configs/tsconfig.node.json" },
+    { "path": "./src/configs/tsconfig.test.json" },
+    { "path": "./src/configs/tsconfig.e2e.json" }
+  ]
+}

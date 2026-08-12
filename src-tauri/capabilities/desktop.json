@@ -1,0 +1,16 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "desktop",
+  "description": "Grants for plugins that are only meaningful on Windows desktop.",
+  "platforms": ["windows"],
+  "windows": ["main"],
+  "permissions": [
+    "deep-link:default",
+    "global-shortcut:default",
+    "window-state:default",
+    "autostart:default",
+    "positioner:default",
+    "stronghold:default",
+    "cli:default"
+  ]
+}

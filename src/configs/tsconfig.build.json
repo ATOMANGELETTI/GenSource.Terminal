@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "tsBuildInfoFile": "./.tsbuildinfo-build",
+    "noEmit": true
+  },
+  "files": [],
+  "references": [{ "path": "./tsconfig.app.json" }]
+}

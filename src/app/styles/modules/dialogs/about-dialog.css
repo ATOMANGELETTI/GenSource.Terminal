@@ -1,0 +1,85 @@
+/* Flat modal — no shadow, gradient, or bevel; a single border separates it
+   from the dimmed backdrop. */
+.about-dialog__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.35);
+}
+
+.about-dialog {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 260px;
+  padding: 24px 20px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  text-align: center;
+}
+
+.about-dialog__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 8px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.about-dialog__title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.about-dialog__version {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.about-dialog__description {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.about-dialog__publisher {
+  margin: 0;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.about-dialog__close {
+  margin-top: 14px;
+  padding: 6px 18px;
+  background-color: var(--hover);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 12.5px;
+  cursor: default;
+}
+
+.about-dialog__close:hover {
+  background-color: var(--border);
+}
+
+.about-dialog__close:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}

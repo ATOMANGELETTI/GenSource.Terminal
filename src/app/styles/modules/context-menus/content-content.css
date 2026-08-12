@@ -1,0 +1,6 @@
+/* Positioning only — visual styling (item layout, icons, shortcuts,
+   destructive/disabled states) lives in menu-shared.css. */
+.content-context-menu {
+  position: fixed;
+  min-width: 220px;
+}

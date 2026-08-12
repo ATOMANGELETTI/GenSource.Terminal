@@ -1,0 +1,54 @@
+name: Feature request
+description: Suggest an enhancement for the GenSource suite template
+title: "[feat]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the problem and proposed change. Prefer suite-wide reuse over
+        one-off product needs when possible.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What pain or gap does this address?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: What should change in the template?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other approaches you evaluated (or why none fit).
+    validations:
+      required: false
+
+  - type: textarea
+    id: suite-impact
+    attributes:
+      label: Suite reuse impact
+      description: |
+        How would forks or other GenSource apps benefit? Note packaging,
+        plugins, UI shell, or agent/tooling surfaces if relevant.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues and did not find a duplicate.
+          required: true
+        - label: This request does not require committing secrets or private credentials.
+          required: true

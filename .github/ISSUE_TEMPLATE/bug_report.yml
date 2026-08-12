@@ -1,0 +1,90 @@
+name: Bug report
+description: Report a defect in GenSource.Template
+title: "[bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. Search existing issues first.
+        For security findings, use the [Security policy](../SECURITY.md) instead.
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      description: This template is Windows-first.
+      options:
+        - Windows 11
+        - Windows 10
+        - Other (describe below)
+      default: 0
+    validations:
+      required: true
+
+  - type: input
+    id: node-version
+    attributes:
+      label: Node.js version
+      description: Prefer Node 22 (see `.node-version`).
+      placeholder: "22.x.x"
+    validations:
+      required: true
+
+  - type: input
+    id: rust-version
+    attributes:
+      label: Rust / Cargo version
+      description: Output of `rustc --version` (and `cargo --version` if relevant).
+      placeholder: "rustc 1.x.x"
+    validations:
+      required: false
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Minimal steps starting from a clean clone when possible.
+      placeholder: |
+        1. npm install
+        2. npm run tauri:dev
+        3. …
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs and evidence
+      description: |
+        Relevant excerpts from `other/logging/app/` or `other/logging/build/`
+        (`[TIME]_[DATE]_[APPVERSION].log`). Redact secrets before pasting.
+      render: shell
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I reproduced this on a clean clone (or documented why I could not).
+          required: false
+        - label: I searched existing issues and did not find a duplicate.
+          required: true
+        - label: This report does not contain secrets or credentials.
+          required: true

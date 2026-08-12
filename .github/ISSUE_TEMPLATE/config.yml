@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Development guide
+    url: https://github.com/ATOMANGELETTI/GenSource.Template/blob/main/other/documents/development.md
+    about: Layout, env files, and day-to-day test workflows.
+  - name: Packaging guide
+    url: https://github.com/ATOMANGELETTI/GenSource.Template/blob/main/other/documents/packaging.md
+    about: Windows NSIS builds, portable zips, and fork identity checklist.
+  - name: Security policy
+    url: https://github.com/ATOMANGELETTI/GenSource.Template/blob/main/.github/SECURITY.md
+    about: Report vulnerabilities privately — do not file public security issues.

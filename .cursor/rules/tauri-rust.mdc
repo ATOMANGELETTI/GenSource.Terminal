@@ -1,0 +1,20 @@
+---
+description: Tauri v2 Rust backend — commands, state, capabilities
+globs: src-tauri/**/*
+alwaysApply: false
+---
+
+# Tauri / Rust
+
+- Add `#[tauri::command]` handlers in `src-tauri/src/commands/commands.rs`.
+- Register new commands in the `invoke_handler` list in `src-tauri/src/lib.rs`.
+- Shared state: `src-tauri/src/state/state.rs`. Models: `src-tauri/src/mdoels/`
+  (preserve the `mdoels` spelling unless asked to rename).
+- Permission changes: update `src-tauri/capabilities/default.json` and
+  `desktop.json` when desktop-only grants apply.
+- Prefer `?` / mapped errors over bare `unwrap()` in command paths.
+
+```text
+❌ BAD: new command file only — never registered, no capability entry
+✅ GOOD: commands.rs + lib.rs invoke_handler + capabilities as needed
+```

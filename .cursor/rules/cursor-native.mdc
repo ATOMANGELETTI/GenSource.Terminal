@@ -1,0 +1,23 @@
+---
+description: Extend .cursor/ using only Cursor-native rules, skills, commands, agents, hooks, MCP, CLI
+globs: .cursor/**
+alwaysApply: false
+---
+
+# Cursor-native agent context
+
+- Allowed under `.cursor/`: `AGENTS.md`, `rules/*.mdc`, `skills/*/SKILL.md`,
+  `commands/*.md`, `agents/*.md`, `hooks.json`, `hooks/`, `mcp.json`,
+  `cli.json`.
+- Do **not** recreate custom trees (`personas/`, `memory/`, `workflows/`,
+  `instructions/`, top-level `scripts/`, etc.).
+- Rules use `.mdc` — not `.rules.md`.
+- Slash commands use `.md` — not `.command.md`.
+- Subagents use `.cursor/agents/<name>.md` — not `.agent.md`.
+- New multi-step workflows → a skill via `create-skill-pro`.
+- Cross-cutting automation → `.cursor/hooks/` (Node `.mjs`).
+
+```text
+❌ BAD: .cursor/personas/ or .cursor/agents/foo.agent.md
+✅ GOOD: .cursor/agents/foo.md and .cursor/rules/bar.mdc
+```

@@ -1,0 +1,21 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "tray-menu",
+  "description": "Minimal ACL for the ephemeral tray flyout (show/hide main, prefs, updates, quit).",
+  "windows": ["tray-menu"],
+  "permissions": [
+    "core:default",
+    "core:window:allow-show",
+    "core:window:allow-hide",
+    "core:window:allow-set-focus",
+    "core:window:allow-is-visible",
+    "core:event:default",
+    "core:tray:default",
+    "allow-app-commands",
+    "log:default",
+    "opener:default",
+    "notification:default",
+    "updater:default",
+    "os:default"
+  ]
+}

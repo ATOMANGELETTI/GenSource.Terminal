@@ -1,0 +1,181 @@
+:root {
+  /* Nord palette swatches (Polar Night · Snow Storm · Frost · Aurora) */
+  --nord0: #2e3440;
+  --nord1: #3b4252;
+  --nord2: #434c5e;
+  --nord3: #4c566a;
+  --nord4: #d8dee9;
+  --nord5: #e5e9f0;
+  --nord6: #eceff4;
+  --nord7: #8fbcbb;
+  --nord8: #88c0d0;
+  --nord9: #81a1c1;
+  --nord10: #5e81ac;
+  --nord11: #bf616a;
+  --nord12: #d08770;
+  --nord13: #ebcb8b;
+  --nord14: #a3be8c;
+  --nord15: #b48ead;
+
+  /* macOS traffic lights (constant across every theme) */
+  --traffic-close: #ff5f57;
+  --traffic-minimize: #febc2e;
+  --traffic-maximize: #28c840;
+
+  /* Fallback semantic tokens (= nord-polar-night) for first paint before JS
+     applies `data-theme`, and for any unrecognized theme value. */
+  --bg: var(--nord0);
+  --surface: var(--nord1);
+  --border: var(--nord3);
+  --text: var(--nord6);
+  --text-muted: var(--nord4);
+  --accent: var(--nord8);
+  --hover: var(--nord2);
+  --danger: var(--nord11);
+  --warning: var(--nord13);
+  --success: var(--nord14);
+  --info: var(--nord15);
+
+  color-scheme: dark;
+}
+
+/*
+ * Nord themes by palette group. Frost and Aurora each have dark + light
+ * ambiance variants; `resolveTheme` picks the matching one from the OS
+ * prefers-color-scheme when the preference is frost / aurora / system.
+ */
+
+/* Polar Night — dark ambiance, balanced frost-cyan accent. */
+[data-theme="nord-polar-night"] {
+  --bg: var(--nord0);
+  --surface: var(--nord1);
+  --border: var(--nord3);
+  --text: var(--nord6);
+  --text-muted: var(--nord4);
+  --accent: var(--nord8);
+  --hover: var(--nord2);
+  --danger: var(--nord11);
+  --warning: var(--nord13);
+  --success: var(--nord14);
+  --info: var(--nord15);
+
+  color-scheme: dark;
+}
+
+/* Snow Storm — bright ambiance, deep frost-blue accent. */
+[data-theme="nord-snow-storm"] {
+  --bg: var(--nord6);
+  --surface: var(--nord5);
+  --border: var(--nord4);
+  --text: var(--nord0);
+  --text-muted: var(--nord3);
+  --accent: var(--nord10);
+  --hover: var(--nord4);
+  --danger: var(--nord11);
+  --warning: var(--nord13);
+  --success: var(--nord14);
+  --info: var(--nord15);
+
+  color-scheme: light;
+}
+
+/* Frost (dark) — cool cyan-forward; Frost palette drives chrome. */
+[data-theme="nord-frost"] {
+  --bg: var(--nord0);
+  --surface: var(--nord1);
+  --border: var(--nord10);
+  --text: var(--nord6);
+  --text-muted: var(--nord9);
+  --accent: var(--nord7);
+  --hover: var(--nord2);
+  --danger: var(--nord11);
+  --warning: var(--nord13);
+  --success: var(--nord14);
+  --info: var(--nord8);
+
+  color-scheme: dark;
+}
+
+/* Frost (light) — Snow Storm bases with Frost chrome. */
+[data-theme="nord-frost-light"] {
+  --bg: var(--nord6);
+  --surface: var(--nord5);
+  --border: var(--nord10);
+  --text: var(--nord0);
+  --text-muted: var(--nord10);
+  --accent: var(--nord7);
+  --hover: var(--nord4);
+  --danger: var(--nord11);
+  --warning: var(--nord13);
+  --success: var(--nord14);
+  --info: var(--nord8);
+
+  color-scheme: light;
+}
+
+/* Aurora (dark) — warm colorful; Aurora palette drives chrome. */
+[data-theme="nord-aurora"] {
+  --bg: var(--nord0);
+  --surface: var(--nord1);
+  --border: var(--nord15);
+  --text: var(--nord6);
+  --text-muted: var(--nord4);
+  --accent: var(--nord12);
+  --hover: var(--nord2);
+  --danger: var(--nord11);
+  --warning: var(--nord13);
+  --success: var(--nord14);
+  --info: var(--nord15);
+
+  color-scheme: dark;
+}
+
+/* Aurora (light) — Snow Storm bases with Aurora chrome. */
+[data-theme="nord-aurora-light"] {
+  --bg: var(--nord6);
+  --surface: var(--nord5);
+  --border: var(--nord15);
+  --text: var(--nord0);
+  --text-muted: var(--nord3);
+  --accent: var(--nord12);
+  --hover: var(--nord4);
+  --danger: var(--nord11);
+  --warning: var(--nord13);
+  --success: var(--nord14);
+  --info: var(--nord15);
+
+  color-scheme: light;
+}
+
+@theme {
+  --color-nord0: var(--nord0);
+  --color-nord1: var(--nord1);
+  --color-nord2: var(--nord2);
+  --color-nord3: var(--nord3);
+  --color-nord4: var(--nord4);
+  --color-nord5: var(--nord5);
+  --color-nord6: var(--nord6);
+  --color-nord7: var(--nord7);
+  --color-nord8: var(--nord8);
+  --color-nord9: var(--nord9);
+  --color-nord10: var(--nord10);
+  --color-nord11: var(--nord11);
+  --color-nord12: var(--nord12);
+  --color-nord13: var(--nord13);
+  --color-nord14: var(--nord14);
+  --color-nord15: var(--nord15);
+
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-accent: var(--accent);
+  --color-hover: var(--hover);
+  --color-danger: var(--danger);
+  --color-warning: var(--warning);
+  --color-success: var(--success);
+  --color-info: var(--info);
+
+  --font-sans: Terminus, ui-monospace, monospace;
+}

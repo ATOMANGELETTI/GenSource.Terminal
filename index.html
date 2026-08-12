@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GenSource Template</title>
+    <!-- Critical first-paint bg before Vite/CSS modules load (avoids white flash). -->
+    <style>
+      html,
+      body,
+      #root {
+        margin: 0;
+        height: 100%;
+        background: #2e3440;
+      }
+      @media (prefers-color-scheme: light) {
+        html,
+        body,
+        #root {
+          background: #eceff4;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/app/main.tsx"></script>
+  </body>
+</html>

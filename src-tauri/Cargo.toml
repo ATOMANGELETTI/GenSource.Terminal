@@ -1,0 +1,58 @@
+[package]
+name = "gensource-template"
+version = "0.1.1"
+description = "GenSource Tauri v2 desktop app template"
+authors = ["GenSource"]
+edition = "2021"
+
+[lib]
+name = "app_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+# Core
+tauri = { version = "2", features = ["tray-icon", "image-png"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+log = "0.4.33"
+notify = "7"
+time = { version = "0.3", features = ["local-offset", "formatting"] }
+
+# Desktop plugins (kitchen sink; mobile-only plugins intentionally omitted:
+# barcode-scanner, biometric, geolocation, haptics, nfc). `localhost` is
+# also omitted since it conflicts with the standard Vite/Tauri dev-server
+# asset serving already used by this template.
+tauri-plugin-log = "2.9.0"
+tauri-plugin-fs = "2.5.1"
+tauri-plugin-dialog = "2.7.2"
+tauri-plugin-store = "2.4.4"
+tauri-plugin-opener = "2.5.4"
+tauri-plugin-notification = "2.3.3"
+tauri-plugin-os = "2.3.2"
+tauri-plugin-process = "2.3.1"
+tauri-plugin-clipboard-manager = "2.3.2"
+tauri-plugin-shell = "2.3.5"
+tauri-plugin-http = "2.5.9"
+tauri-plugin-deep-link = "2.4.9"
+tauri-plugin-global-shortcut = "2.3.2"
+tauri-plugin-updater = "2.10.1"
+tauri-plugin-sql = { version = "2.4.0", features = ["sqlite"] }
+tauri-plugin-window-state = "2.4.1"
+tauri-plugin-single-instance = { version = "2.4.3", features = ["deep-link"] }
+tauri-plugin-autostart = "2.5.1"
+tauri-plugin-positioner = { version = "2.3.3", features = ["tray-icon"] }
+tauri-plugin-persisted-scope = "2.3.7"
+tauri-plugin-stronghold = "2.3.1"
+tauri-plugin-upload = "2.4.0"
+tauri-plugin-websocket = "2.4.2"
+tauri-plugin-cli = "2.4.1"
+json_comments = "0.2"
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+opt-level = "s"

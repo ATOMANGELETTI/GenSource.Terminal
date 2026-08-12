@@ -1,0 +1,135 @@
+// =============================================================================
+// keybindings.json — user-editable keyboard shortcuts
+// =============================================================================
+// Location (dev):     <repo>/other/configs/keybindings.json
+// Location (install): <folder next to the .exe>/other/configs/keybindings.json
+//
+// How to use:
+//   1. Change "shortcut", "enabled", or "scope" on an existing binding and save.
+//   2. Restart the app for global shortcuts to re-register (local shortcuts
+//      are read when the frontend loads — restart or reload after edits).
+//   3. Use Ctrl+, to open this configs folder from the app.
+//   4. Comments (// and /* */) are allowed — this is JSONC, not strict JSON.
+//
+// Binding fields:
+//   id       — stable action id wired in code (do not rename unless you also
+//              update the Rust/frontend handlers).
+//   shortcut — chord string, e.g. "Ctrl+Shift+G", "Ctrl+=", "Ctrl+,".
+//              Use "" and "enabled": false to leave an action unbound.
+//   enabled  — false skips registration / in-app handling.
+//   scope    — "global" = OS-wide (works even when unfocused; handled in Rust).
+//              "local"  = only while this app window is focused (frontend).
+//              Prefer "local" for editing keys (Reload, Copy, Paste, Zoom, …)
+//              so they do not hijack other applications.
+//
+// Modifier names: Ctrl, Shift, Alt, Super/Meta (platform-dependent).
+// =============================================================================
+{
+  "bindings": [
+    // --- Global (Rust / OS-wide) ---------------------------------------------
+    {
+      // Show + focus the main window (even when hidden / unfocused).
+      "id": "window.show",
+      "shortcut": "Ctrl+Shift+G",
+      "enabled": true,
+      "scope": "global"
+    },
+    {
+      // Hide the main window.
+      "id": "window.hide",
+      "shortcut": "Ctrl+Shift+H",
+      "enabled": true,
+      "scope": "global"
+    },
+    {
+      // Quit the application.
+      "id": "app.quit",
+      "shortcut": "Ctrl+Shift+Q",
+      "enabled": true,
+      "scope": "global"
+    },
+
+    // --- Local content / menus (frontend) ------------------------------------
+    {
+      // Reload the webview.
+      "id": "content.reload",
+      "shortcut": "Ctrl+R",
+      "enabled": true,
+      "scope": "local"
+    },
+    {
+      "id": "content.zoomIn",
+      "shortcut": "Ctrl+=",
+      "enabled": true,
+      "scope": "local"
+    },
+    {
+      "id": "content.zoomOut",
+      "shortcut": "Ctrl+-",
+      "enabled": true,
+      "scope": "local"
+    },
+    {
+      "id": "content.zoomReset",
+      "shortcut": "Ctrl+0",
+      "enabled": true,
+      "scope": "local"
+    },
+    {
+      "id": "content.copy",
+      "shortcut": "Ctrl+C",
+      "enabled": true,
+      "scope": "local"
+    },
+    {
+      "id": "content.paste",
+      "shortcut": "Ctrl+V",
+      "enabled": true,
+      "scope": "local"
+    },
+    {
+      // Opens this other/configs/ folder in the system file manager.
+      "id": "content.preferences",
+      "shortcut": "Ctrl+,",
+      "enabled": true,
+      "scope": "local"
+    },
+    {
+      // Menu label only / future hook — unbound by default.
+      "id": "content.about",
+      "shortcut": "",
+      "enabled": false,
+      "scope": "local"
+    },
+
+    // --- Local titlebar ------------------------------------------------------
+    {
+      // Minimize (macOS-style "hide to dock/taskbar" toggle in this shell).
+      "id": "titlebar.toggleWindow",
+      "shortcut": "Ctrl+M",
+      "enabled": true,
+      "scope": "local"
+    },
+    {
+      "id": "titlebar.toggleMaximize",
+      "shortcut": "Ctrl+Shift+M",
+      "enabled": true,
+      "scope": "local"
+    },
+    {
+      "id": "titlebar.close",
+      "shortcut": "Ctrl+W",
+      "enabled": true,
+      "scope": "local"
+    },
+
+    // --- Tray / extras -------------------------------------------------------
+    {
+      // Reserved for tray "Check for updates" — unbound by default.
+      "id": "tray.checkUpdates",
+      "shortcut": "",
+      "enabled": false,
+      "scope": "local"
+    }
+  ]
+}

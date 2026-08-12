@@ -1,0 +1,13 @@
+# Windows-first defaults. Keep minimal; override per-machine via a global
+# cargo config or CARGO_* env vars if you need machine-specific flags.
+#
+# LNK4098: prebuilt libsodium (tauri-plugin-stronghold) links LIBCMTD while
+# Rust uses a different CRT. Safe to ignore for this vendored static lib.
+# LNK4099 cannot be /IGNORE'd on many MSVC toolchains; that noise is allowed
+# via `linker_messages` in lib.rs / main.rs instead.
+
+[target.x86_64-pc-windows-msvc]
+rustflags = ["-C", "link-arg=/IGNORE:4098"]
+
+[target.i686-pc-windows-msvc]
+rustflags = ["-C", "link-arg=/IGNORE:4098"]

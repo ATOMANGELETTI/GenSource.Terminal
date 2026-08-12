@@ -1,0 +1,10 @@
+# TESTING COMMANDS
+
+npm test
+npm run test:e2e
+npm run test:e2e:update
+
+# PACKAGING COMMANDS
+
+npm run package
+npm run package:clean

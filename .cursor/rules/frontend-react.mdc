@@ -1,0 +1,21 @@
+---
+description: React/TypeScript frontend layout under src/app/
+globs: src/app/**/*.{ts,tsx,css}
+alwaysApply: false
+---
+
+# Frontend (React)
+
+- Pages live under `src/app/pages/` using PascalCase component filenames
+  (e.g. `Window.tsx`).
+- Global styles: `src/app/styles/`. Module styles may live under
+  `src/app/styles/modules/` when that tree already exists.
+- Shared types: `src/app/types/` — put Tauri IPC types in `tauri.ts`.
+- Call backend commands via Tauri `invoke()` with types from `types/tauri.ts`.
+- When filling placeholders, keep the existing path/name intent; do not
+  invent a second app tree.
+
+```tsx
+// ❌ BAD: src/components/Home.tsx (outside template layout)
+// ✅ GOOD: src/app/pages/Home.tsx
+```

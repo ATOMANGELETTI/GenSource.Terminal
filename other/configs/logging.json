@@ -1,0 +1,24 @@
+// =============================================================================
+// logging.json — which log levels are written to other/logging/app/
+// =============================================================================
+// Location (dev):     <repo>/other/configs/logging.json
+// Location (install): <folder next to the .exe>/other/configs/logging.json
+//
+// How to use:
+//   1. Set each level to true (include) or false (exclude) and save.
+//   2. Changes apply automatically while the app is running (file watcher).
+//   3. Unknown keys are ignored; missing keys fall back to defaults.
+//   4. Comments (// and /* */) are allowed — this is JSONC, not strict JSON.
+//
+// Levels map to the Rust `log` crate except `fatal`, which is a separate
+// channel (error-level messages tagged with target gensource::fatal).
+// Build logs under other/logging/build/ are full transcripts and ignore this file.
+// =============================================================================
+{
+  "error": true,
+  "warn": true,
+  "info": true,
+  "debug": false,
+  "trace": false,
+  "fatal": true
+}

@@ -1,0 +1,22 @@
+/* The tray-menu window itself has no chrome (transparent, no decorations,
+   no shadow — see tauri.conf.json). Only the flat .context-menu surface
+   should paint — match titlebar/content overlay menus, not a filled rect. */
+
+html:has(.tray-window),
+html:has(.tray-window) body,
+html:has(.tray-window) #root {
+  background: transparent;
+}
+
+.tray-window {
+  width: 100%;
+  height: 100%;
+  padding: 6px;
+  background: transparent;
+}
+
+.tray-window .context-menu {
+  width: 100%;
+  height: auto;
+  min-width: 0;
+}

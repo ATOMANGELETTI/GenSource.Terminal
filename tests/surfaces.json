@@ -1,0 +1,88 @@
+{
+  "surfaces": [
+    {
+      "id": "theme-resolve",
+      "kind": "unit",
+      "path": "tests/unit/theme.test.ts"
+    },
+    {
+      "id": "splash-progress",
+      "kind": "unit",
+      "path": "tests/unit/splash-progress.test.ts"
+    },
+    {
+      "id": "e2e-window",
+      "kind": "unit",
+      "path": "tests/unit/e2e-window.test.ts"
+    },
+    {
+      "id": "settings-font",
+      "kind": "unit",
+      "path": "tests/unit/settings-font.test.ts"
+    },
+    {
+      "id": "window-close",
+      "kind": "unit",
+      "path": "tests/unit/window-close.test.ts"
+    },
+    {
+      "id": "packaging-invariants",
+      "kind": "unit",
+      "path": "tests/unit/packaging-invariants.test.ts"
+    },
+    {
+      "id": "smoke",
+      "kind": "unit",
+      "path": "tests/unit/smoke.test.ts"
+    },
+    {
+      "id": "shell",
+      "kind": "e2e",
+      "path": "tests/e2e/shell.spec.ts",
+      "visual": true
+    },
+    {
+      "id": "themes",
+      "kind": "e2e",
+      "path": "tests/e2e/themes.spec.ts",
+      "visual": true
+    },
+    {
+      "id": "fonts",
+      "kind": "e2e",
+      "path": "tests/e2e/fonts.spec.ts",
+      "visual": true
+    },
+    {
+      "id": "menus",
+      "kind": "e2e",
+      "path": "tests/e2e/menus.spec.ts",
+      "visual": true
+    },
+    {
+      "id": "about",
+      "kind": "e2e",
+      "path": "tests/e2e/about.spec.ts",
+      "visual": true
+    },
+    {
+      "id": "splash",
+      "kind": "e2e",
+      "path": "tests/e2e/splash.spec.ts",
+      "visual": true
+    },
+    {
+      "id": "tray",
+      "kind": "e2e",
+      "path": "tests/e2e/tray.spec.ts",
+      "visual": true
+    }
+  ],
+  "commands": {
+    "unit": "npm test",
+    "e2e": "npm run test:e2e",
+    "e2eUpdate": "npm run test:e2e:update"
+  },
+  "artifactsDir": "tests/artifacts",
+  "baselinesDir": "tests/e2e/baselines"
+}

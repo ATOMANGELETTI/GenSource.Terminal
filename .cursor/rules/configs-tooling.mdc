@@ -1,0 +1,18 @@
+---
+description: Keep build/test tooling config centralized under src/configs/
+globs: src/configs/**/*
+alwaysApply: false
+---
+
+# Configs & tooling
+
+- Edit existing files under `src/configs/` in place.
+- Do not add duplicate root-level `vite.config.*`, `vitest.config.*`,
+  `playwright.config.*`, or `eslint.config.*`.
+- Root `tsconfig.json` should continue to **reference** the split configs
+  (`tsconfig.app.json`, `tsconfig.node.json`, etc.), not replace them.
+
+```text
+❌ BAD: new eslint.config.js at repo root
+✅ GOOD: edit src/configs/eslint.config.js
+```

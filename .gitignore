@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+release/
+build/
+src-tauri/target/
+src-tauri/gen/schemas/*.json
+!src-tauri/gen/schemas/.gitkeep
+
+# Test / coverage artifacts
+tests/artifacts/
+coverage/
+playwright-report/
+test-results/
+*.lcov
+
+# Env secrets (track `.env.example` names only)
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+other/logging/app/*
+other/logging/build/*
+!other/logging/app/.gitkeep
+!other/logging/build/.gitkeep
+other/utilities/scripts/archive/*
+!other/utilities/scripts/archive/.gitkeep
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+*.iml
+
+# Lock / cache
+.vite/
+.turbo/
+.cache/
+*.tsbuildinfo
+
+# Cargo
+**/*.rs.bk
