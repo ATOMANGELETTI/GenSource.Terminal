@@ -1,0 +1,210 @@
+src/app/components/icons/MenuIcons.tsx
+  s_444898fc260032::t_6be6c05ed5deb9 183-231
+other/configs/settings.json
+  s_19d95ca64f25f9::t_b9aec2fdac5c87 7-27
+src/configs/.tsbuildinfo-test
+  s_c379ca795745a3::t_5440a889e8eea2 1
+src/app/styles/modules/motion/transitions.css
+  s_1f650696ef2b43::t_58cf47bc251d58 26-64,75-76,85-90,96-97
+  s_c379ca795745a3::t_ed8e63ce85c062 91-95
+  s_c379ca795745a3::t_c17cbe98e1da7a 65-74
+src/app/components/terminal/XtermView.tsx
+  s_c379ca795745a3::t_2e2513193c87de 227,230-238
+  s_c379ca795745a3::t_c309d119f624fd 11
+  s_1f650696ef2b43::t_9e3dd9d2171163 1-10,12-67,74-226,228-229,239-243
+  s_c379ca795745a3::t_d980341dc18db4 68-73
+src/app/lib/terminal/nord-xterm-theme.ts
+  s_1f650696ef2b43::t_31c1e44bc94e4a 1-39
+.gitignore
+  h_90ad036e211778 48-50
+other/configs/README.md
+  s_444898fc260032::t_9a3b2dfca735a4 150-161
+  s_19d95ca64f25f9::t_edec15e3d70857 24,34-40,44-62
+src/app/hooks/usePinnedTabs.ts
+  s_444898fc260032::t_2662bd855b9867 1-13,21-46
+  s_444898fc260032::t_cfabaddbe81b90 14-20
+src/app/components/terminal/TabBar.tsx
+  s_1f650696ef2b43::t_fbdd609b52700f 1-51
+src/app/styles/modules/terminal/pane.css
+  s_c379ca795745a3::t_39782fc60b710b 20,38,45,55-59,62,67-68,75-76,83-86,99-100,114-118
+  s_1f650696ef2b43::t_c000f0500dab5a 1-19,21-37,39-44,46-54,60-61,63-66,69-74,77-82,87-98,101-113,119-123
+src/configs/.tsbuildinfo-e2e
+  s_c379ca795745a3::t_281f1dd081191c 1
+src/app/components/terminal/Tab.tsx
+  s_c379ca795745a3::t_08053d052871f2 3
+  s_c379ca795745a3::t_f2b291d462ae90 80,89-91
+  s_1f650696ef2b43::t_54174ca53c69c3 1-2,4-79,81-88,92-95
+src/app/styles/modules/terminal/tabs.css
+  s_1f650696ef2b43::t_3d68a8d62d548e 1-5,7-23,27,29-35,37-57,59-60,62-85,88-95,97-98,104-108,114-115,122-132,134-140,142-147,156
+  s_c379ca795745a3::t_6c47ce7fefa5db 6,24-26,28,36,58,61,86-87,96,99-103,109-113,116-121,133,141,148-155
+src/app/types/index.ts
+  s_19d95ca64f25f9::t_1049bfb7c70868 4,9-18
+src-tauri/Cargo.toml
+  s_ca70b7df491a85::t_b18db247c89ce1 53-54
+src-tauri/src/pty/mod.rs
+  s_ca70b7df491a85::t_b8b5fb0fe22d0d 1-5
+src-tauri/src/pty/pool.rs
+  s_ca70b7df491a85::t_a8397bec09097e 1-77,80-199
+  s_ca70b7df491a85::t_077f90143e4c8f 78-79
+src-tauri/src/config/mod.rs
+  s_19d95ca64f25f9::t_1214ab509cd0ec 156-188,191,203-205
+  s_19d95ca64f25f9::t_8aab7eac8ae84f 482-488
+  s_19d95ca64f25f9::t_432c83bb753335 619,624-630
+  s_19d95ca64f25f9::t_7b038c00e5d081 746-783
+src/app/styles/modules/terminal/xterm.css
+  s_c379ca795745a3::t_480b7c557528c7 3-8,12,22-26,31-32
+  s_c379ca795745a3::t_85e7166efa99f7 27-30,33-38
+  s_1f650696ef2b43::t_b3352d167b8e51 1-2,9-11,13-21,39
+src/app/hooks/usePtySession.ts
+  s_1f650696ef2b43::t_5b0676e2b98942 1-62,78-123,138-146,155-250
+  s_1f650696ef2b43::t_71c2975c259af5 124-125,129-137
+  s_c379ca795745a3::t_09fc2de3391b71 63-77
+  s_c379ca795745a3::t_c4788b3cab7d2f 147-154
+  s_c379ca795745a3::t_de65b770dec6cc 126-128
+src/app/styles/modules/layout/shell.css
+  s_1f650696ef2b43::t_c767198dcdd3e9 21-26
+src/configs/.tsbuildinfo-app
+  s_c379ca795745a3::t_5440a889e8eea2 1
+src-tauri/src/mdoels/models.rs
+  s_19d95ca64f25f9::t_72a75e2d5d6e77 68-115,132-145,169-175,180-229
+tests/unit/pinned-tabs.test.ts
+  s_444898fc260032::t_99a48c246050d7 1-68
+src/app/pages/content-menus/content-area-menu.tsx
+  s_444898fc260032::t_be805218b35030 3-4,6-7,9,22-34,39,48,57-59,114-182,192
+src/app/App.tsx
+  s_444898fc260032::t_207f36b4275aca 1,7-9,34,140-144,157,170-175,178
+  s_c379ca795745a3::t_a004235771f15d 103-124,134-135
+  s_1f650696ef2b43::t_b973202204566b 154
+  s_c379ca795745a3::t_0875dfc30b6cb8 176-177
+src/app/components/terminal/TerminalWorkspace.tsx
+  s_444898fc260032::t_f8d55703c6e226 207-219,250,284,290-296,298-309,311-312
+  s_c379ca795745a3::t_053a52e0155592 482
+  s_1f650696ef2b43::t_11d3e2b58fdb21 1-10,12,14-18,21-48,50-68,70-82,84-116,120-146,151,153-155,160,162-206,220-227,229-233,243-249,251-264,268-283,285-289,297,310,313-365,386-427,439-481,483-488,490-496,498-551,553-562
+  s_444898fc260032::t_854a7b87b784eb 11,13,19-20
+  s_c379ca795745a3::t_f75873bec47a75 234-242
+  s_1f650696ef2b43::t_f7da41889f7f96 49,69,83,117-119,147-150,152,156-159,161,228,265-267,366-385,428-438,489,497,552
+src/app/hooks/useTerminalSettings.ts
+  s_c379ca795745a3::t_b1caba7de61f9f 54-56
+  s_444898fc260032::t_4ba1103f183a62 1-53,57-103
+src/app/lib/terminal/pinned-tabs.ts
+  s_444898fc260032::t_4330c6cdcdf176 1-99
+src-tauri/src/commands/commands.rs
+  s_ca70b7df491a85::t_e3800d96de563f 4-5,9-13
+  s_ca70b7df491a85::t_c3ed0b437ff8d6 104-147
+src/app/components/terminal/FindBar.tsx
+  s_1f650696ef2b43::t_d63d4cd7d3f73f 1-80
+tests/e2e/terminal-pins.spec.ts
+  s_c379ca795745a3::t_d4ba1aa977a636 1-45,55
+  s_c379ca795745a3::t_8a20042de3d84a 46-54
+src/app/lib/terminal/session-manager.ts
+  s_444898fc260032::t_f996928c7a5c33 1-11,14-16,21-28,47
+  s_1f650696ef2b43::t_5605a8fcfcb1a2 12-13,17-20,29-46
+src/app/styles/index.css
+  s_1f650696ef2b43::t_05c8cc0ed4181c 10-13
+src-tauri/permissions/app-commands.toml
+  s_ca70b7df491a85::t_028f573da4c672 13-16
+src/app/components/terminal/TerminalPane.tsx
+  s_1f650696ef2b43::t_b130dd661a50d2 1-116
+src/app/types/tauri.ts
+  s_19d95ca64f25f9::t_82fc4f0bbfbd3a 10-19,27-81
+src-tauri/src/lib.rs
+  s_ca70b7df491a85::t_3137ff700f5017 137,147-150
+  s_ca70b7df491a85::t_c2ce8739b7196e 294-307
+  s_ca70b7df491a85::t_83391d45b6dcea 14
+src/app/styles/modules/terminal/workspace.css
+  s_1f650696ef2b43::t_baf311cb77b02d 1-15,17-42
+  s_c379ca795745a3::t_22e8dc05de4844 16
+tests/unit/terminal-settings.test.ts
+  s_444898fc260032::t_9628dec8b272ad 1-39
+src/app/lib/e2e-window.ts
+  s_19d95ca64f25f9::t_40d2b781f9bc41 25-44
+src/app/lib/terminal/terminal-settings.ts
+  s_444898fc260032::t_eb8cc367eecba3 1-105
+tests/e2e/shell.spec.ts
+  s_c379ca795745a3::t_761d019581051d 6,9-10
+tests/surfaces.json
+  s_c379ca795745a3::t_8e7e1046ce4193 33-47,59-64
+other/configs/keybindings.json
+  s_444898fc260032::t_9b9f3f53ce4acf 92-121
+package-lock.json
+  s_1f650696ef2b43::t_de9b4186c6068d 35-37,3370-3390
+package.json
+  s_1f650696ef2b43::t_a6063b02b1d73e 53-55
+.cursor/hooks/state/continual-learning.json
+  h_90ad036e211778 4,6
+other/documents/licenses/NerdFonts/License_Symbols
+  h_90ad036e211778 1-21
+public/fonts/nerdfonts/symbols/10-nerd-font-symbols.conf
+  h_90ad036e211778 1-1492
+public/fonts/nerdfonts/symbols/README.md
+  h_90ad036e211778 1-67
+public/fonts/nerdfonts/symbols/SymbolsNerdFont-Regular.ttf
+  h_90ad036e211778 1-3
+public/fonts/nerdfonts/symbols/SymbolsNerdFontMono-Regular.ttf
+  h_90ad036e211778 1-3
+public/icons/icon.ico
+  h_90ad036e211778 2
+public/icons/icon.png
+  h_90ad036e211778 2-3
+public/icons/temp/icon.ico
+  h_90ad036e211778 2
+public/icons/temp/icon.png
+  h_90ad036e211778 2-3
+public/icons/temp/icon.svg
+  h_90ad036e211778 1
+src-tauri/Cargo.lock
+  h_90ad036e211778 558,769-774,1805-1815,2158,2188,3560-3571,3580,4326-4346,4503,4544,5438-5448,5513-5528
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "136a53a77d577097ed2ae7745a6d7bf1a99e5c11",
+  "prompts": {},
+  "humans": {
+    "h_90ad036e211778": {
+      "author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  },
+  "sessions": {
+    "s_19d95ca64f25f9": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "92394847-9bb7-4164-a6ad-122d7665de7b",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_1f650696ef2b43": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "426bd52c-90ab-4c2c-bcf7-070bace136c6",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_444898fc260032": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "5c6e939b-8456-4616-b893-bbba861c0da9",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_c379ca795745a3": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "8e2434a6-d7d7-4cc4-b7fc-0017882a9b55",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_ca70b7df491a85": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "4ab8325e-5953-41ef-bc42-75548bf94904",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
