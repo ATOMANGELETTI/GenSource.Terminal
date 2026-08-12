@@ -6,6 +6,48 @@ export const PINNED_TABS_KEY = "terminal.pinnedTabs";
 
 const EMPTY: PinnedTabsState = { version: 1, tabs: [] };
 
+const PROMPT_MARKERS = ["❯", "$", "#", "%", ">"] as const;
+
+/**
+ * True for blank lines and idle shell prompts with no command text after the
+ * last prompt marker (e.g. `❯`, `PS C:\>`, `user@host ❯ ~ ❯`).
+ */
+export function isPromptOnlyLine(line: string): boolean {
+  const trimmed = line.trim();
+  if (trimmed.length === 0) {
+    return true;
+  }
+
+  let lastMarkerEnd = -1;
+  for (const marker of PROMPT_MARKERS) {
+    const idx = trimmed.lastIndexOf(marker);
+    if (idx !== -1) {
+      const end = idx + marker.length;
+      if (end > lastMarkerEnd) {
+        lastMarkerEnd = end;
+      }
+    }
+  }
+
+  if (lastMarkerEnd === -1) {
+    return false;
+  }
+
+  return trimmed.slice(lastMarkerEnd).trim().length === 0;
+}
+
+/**
+ * Drop blank and prompt-only lines so pinned tabs only persist real IO.
+ * Returns `""` when nothing remains (skip restore write; fresh PTY prompt only).
+ */
+export function sanitizePinnedScrollback(text: string): string {
+  if (!text) {
+    return "";
+  }
+  const survivors = text.split("\n").filter((line) => !isPromptOnlyLine(line));
+  return survivors.length === 0 ? "" : survivors.join("\n");
+}
+
 /** Keep only the last `maxLines` lines of scrollback text. */
 export function truncateScrollback(text: string, maxLines: number): string {
   if (maxLines <= 0) {
@@ -144,7 +186,7 @@ export function toPinnedRecords(
       profileId: tab.profileId,
       title: tab.title,
       scrollback: truncateScrollback(
-        scrollbacks.get(tab.tabId) ?? "",
+        sanitizePinnedScrollback(scrollbacks.get(tab.tabId) ?? ""),
         scrollbackLines,
       ),
       wasActive,
@@ -192,7 +234,7 @@ export function normalizePinnedTabsState(raw: unknown): PinnedTabsState {
       tabId: item.tabId,
       profileId: item.profileId,
       title: item.title,
-      scrollback: item.scrollback,
+      scrollback: sanitizePinnedScrollback(item.scrollback),
       wasActive,
     });
   }

@@ -52,6 +52,10 @@ tauri-plugin-cli = "2.4.1"
 json_comments = "0.2"
 portable-pty = "0.9"
 uuid = { version = "1", features = ["v4"] }
+sysinfo = "0.39"
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.61", features = ["Win32_System_Performance"] }
 
 [profile.release]
 panic = "abort"

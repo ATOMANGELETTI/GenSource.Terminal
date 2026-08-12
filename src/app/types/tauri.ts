@@ -102,3 +102,14 @@ export type GreetResponse = string;
 export interface GreetArgs {
   name: string;
 }
+
+/** Snapshot from `get_system_metrics`. */
+export interface SystemMetrics {
+  cpuPercent: number;
+  /** Omitted when GPU counters are unavailable. */
+  gpuPercent?: number;
+  ramUsedBytes: number;
+  ramTotalBytes: number;
+  netUpBps: number;
+  netDownBps: number;
+}

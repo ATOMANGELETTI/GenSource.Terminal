@@ -1,0 +1,34 @@
+---
+description: Maintain a live task checklist via TodoWrite for multi-step work
+alwaysApply: true
+---
+
+# Task checklist discipline
+
+For any task with **2+ steps**, create a todo list with **TodoWrite**
+before substantive work. Update it as you go — do not leave stale items.
+
+## When to use
+
+- **Do** create todos for features, fixes, refactors, migrations, and any
+  work that spans multiple files or phases.
+- **Skip** for pure Q&A, yes/no answers, or trivial one-shot edits (single
+  typo, one-line change with no follow-up).
+
+## How to maintain
+
+1. Break the task into concrete steps; create todos **before** editing or
+   running commands.
+2. Mark exactly **one** item `in_progress` at a time.
+3. Mark each item `completed` as soon as that step is done.
+4. Add new todos if scope grows; cancel items that are no longer needed.
+5. Before finishing, ensure every todo is `completed` or `cancelled` — no
+   lingering `pending` or `in_progress` items.
+
+Use **TodoWrite** (native Cursor todo UI). Do **not** use markdown
+checklists in chat as a substitute.
+
+```text
+❌ BAD: jump into edits, then paste a markdown checklist at the end
+✅ GOOD: TodoWrite with steps → mark in_progress → work → mark completed
+```

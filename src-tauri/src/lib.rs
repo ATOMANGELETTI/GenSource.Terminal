@@ -5,12 +5,12 @@
 // on Windows debug links; allow until upstream ships matching PDBs/CRT.
 #![cfg_attr(all(windows, target_env = "msvc"), allow(linker_messages))]
 
-#[path = "commands/commands.rs"]
 mod commands;
 mod config;
 mod logging;
 #[path = "mdoels/models.rs"]
 mod mdoels;
+mod metrics;
 mod pty;
 #[path = "state/state.rs"]
 mod state;
@@ -149,6 +149,17 @@ pub fn run() {
             commands::pty_write,
             commands::pty_resize,
             commands::pty_kill,
+            commands::fs_list_drives,
+            commands::fs_list_dir,
+            commands::fs_create_file,
+            commands::fs_create_dir,
+            commands::fs_rename,
+            commands::fs_remove,
+            commands::fs_entry_info,
+            commands::fs_open_path,
+            commands::fs_reveal_path,
+            commands::fs_username,
+            commands::get_system_metrics,
         ])
         .setup(|app| {
             // Stronghold needs a filesystem path for its key-derivation

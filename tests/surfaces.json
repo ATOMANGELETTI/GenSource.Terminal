@@ -46,6 +46,11 @@
       "path": "tests/unit/terminal-settings.test.ts"
     },
     {
+      "id": "file-tree-filter",
+      "kind": "unit",
+      "path": "tests/unit/file-tree-filter.test.ts"
+    },
+    {
       "id": "smoke",
       "kind": "unit",
       "path": "tests/unit/smoke.test.ts"

@@ -21,6 +21,7 @@ import {
 import {
   pinPersistSignature,
   resolvePinnedScrollback,
+  sanitizePinnedScrollback,
   shouldPersistPins,
   toPinnedRecords,
 } from "../../lib/terminal/pinned-tabs";
@@ -40,7 +41,7 @@ import TerminalPane from "./TerminalPane";
 import TerminalParticleField from "./TerminalParticleField";
 import type { XtermViewHandle } from "./XtermView";
 
-const DEFAULT_PANEL_WIDTH = 200;
+const DEFAULT_PANEL_WIDTH = 260;
 const PIN_SNAPSHOT_INTERVAL_MS = 5000;
 /** Safety net so a tab never stays shell-less if restore never reports ready. */
 const RESTORE_PTY_TIMEOUT_MS = 1500;
@@ -388,7 +389,10 @@ const TerminalWorkspace = forwardRef<TerminalWorkspaceHandle>(
           initial: t.initialScrollback,
         });
         if (live.length > 0) {
-          lastScrollbacksRef.current.set(t.tabId, live);
+          lastScrollbacksRef.current.set(
+            t.tabId,
+            sanitizePinnedScrollback(live),
+          );
         }
         scrollbacks.set(t.tabId, text);
       }
@@ -647,7 +651,10 @@ const TerminalWorkspace = forwardRef<TerminalWorkspaceHandle>(
           } else {
             const live = xtermHandles.current.get(tabId)?.getScrollbackText();
             if (live) {
-              lastScrollbacksRef.current.set(tabId, live);
+              lastScrollbacksRef.current.set(
+                tabId,
+                sanitizePinnedScrollback(live),
+              );
             }
           }
           return { ...t, pinned };

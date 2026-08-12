@@ -9,6 +9,7 @@
 @import "./modules/motion/transitions.css";
 @import "./modules/terminal/workspace.css";
 @import "./modules/terminal/side-panel.css";
+@import "./modules/terminal/explorer.css";
 @import "./modules/terminal/status-bar.css";
 @import "./modules/terminal/tabs.css";
 @import "./modules/terminal/pane.css";

@@ -27,6 +27,11 @@
   padding: 0.75rem;
 }
 
+.side-panel__content--flush {
+  padding: 0;
+  overflow: hidden;
+}
+
 .side-panel__placeholder {
   margin: 0;
   color: var(--text-muted);
@@ -73,6 +78,11 @@
   color: var(--text);
   background: var(--bg);
   border-top-color: var(--accent);
+}
+
+.side-panel__tab-icon {
+  width: 15px;
+  height: 15px;
 }
 
 .side-panel__tab-label {

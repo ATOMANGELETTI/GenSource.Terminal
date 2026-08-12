@@ -325,3 +325,42 @@ impl Default for LoggingSettings {
         }
     }
 }
+
+/// Files Explorer entry kind (`fs_list_drives` / `fs_list_dir` / `fs_entry_info`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum FsEntryKind {
+    Drive,
+    Dir,
+    File,
+}
+
+/// Serialized filesystem entry for the Files Explorer panel.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FsEntry {
+    pub name: String,
+    pub path: String,
+    pub kind: FsEntryKind,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub extension: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub size: Option<u64>,
+    /// RFC3339 timestamp when available.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub modified: Option<String>,
+}
+
+/// Snapshot from `get_system_metrics` (status-bar CPU / GPU / RAM / net).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SystemMetrics {
+    pub cpu_percent: f32,
+    /// `None` when GPU counters are unavailable (non-Windows or PDH failure).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub gpu_percent: Option<f32>,
+    pub ram_used_bytes: u64,
+    pub ram_total_bytes: u64,
+    pub net_up_bps: f64,
+    pub net_down_bps: f64,
+}

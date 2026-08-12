@@ -247,3 +247,134 @@ export function PanelLeftIcon(props: IconProps) {
     </svg>
   );
 }
+
+export function FolderIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M2.5 5.2V12a1.2 1.2 0 0 0 1.2 1.2h8.6A1.2 1.2 0 0 0 13.5 12V6.4A1.2 1.2 0 0 0 12.3 5.2H8L6.7 3.8H3.7A1.2 1.2 0 0 0 2.5 5z" />
+    </svg>
+  );
+}
+
+export function NewFileIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M4.5 2.5h4.2L11.5 5.3V13a.8.8 0 0 1-.8.8H4.5a.8.8 0 0 1-.8-.8V3.3a.8.8 0 0 1 .8-.8z" />
+      <path d="M8.5 2.5V5.3h2.8" />
+      <path d="M6 9h4M8 7v4" />
+    </svg>
+  );
+}
+
+export function NewFolderIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M2.5 5.2V12a1.2 1.2 0 0 0 1.2 1.2h8.6A1.2 1.2 0 0 0 13.5 12V6.4A1.2 1.2 0 0 0 12.3 5.2H8L6.7 3.8H3.7A1.2 1.2 0 0 0 2.5 5z" />
+      <path d="M8 8v3.2M6.4 9.6h3.2" />
+    </svg>
+  );
+}
+
+export function ChevronRightIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M6 3.5 10.5 8 6 12.5" />
+    </svg>
+  );
+}
+
+export function DriveIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <rect x="2.5" y="4" width="11" height="7.5" rx="1.2" />
+      <path d="M4.5 11.5v1M11.5 11.5v1" />
+      <circle cx="5.2" cy="7.8" r="0.7" fill="currentColor" stroke="none" />
+      <path d="M7.5 7.8h4" />
+    </svg>
+  );
+}
+
+export function OpenExternalIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M6.5 3.5H3.7A1.2 1.2 0 0 0 2.5 4.7v7.6A1.2 1.2 0 0 0 3.7 13.5h7.6a1.2 1.2 0 0 0 1.2-1.2V9.5" />
+      <path d="M9.5 2.5h4v4M13.5 2.5 7.5 8.5" />
+    </svg>
+  );
+}
+
+export function RevealIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M2.5 5.2V12a1.2 1.2 0 0 0 1.2 1.2h8.6A1.2 1.2 0 0 0 13.5 12V6.4A1.2 1.2 0 0 0 12.3 5.2H8L6.7 3.8H3.7A1.2 1.2 0 0 0 2.5 5z" />
+      <circle cx="8.5" cy="9" r="2" />
+      <path d="M10 10.5 12 12.5" />
+    </svg>
+  );
+}
+
+export function DeleteIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M3.5 4.5h9" />
+      <path d="M5.5 4.5V3.5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v1" />
+      <path d="M6 7v5M8 7v5M10 7v5" />
+      <path d="M4.5 4.5l.7 8.2a1 1 0 0 0 1 .8h3.6a1 1 0 0 0 1-.8l.7-8.2" />
+    </svg>
+  );
+}
+
+export function FileGenericIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M4.5 2.5h4.2L11.5 5.3V13a.8.8 0 0 1-.8.8H4.5a.8.8 0 0 1-.8-.8V3.3a.8.8 0 0 1 .8-.8z" />
+      <path d="M8.5 2.5V5.3h2.8" />
+    </svg>
+  );
+}
+
+export function CpuIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <rect x="4.5" y="4.5" width="7" height="7" rx="0.8" />
+      <path d="M6.5 6.5h3v3h-3z" />
+      <path d="M8 2.5v2M8 11.5v2M2.5 8h2M11.5 8h2M4.2 4.2l1.2 1.2M10.6 10.6l1.2 1.2M11.8 4.2l-1.2 1.2M5.4 10.6l-1.2 1.2" />
+    </svg>
+  );
+}
+
+export function GpuIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <rect x="2.5" y="4.5" width="11" height="7" rx="1" />
+      <circle cx="8" cy="8" r="1.6" />
+      <path d="M5 4.5V3.5M8 4.5V3.2M11 4.5V3.5M5 11.5v1M8 11.5v1.3M11 11.5v1" />
+    </svg>
+  );
+}
+
+export function MemoryIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <rect x="2.5" y="5" width="11" height="6" rx="0.8" />
+      <path d="M5 5v6M8 5v6M11 5v6" />
+      <path d="M4 11v1.5M7 11v1.5M10 11v1.5M13 11v1.5" />
+    </svg>
+  );
+}
+
+export function ArrowUpIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M8 12.5V3.5M4.5 7L8 3.5 11.5 7" />
+    </svg>
+  );
+}
+
+export function ArrowDownIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M8 3.5v9M4.5 9L8 12.5 11.5 9" />
+    </svg>
+  );
+}

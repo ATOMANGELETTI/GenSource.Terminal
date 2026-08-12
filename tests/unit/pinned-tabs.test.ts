@@ -4,6 +4,7 @@ import {
   normalizePinnedTabsState,
   pinPersistSignature,
   resolvePinnedScrollback,
+  sanitizePinnedScrollback,
   shouldPersistPins,
   shouldWritePinnedState,
   truncateScrollback,
@@ -94,6 +95,96 @@ describe("pinned-tabs", () => {
     expect(normalizePinnedTabsState({ version: 1, tabs: "nope" }).tabs).toEqual(
       [],
     );
+  });
+});
+
+describe("sanitizePinnedScrollback", () => {
+  it("clears idle-only buffers to empty", () => {
+    expect(sanitizePinnedScrollback("❯\n\n❯\n")).toBe("");
+    expect(sanitizePinnedScrollback("❯")).toBe("");
+    expect(sanitizePinnedScrollback("PS C:\\>")).toBe("");
+    expect(sanitizePinnedScrollback("DUSTI@msi-laptop ❯ ~ ❯")).toBe("");
+    expect(sanitizePinnedScrollback("\n\n  \n")).toBe("");
+  });
+
+  it("keeps command text after a prompt marker", () => {
+    expect(sanitizePinnedScrollback("❯ git status")).toBe("❯ git status");
+    expect(sanitizePinnedScrollback("$ ls -la")).toBe("$ ls -la");
+  });
+
+  it("preserves real output and strips trailing idle prompts", () => {
+    const input = [
+      "❯ git status",
+      "On branch main",
+      "nothing to commit",
+      "",
+      "❯",
+      "DUSTI@host ❯ ~ ❯",
+    ].join("\n");
+    expect(sanitizePinnedScrollback(input)).toBe(
+      ["❯ git status", "On branch main", "nothing to commit"].join("\n"),
+    );
+  });
+
+  it("clears stacked prompts on normalize", () => {
+    const state = normalizePinnedTabsState({
+      version: 1,
+      tabs: [
+        {
+          tabId: "1",
+          profileId: "powershell",
+          title: "Pinned",
+          scrollback: "❯\n\nPS C:\\>\nuser@host ❯ ~ ❯",
+          wasActive: true,
+        },
+      ],
+    });
+    expect(state.tabs[0]?.scrollback).toBe("");
+  });
+
+  it("does not persist blank or prompt-only text via toPinnedRecords", () => {
+    const tabs: TabState[] = [
+      {
+        tabId: "1",
+        sessionId: "s1",
+        profileId: "powershell",
+        title: "Pinned",
+        pinned: true,
+        status: "running",
+      },
+    ];
+    const state = toPinnedRecords(
+      tabs,
+      "1",
+      new Map([["1", "❯\n\nPS C:\\>"]]),
+      5000,
+    );
+    expect(state.tabs[0]?.scrollback).toBe("");
+  });
+
+  it("serializes sanitized real IO without trailing idle prompts", () => {
+    const tabs: TabState[] = [
+      {
+        tabId: "1",
+        sessionId: "s1",
+        profileId: "powershell",
+        title: "Pinned",
+        pinned: true,
+        status: "running",
+      },
+    ];
+    const state = toPinnedRecords(
+      tabs,
+      "1",
+      new Map([
+        [
+          "1",
+          "❯ echo hi\nhi\n❯",
+        ],
+      ]),
+      5000,
+    );
+    expect(state.tabs[0]?.scrollback).toBe("❯ echo hi\nhi");
   });
 });
 

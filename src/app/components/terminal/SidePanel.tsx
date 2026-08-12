@@ -5,14 +5,17 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from "react";
 
+import { FolderIcon } from "../icons/MenuIcons";
+import FilesExplorer from "./explorer/FilesExplorer";
+
 const MIN_WIDTH = 120;
 const MAX_WIDTH = 480;
 
 const SIDE_PANEL_TABS = [
-  { id: "tab-1", label: "Tab 1" },
-  { id: "tab-2", label: "Tab 2" },
-  { id: "tab-3", label: "Tab 3" },
-  { id: "tab-4", label: "Tab 4" },
+  { id: "files", label: "Files", iconOnly: true },
+  { id: "tab-2", label: "Tab 2", iconOnly: false },
+  { id: "tab-3", label: "Tab 3", iconOnly: false },
+  { id: "tab-4", label: "Tab 4", iconOnly: false },
 ] as const;
 
 type SidePanelTabId = (typeof SIDE_PANEL_TABS)[number]["id"];
@@ -25,7 +28,7 @@ interface SidePanelProps {
 
 export default function SidePanel({ open, width, onResize }: SidePanelProps) {
   const dragRef = useRef<{ startX: number; startWidth: number } | null>(null);
-  const [activeTab, setActiveTab] = useState<SidePanelTabId>("tab-1");
+  const [activeTab, setActiveTab] = useState<SidePanelTabId>("files");
 
   const handlePointerDown = useCallback(
     (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -68,8 +71,7 @@ export default function SidePanel({ open, width, onResize }: SidePanelProps) {
     [onResize, width],
   );
 
-  const activeLabel =
-    SIDE_PANEL_TABS.find((tab) => tab.id === activeTab)?.label ?? "Tab 1";
+  const activeMeta = SIDE_PANEL_TABS.find((tab) => tab.id === activeTab);
 
   return (
     <aside
@@ -81,8 +83,21 @@ export default function SidePanel({ open, width, onResize }: SidePanelProps) {
       aria-hidden={!open}
     >
       <div className="side-panel__body">
-        <div className="side-panel__content" role="tabpanel">
-          <p className="side-panel__placeholder">{activeLabel} content</p>
+        <div
+          className={
+            activeTab === "files"
+              ? "side-panel__content side-panel__content--flush"
+              : "side-panel__content"
+          }
+          role="tabpanel"
+        >
+          {activeTab === "files" ? (
+            <FilesExplorer />
+          ) : (
+            <p className="side-panel__placeholder">
+              {activeMeta?.label ?? "Tab"} content
+            </p>
+          )}
         </div>
         <div className="side-panel__tabs" role="tablist" aria-label="Side panel">
           {SIDE_PANEL_TABS.map((tab) => {
@@ -93,6 +108,8 @@ export default function SidePanel({ open, width, onResize }: SidePanelProps) {
                 type="button"
                 role="tab"
                 aria-selected={isActive}
+                aria-label={tab.iconOnly ? tab.label : undefined}
+                title={tab.iconOnly ? tab.label : undefined}
                 className={
                   isActive
                     ? "side-panel__tab side-panel__tab--active"
@@ -100,7 +117,11 @@ export default function SidePanel({ open, width, onResize }: SidePanelProps) {
                 }
                 onClick={() => setActiveTab(tab.id)}
               >
-                <span className="side-panel__tab-label">{tab.label}</span>
+                {tab.iconOnly ? (
+                  <FolderIcon className="side-panel__tab-icon" />
+                ) : (
+                  <span className="side-panel__tab-label">{tab.label}</span>
+                )}
               </button>
             );
           })}

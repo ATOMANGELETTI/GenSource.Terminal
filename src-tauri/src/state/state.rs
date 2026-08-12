@@ -4,6 +4,7 @@ use std::path::PathBuf;
 use std::sync::{Arc, Mutex, RwLock};
 
 use crate::mdoels::{AppSettings, LoggingSettings};
+use crate::metrics::MetricsCollector;
 
 /// In-memory app state shared across commands and the config watcher.
 pub struct AppState {
@@ -13,6 +14,8 @@ pub struct AppState {
     pub settings: Mutex<AppSettings>,
     /// Live logging toggles, shared with the log plugin filter.
     pub logging: Arc<RwLock<LoggingSettings>>,
+    /// Reused metrics sampler (CPU/net deltas need consecutive reads).
+    pub metrics: Mutex<MetricsCollector>,
 }
 
 impl AppState {
@@ -28,6 +31,7 @@ impl AppState {
             configs_dir: Mutex::new(configs_dir),
             settings: Mutex::new(settings),
             logging,
+            metrics: Mutex::new(MetricsCollector::new()),
         }
     }
 }

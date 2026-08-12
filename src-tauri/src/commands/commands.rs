@@ -10,7 +10,7 @@ use tauri::{AppHandle, Emitter, Manager, Runtime, State};
 use crate::config;
 use crate::mdoels::{
     AppInfo, AppSettings, Keybinding, PtyCreateArgs, PtyCreateResult, PtyResizeArgs,
-    PtySessionIdArgs, PtyWriteArgs,
+    PtySessionIdArgs, PtyWriteArgs, SystemMetrics,
 };
 use crate::pty::PtySessionPool;
 use crate::state::AppState;
@@ -176,4 +176,14 @@ pub fn pty_kill(
     args: PtySessionIdArgs,
 ) -> Result<(), String> {
     pool.kill(&args.session_id)
+}
+
+/// Samples CPU, GPU (Windows PDH when available), RAM, and network rates.
+#[tauri::command]
+pub fn get_system_metrics(state: State<'_, AppState>) -> SystemMetrics {
+    let mut metrics = state
+        .metrics
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner());
+    metrics.sample()
 }

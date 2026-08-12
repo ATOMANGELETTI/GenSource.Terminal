@@ -1,0 +1,342 @@
+/* Files Explorer — flat Nord-token chrome for Side Panel Tab 1. */
+
+.files-explorer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  color: var(--text);
+  background: var(--surface);
+}
+
+.explorer-header {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.45rem 0.5rem 0.4rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.explorer-header__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.explorer-header__user {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+  color: var(--text);
+}
+
+.explorer-header__user-icon {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  color: var(--text-muted);
+}
+
+.explorer-header__username {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.explorer-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.1rem;
+  flex-shrink: 0;
+}
+
+.explorer-header__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.explorer-header__btn:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.explorer-header__btn--active {
+  background: var(--hover);
+  color: var(--accent);
+}
+
+.explorer-header__btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.explorer-header__search {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.3rem 0.45rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.75rem;
+}
+
+.explorer-header__search:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 0;
+  border-color: transparent;
+}
+
+.file-tree {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 0.25rem 0;
+  outline: none;
+}
+
+.file-tree:focus-visible {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.file-tree__status {
+  padding: 0.5rem 0.75rem;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.file-tree__status--error {
+  color: var(--danger);
+}
+
+.file-tree-node {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-height: 1.5rem;
+  padding-right: 0.4rem;
+  color: var(--text);
+  font-size: 0.75rem;
+  line-height: 1.2;
+  cursor: default;
+  user-select: none;
+}
+
+.file-tree-node:hover {
+  background: var(--hover);
+}
+
+.file-tree-node--selected {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.file-tree-node--selected:hover {
+  background: color-mix(in srgb, var(--accent) 24%, transparent);
+}
+
+.file-tree-node--draft {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.file-tree-node__chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 0.9rem;
+  height: 0.9rem;
+  flex-shrink: 0;
+  color: var(--text-muted);
+  transition: transform 120ms ease;
+}
+
+.file-tree-node__chevron--open {
+  transform: rotate(90deg);
+}
+
+.file-tree-node__chevron--hidden {
+  visibility: hidden;
+}
+
+.file-tree-node__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-tree-node__input {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 0.1rem 0.25rem;
+  border: 1px solid var(--accent);
+  border-radius: 3px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.75rem;
+}
+
+.file-tree-node__input:focus {
+  outline: none;
+}
+
+.file-tree-node__meta {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+
+.file-tree-node__meta--error {
+  color: var(--danger);
+}
+
+.file-tree-node__status {
+  padding: 0.15rem 0.4rem 0.35rem;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+
+.file-tree-node__status--error {
+  color: var(--danger);
+}
+
+.file-type-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.file-type-icon--drive {
+  color: color-mix(in srgb, var(--text-muted) 82%, var(--accent) 18%);
+}
+
+.file-type-icon--folder {
+  color: var(--text-muted);
+}
+
+.file-type-icon--kit {
+  color: inherit;
+}
+
+.file-type-icon--kit svg {
+  display: block;
+}
+
+.file-tree-context-menu {
+  position: fixed;
+}
+
+.file-about__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.35);
+}
+
+.file-about {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: min(320px, calc(100vw - 2rem));
+  padding: 1rem 1.1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.file-about__title {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-about__muted {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.file-about__error {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--danger);
+}
+
+.file-about__grid {
+  margin: 0.25rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.file-about__row {
+  display: grid;
+  grid-template-columns: 4.5rem 1fr;
+  gap: 0.5rem;
+  align-items: start;
+  font-size: 0.75rem;
+}
+
+.file-about__row dt {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.file-about__row dd {
+  margin: 0;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-all;
+}
+
+.file-about__close {
+  align-self: flex-end;
+  margin-top: 0.35rem;
+  padding: 0.35rem 0.9rem;
+  background: var(--hover);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 0.75rem;
+  cursor: default;
+}
+
+.file-about__close:hover {
+  background: var(--border);
+}
+
+.file-about__close:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}

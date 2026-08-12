@@ -17,7 +17,21 @@ export type {
   PtyResizeArgs,
   PtyWriteArgs,
   TerminalProfile,
+  SystemMetrics,
 } from "./tauri";
+
+export type {
+  ExplorerDraft,
+  ExplorerDraftMode,
+  FsCreateArgs,
+  FsEntry,
+  FsEntryInfo,
+  FsEntryKind,
+  FsListDirArgs,
+  FsPathArgs,
+  FsRenameArgs,
+  FsUsernameResponse,
+} from "./explorer";
 
 export interface ContextMenuPosition {
   x: number;
