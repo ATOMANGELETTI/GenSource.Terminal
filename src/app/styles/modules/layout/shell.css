@@ -18,3 +18,9 @@
   overflow: auto;
   background-color: var(--bg);
 }
+
+.app-shell__main--terminal {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}

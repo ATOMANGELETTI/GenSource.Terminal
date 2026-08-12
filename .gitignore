@@ -45,3 +45,6 @@ Thumbs.db
 
 # Cargo
 **/*.rs.bk
+
+# SuperPowers Docs and Generated Files
+docs/

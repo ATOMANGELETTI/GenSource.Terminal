@@ -23,12 +23,76 @@
   }
 }
 
+@keyframes terminal-tab-enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes find-bar-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .terminal-tab-enter {
+    animation: terminal-tab-enter 160ms ease-out both;
+  }
+
+  .find-bar-enter {
+    animation: find-bar-enter 180ms ease-out both;
+  }
+
+  .tab-bar__tab {
+    transition:
+      background-color 160ms ease,
+      border-color 160ms ease,
+      color 160ms ease;
+  }
+
+  .tab-bar__action,
+  .tab-bar__add,
+  .find-bar__btn,
+  .terminal-banner__action {
+    transition:
+      background-color 150ms ease,
+      color 150ms ease,
+      border-color 150ms ease;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .fade-in-up {
     animation: none;
   }
 
   .traffic-light {
+    transition: none;
+  }
+
+  .terminal-tab-enter,
+  .find-bar-enter {
+    animation: none;
+  }
+
+  .tab-bar__tab,
+  .tab-bar__action,
+  .tab-bar__add,
+  .find-bar__btn,
+  .terminal-banner__action {
     transition: none;
   }
 }

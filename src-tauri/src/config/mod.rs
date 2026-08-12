@@ -153,9 +153,42 @@ fn parse_jsonc<T: DeserializeOwned>(raw: &str) -> Result<T, serde_json::Error> {
     serde_json::from_reader(StripComments::new(raw.as_bytes()))
 }
 
+/// Post-load normalize for terminal keys: empty profiles → builtins, bad
+/// `defaultProfile` → fallback, clamp scrollback, fix invalid cursor style.
+pub fn normalize_terminal_settings(settings: &mut crate::mdoels::AppSettings) {
+    if settings.profiles.is_empty() {
+        settings.profiles = crate::mdoels::AppSettings::default().profiles;
+    }
+    if !settings
+        .profiles
+        .iter()
+        .any(|p| p.id == settings.default_profile)
+    {
+        if settings.profiles.iter().any(|p| p.id == "powershell") {
+            settings.default_profile = "powershell".into();
+        } else {
+            settings.default_profile = settings.profiles[0].id.clone();
+        }
+    }
+    let sb = settings.scrollback_lines;
+    settings.scrollback_lines = if !sb.is_finite() {
+        5000.0
+    } else if sb < 100.0 {
+        100.0
+    } else if sb > 100_000.0 {
+        100_000.0
+    } else {
+        sb.floor()
+    };
+    match settings.cursor_style.as_str() {
+        "block" | "underline" | "bar" => {}
+        _ => settings.cursor_style = "bar".into(),
+    }
+}
+
 pub fn load_settings(dir: &Path) -> AppSettings {
     let path = dir.join(SETTINGS_FILE);
-    match fs::read_to_string(&path) {
+    let mut settings = match fs::read_to_string(&path) {
         Ok(raw) => match parse_jsonc::<AppSettings>(&raw) {
             Ok(settings) => settings,
             Err(err) => {
@@ -167,7 +200,9 @@ pub fn load_settings(dir: &Path) -> AppSettings {
             warn!("could not read settings.json ({err}); using defaults");
             AppSettings::default()
         }
-    }
+    };
+    normalize_terminal_settings(&mut settings);
+    settings
 }
 
 fn merge_settings_partial(raw: &str) -> Option<AppSettings> {
@@ -444,6 +479,13 @@ fn appearance_changed(previous: &AppSettings, next: &AppSettings) -> bool {
         || previous.start_minimized != next.start_minimized
         || previous.always_on_top != next.always_on_top
         || previous.autostart != next.autostart
+        || previous.default_profile != next.default_profile
+        || previous.terminal_font_family != next.terminal_font_family
+        || previous.terminal_font_size != next.terminal_font_size
+        || (previous.scrollback_lines - next.scrollback_lines).abs() > f64::EPSILON
+        || previous.cursor_style != next.cursor_style
+        || previous.cursor_blink != next.cursor_blink
+        || previous.profiles != next.profiles
 }
 
 pub fn reload_and_apply_settings<R: Runtime>(app: &AppHandle<R>) -> Result<AppSettings, String> {
@@ -574,11 +616,18 @@ mod tests {
             .join("other")
             .join("configs");
         let settings = load_settings(&dir);
-        assert_eq!(settings.theme, "nord-frost");
+        assert_eq!(settings.theme, "nord-polar-night");
         assert_eq!(settings.font_family, "Terminus");
         assert_eq!(settings.font_size, 14.0);
         assert!(!settings.autostart);
         assert!(!settings.always_on_top);
+        assert_eq!(settings.default_profile, "powershell");
+        assert_eq!(settings.scrollback_lines, 5000.0);
+        assert_eq!(settings.cursor_style, "bar");
+        assert!(settings.cursor_blink);
+        assert_eq!(settings.profiles.len(), 2);
+        assert_eq!(settings.profiles[0].id, "powershell");
+        assert_eq!(settings.profiles[1].id, "cmd");
     }
 
     #[test]
@@ -692,5 +741,43 @@ mod tests {
         );
         assert_eq!(system, frost);
         assert_eq!(system, aurora);
+    }
+}
+
+#[cfg(test)]
+mod terminal_settings_tests {
+    use super::*;
+    use crate::mdoels::AppSettings;
+
+    #[test]
+    fn empty_profiles_get_builtins() {
+        let mut s = AppSettings::default();
+        s.profiles.clear();
+        normalize_terminal_settings(&mut s);
+        assert_eq!(s.profiles.len(), 2);
+        assert_eq!(s.profiles[0].id, "powershell");
+        assert_eq!(s.profiles[1].id, "cmd");
+    }
+
+    #[test]
+    fn bad_default_profile_falls_back() {
+        let mut s = AppSettings::default();
+        s.default_profile = "nope".into();
+        normalize_terminal_settings(&mut s);
+        assert_eq!(s.default_profile, "powershell");
+    }
+
+    #[test]
+    fn scrollback_clamped() {
+        let mut s = AppSettings::default();
+        s.scrollback_lines = 1.0;
+        normalize_terminal_settings(&mut s);
+        assert_eq!(s.scrollback_lines, 100.0);
+        s.scrollback_lines = 999_999.0;
+        normalize_terminal_settings(&mut s);
+        assert_eq!(s.scrollback_lines, 100_000.0);
+        s.scrollback_lines = f64::NAN;
+        normalize_terminal_settings(&mut s);
+        assert_eq!(s.scrollback_lines, 5000.0);
     }
 }

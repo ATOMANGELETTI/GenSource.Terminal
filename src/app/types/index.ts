@@ -1,10 +1,21 @@
 export type {
   AppInfo,
   AppSettings,
+  CursorStyle,
   GreetArgs,
   GreetResponse,
   Keybinding,
   KeybindingScope,
+  PinnedTabRecord,
+  PinnedTabsState,
+  PtyCreateArgs,
+  PtyCreateResult,
+  PtyExitEvent,
+  PtyKillArgs,
+  PtyOutputEvent,
+  PtyResizeArgs,
+  PtyWriteArgs,
+  TerminalProfile,
 } from "./tauri";
 
 export interface ContextMenuPosition {

@@ -10,4 +10,8 @@ commands.allow = [
   "open_configs_folder",
   "hide_main_window",
   "quit_app",
+  "pty_create",
+  "pty_write",
+  "pty_resize",
+  "pty_kill",
 ]

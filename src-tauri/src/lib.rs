@@ -11,6 +11,7 @@ mod config;
 mod logging;
 #[path = "mdoels/models.rs"]
 mod mdoels;
+mod pty;
 #[path = "state/state.rs"]
 mod state;
 
@@ -133,6 +134,7 @@ pub fn run() {
             early_settings,
             Some(early_configs.clone()),
         ))
+        .manage(Arc::new(pty::PtySessionPool::default()))
         .invoke_handler(tauri::generate_handler![
             commands::greet,
             commands::get_app_info,
@@ -142,6 +144,10 @@ pub fn run() {
             commands::open_configs_folder,
             commands::hide_main_window,
             commands::quit_app,
+            commands::pty_create,
+            commands::pty_write,
+            commands::pty_resize,
+            commands::pty_kill,
         ])
         .setup(|app| {
             // Stronghold needs a filesystem path for its key-derivation
@@ -285,9 +291,20 @@ pub fn run() {
     builder
         .build(tauri::generate_context!())
         .expect("error while building the GenSource Template app")
-        .run(|_app_handle, event| {
-            if let RunEvent::ExitRequested { .. } = event {
-                log::info!("GenSource Template is exiting");
+        .run(|app_handle, event| {
+            match event {
+                RunEvent::ExitRequested { .. } => {
+                    log::info!("GenSource Template is exiting");
+                    if let Some(pool) = app_handle.try_state::<Arc<pty::PtySessionPool>>() {
+                        pool.kill_all();
+                    }
+                }
+                RunEvent::Exit => {
+                    if let Some(pool) = app_handle.try_state::<Arc<pty::PtySessionPool>>() {
+                        pool.kill_all();
+                    }
+                }
+                _ => {}
             }
         });
 }

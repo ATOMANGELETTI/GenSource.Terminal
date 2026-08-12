@@ -1,10 +1,16 @@
 //! `#[tauri::command]` handlers. Register new commands in the
 //! `invoke_handler![...]` list in `lib.rs`.
 
+use std::sync::Arc;
+
 use tauri::{AppHandle, Manager, State};
 
 use crate::config;
-use crate::mdoels::{AppInfo, AppSettings, Keybinding};
+use crate::mdoels::{
+    AppInfo, AppSettings, Keybinding, PtyCreateArgs, PtyCreateResult, PtyResizeArgs,
+    PtySessionIdArgs, PtyWriteArgs,
+};
+use crate::pty::PtySessionPool;
 use crate::state::AppState;
 
 /// Simple example command: greets `name` and tracks how many times any
@@ -94,4 +100,48 @@ pub fn hide_main_window(app: AppHandle) -> Result<(), String> {
 #[tauri::command]
 pub fn quit_app(app: AppHandle) {
     app.exit(0);
+}
+
+/// Spawns a ConPTY session for `profileId` resolved from in-memory settings.
+#[tauri::command]
+pub fn pty_create(
+    app: AppHandle,
+    state: State<'_, AppState>,
+    pool: State<'_, Arc<PtySessionPool>>,
+    args: PtyCreateArgs,
+) -> Result<PtyCreateResult, String> {
+    let settings = state
+        .settings
+        .lock()
+        .unwrap_or_else(|p| p.into_inner())
+        .clone();
+    let session_id = pool.create(&app, &settings, &args.profile_id, args.cols, args.rows)?;
+    Ok(PtyCreateResult { session_id })
+}
+
+/// Writes UTF-8 data to a live PTY session's stdin.
+#[tauri::command]
+pub fn pty_write(
+    pool: State<'_, Arc<PtySessionPool>>,
+    args: PtyWriteArgs,
+) -> Result<(), String> {
+    pool.write(&args.session_id, &args.data)
+}
+
+/// Resizes a live PTY session's cols/rows.
+#[tauri::command]
+pub fn pty_resize(
+    pool: State<'_, Arc<PtySessionPool>>,
+    args: PtyResizeArgs,
+) -> Result<(), String> {
+    pool.resize(&args.session_id, args.cols, args.rows)
+}
+
+/// Kills a PTY session and removes it from the pool.
+#[tauri::command]
+pub fn pty_kill(
+    pool: State<'_, Arc<PtySessionPool>>,
+    args: PtySessionIdArgs,
+) -> Result<(), String> {
+    pool.kill(&args.session_id)
 }

@@ -89,6 +89,36 @@
       "shortcut": "",
       "enabled": false,
       "scope": "local"
+    },
+    {
+      "id": "terminal.newTab",
+      "shortcut": "Ctrl+Shift+T",
+      "enabled": true,
+      "scope": "local"
+    },
+    {
+      "id": "terminal.closeTab",
+      "shortcut": "Ctrl+Shift+W",
+      "enabled": true,
+      "scope": "local"
+    },
+    {
+      "id": "terminal.togglePin",
+      "shortcut": "Ctrl+Shift+P",
+      "enabled": true,
+      "scope": "local"
+    },
+    {
+      "id": "terminal.search",
+      "shortcut": "Ctrl+F",
+      "enabled": true,
+      "scope": "local"
+    },
+    {
+      "id": "terminal.clear",
+      "shortcut": "Ctrl+Shift+K",
+      "enabled": true,
+      "scope": "local"
     }
   ]
 }

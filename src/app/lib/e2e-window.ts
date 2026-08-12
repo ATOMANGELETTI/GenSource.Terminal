@@ -22,6 +22,26 @@ export const E2E_DEFAULT_SETTINGS: AppSettings = {
   startMinimized: false,
   autostart: false,
   alwaysOnTop: false,
+  defaultProfile: "powershell",
+  scrollbackLines: 5000,
+  cursorStyle: "bar",
+  cursorBlink: true,
+  profiles: [
+    {
+      id: "powershell",
+      name: "PowerShell",
+      command: "powershell.exe",
+      args: ["-NoLogo"],
+      startingDirectory: null,
+    },
+    {
+      id: "cmd",
+      name: "CMD",
+      command: "cmd.exe",
+      args: [],
+      startingDirectory: null,
+    },
+  ],
 };
 
 /**

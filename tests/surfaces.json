@@ -31,6 +31,21 @@
       "path": "tests/unit/packaging-invariants.test.ts"
     },
     {
+      "id": "clipboard",
+      "kind": "unit",
+      "path": "tests/unit/clipboard.test.ts"
+    },
+    {
+      "id": "pinned-tabs",
+      "kind": "unit",
+      "path": "tests/unit/pinned-tabs.test.ts"
+    },
+    {
+      "id": "terminal-settings",
+      "kind": "unit",
+      "path": "tests/unit/terminal-settings.test.ts"
+    },
+    {
       "id": "smoke",
       "kind": "unit",
       "path": "tests/unit/smoke.test.ts"
@@ -40,6 +55,12 @@
       "kind": "e2e",
       "path": "tests/e2e/shell.spec.ts",
       "visual": true
+    },
+    {
+      "id": "terminal-pins",
+      "kind": "e2e",
+      "path": "tests/e2e/terminal-pins.spec.ts",
+      "visual": false
     },
     {
       "id": "themes",

@@ -50,6 +50,8 @@ tauri-plugin-upload = "2.4.0"
 tauri-plugin-websocket = "2.4.2"
 tauri-plugin-cli = "2.4.1"
 json_comments = "0.2"
+portable-pty = "0.9"
+uuid = { version = "1", features = ["v4"] }
 
 [profile.release]
 panic = "abort"

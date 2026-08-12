@@ -180,3 +180,52 @@ export function QuitIcon(props: IconProps) {
     </svg>
   );
 }
+
+export function NewTabIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <rect x="2.5" y="3.5" width="11" height="9" rx="1.2" />
+      <path d="M8 6.2v3.6M6.2 8h3.6" />
+    </svg>
+  );
+}
+
+export function CloseTabIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <rect x="2.5" y="3.5" width="11" height="9" rx="1.2" />
+      <path d="M6 6.5l4 4M10 6.5l-4 4" />
+    </svg>
+  );
+}
+
+export function PinIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M8 12.5V9.2" />
+      <path d="M5.2 9.2h5.6" />
+      <path d="M6 9.2 6.8 4.8h2.4L10 9.2" />
+      <circle cx="8" cy="3.6" r="0.9" />
+    </svg>
+  );
+}
+
+export function FindIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <circle cx="7" cy="7" r="4.5" />
+      <path d="M14 14l-3.2-3.2" />
+    </svg>
+  );
+}
+
+export function ClearIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M3.5 4.5h9" />
+      <path d="M5.5 4.5V3.5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v1" />
+      <path d="M6 7v5M8 7v5M10 7v5" />
+      <path d="M4.5 4.5l.7 8.2a1 1 0 0 0 1 .8h3.6a1 1 0 0 0 1-.8l.7-8.2" />
+    </svg>
+  );
+}

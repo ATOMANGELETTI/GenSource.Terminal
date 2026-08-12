@@ -65,6 +65,54 @@ impl AppInfoFile {
     }
 }
 
+/// A shell profile from `settings.json` `profiles` (resolved by id at spawn).
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct TerminalProfile {
+    pub id: String,
+    pub name: String,
+    pub command: String,
+    #[serde(default)]
+    pub args: Vec<String>,
+    #[serde(default)]
+    pub starting_directory: Option<String>,
+}
+
+fn default_profiles() -> Vec<TerminalProfile> {
+    vec![
+        TerminalProfile {
+            id: "powershell".into(),
+            name: "PowerShell".into(),
+            command: "powershell.exe".into(),
+            args: vec!["-NoLogo".into()],
+            starting_directory: None,
+        },
+        TerminalProfile {
+            id: "cmd".into(),
+            name: "CMD".into(),
+            command: "cmd.exe".into(),
+            args: Vec::new(),
+            starting_directory: None,
+        },
+    ]
+}
+
+fn default_default_profile() -> String {
+    "powershell".into()
+}
+
+fn default_scrollback_lines() -> f64 {
+    5000.0
+}
+
+fn default_cursor_style() -> String {
+    "bar".into()
+}
+
+fn default_cursor_blink() -> bool {
+    true
+}
+
 /// On-disk `other/configs/settings.json` shape.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
@@ -81,6 +129,20 @@ pub struct AppSettings {
     pub autostart: bool,
     #[serde(default)]
     pub always_on_top: bool,
+    #[serde(default = "default_default_profile")]
+    pub default_profile: String,
+    #[serde(default)]
+    pub terminal_font_family: Option<String>,
+    #[serde(default)]
+    pub terminal_font_size: Option<f64>,
+    #[serde(default = "default_scrollback_lines")]
+    pub scrollback_lines: f64,
+    #[serde(default = "default_cursor_style")]
+    pub cursor_style: String,
+    #[serde(default = "default_cursor_blink")]
+    pub cursor_blink: bool,
+    #[serde(default = "default_profiles")]
+    pub profiles: Vec<TerminalProfile>,
 }
 
 fn default_theme() -> String {
@@ -104,8 +166,65 @@ impl Default for AppSettings {
             start_minimized: false,
             autostart: false,
             always_on_top: false,
+            default_profile: default_default_profile(),
+            terminal_font_family: None,
+            terminal_font_size: None,
+            scrollback_lines: default_scrollback_lines(),
+            cursor_style: default_cursor_style(),
+            cursor_blink: default_cursor_blink(),
+            profiles: default_profiles(),
         }
     }
+}
+
+/// IPC: `pty_create` args (camelCase from frontend).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PtyCreateArgs {
+    pub profile_id: String,
+    pub cols: u16,
+    pub rows: u16,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PtySessionIdArgs {
+    pub session_id: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PtyWriteArgs {
+    pub session_id: String,
+    pub data: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PtyResizeArgs {
+    pub session_id: String,
+    pub cols: u16,
+    pub rows: u16,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PtyCreateResult {
+    pub session_id: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PtyOutputEvent {
+    pub session_id: String,
+    pub data: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PtyExitEvent {
+    pub session_id: String,
+    pub code: Option<i32>,
 }
 
 /// Whether a keybinding is registered as an OS-wide global shortcut (fires

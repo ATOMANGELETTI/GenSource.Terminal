@@ -1,7 +1,12 @@
 import {
   AboutIcon,
+  ClearIcon,
+  CloseTabIcon,
   CopyIcon,
+  FindIcon,
+  NewTabIcon,
   PasteIcon,
+  PinIcon,
   PreferencesIcon,
   ReloadIcon,
   ZoomInIcon,
@@ -14,10 +19,24 @@ import { zoomIn, zoomOut, zoomReset } from "../../lib/zoom";
 import type { ContextMenuPosition } from "../../types";
 import { invoke } from "@tauri-apps/api/core";
 
+/** Optional terminal actions; Track D wires these to TerminalWorkspace. */
+export interface ContentAreaTerminalActions {
+  onNewTab?: () => void;
+  onCloseTab?: () => void;
+  onTogglePin?: () => void;
+  onSearch?: () => void;
+  onClear?: () => void;
+  /** When set, overrides default document copy (terminal selection precedence). */
+  onCopy?: () => void;
+  /** When set, overrides default paste (terminal-focused paste). */
+  onPaste?: () => void;
+}
+
 interface ContentAreaMenuProps extends ContextMenuPosition {
   productName: string;
   onClose: () => void;
   onAbout: () => void;
+  terminal?: ContentAreaTerminalActions;
 }
 
 export default function ContentAreaMenu({
@@ -26,6 +45,7 @@ export default function ContentAreaMenu({
   productName,
   onClose,
   onAbout,
+  terminal,
 }: ContentAreaMenuProps) {
   const { label } = useKeybindingLabels();
 
@@ -33,6 +53,9 @@ export default function ContentAreaMenu({
     void action();
     onClose();
   };
+
+  const copy = terminal?.onCopy ?? copySelection;
+  const paste = terminal?.onPaste ?? pasteAtFocus;
 
   return (
     <nav
@@ -88,7 +111,75 @@ export default function ContentAreaMenu({
         type="button"
         className="context-menu__item"
         role="menuitem"
-        onClick={run(copySelection)}
+        disabled={!terminal?.onNewTab}
+        onClick={run(() => terminal?.onNewTab?.())}
+      >
+        <NewTabIcon className="context-menu__icon" />
+        <span className="context-menu__label">New Tab</span>
+        <span className="context-menu__shortcut">
+          {label("terminal.newTab")}
+        </span>
+      </button>
+      <button
+        type="button"
+        className="context-menu__item"
+        role="menuitem"
+        disabled={!terminal?.onCloseTab}
+        onClick={run(() => terminal?.onCloseTab?.())}
+      >
+        <CloseTabIcon className="context-menu__icon" />
+        <span className="context-menu__label">Close Tab</span>
+        <span className="context-menu__shortcut">
+          {label("terminal.closeTab")}
+        </span>
+      </button>
+      <button
+        type="button"
+        className="context-menu__item"
+        role="menuitem"
+        disabled={!terminal?.onTogglePin}
+        onClick={run(() => terminal?.onTogglePin?.())}
+      >
+        <PinIcon className="context-menu__icon" />
+        <span className="context-menu__label">Pin / Unpin</span>
+        <span className="context-menu__shortcut">
+          {label("terminal.togglePin")}
+        </span>
+      </button>
+      <button
+        type="button"
+        className="context-menu__item"
+        role="menuitem"
+        disabled={!terminal?.onClear}
+        onClick={run(() => terminal?.onClear?.())}
+      >
+        <ClearIcon className="context-menu__icon" />
+        <span className="context-menu__label">Clear</span>
+        <span className="context-menu__shortcut">
+          {label("terminal.clear")}
+        </span>
+      </button>
+      <button
+        type="button"
+        className="context-menu__item"
+        role="menuitem"
+        disabled={!terminal?.onSearch}
+        onClick={run(() => terminal?.onSearch?.())}
+      >
+        <FindIcon className="context-menu__icon" />
+        <span className="context-menu__label">Find</span>
+        <span className="context-menu__shortcut">
+          {label("terminal.search")}
+        </span>
+      </button>
+
+      <div className="context-menu__separator" role="separator" />
+
+      <button
+        type="button"
+        className="context-menu__item"
+        role="menuitem"
+        onClick={run(copy)}
       >
         <CopyIcon className="context-menu__icon" />
         <span className="context-menu__label">Copy</span>
@@ -98,7 +189,7 @@ export default function ContentAreaMenu({
         type="button"
         className="context-menu__item"
         role="menuitem"
-        onClick={run(pasteAtFocus)}
+        onClick={run(paste)}
       >
         <PasteIcon className="context-menu__icon" />
         <span className="context-menu__label">Paste</span>

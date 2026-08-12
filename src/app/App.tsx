@@ -1,10 +1,12 @@
-import { useCallback, useEffect, useState, type MouseEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
 
 import Titlebar from "./components/layout/Titlebar";
 import AboutDialog from "./components/dialogs/AboutDialog";
 import ContentAreaMenu from "./pages/content-menus/content-area-menu";
 import TitlebarMenu from "./pages/content-menus/titlebar-menu";
-import WindowPage from "./pages/window/window";
+import TerminalWorkspace, {
+  type TerminalWorkspaceHandle,
+} from "./components/terminal/TerminalWorkspace";
 import { copySelection, pasteAtFocus } from "./lib/clipboard";
 import { useLocalShortcuts } from "./lib/keybindings";
 import {
@@ -29,6 +31,7 @@ export default function App() {
   const [menu, setMenu] = useState<ContextMenuState>(CLOSED_MENU);
   const [appInfo, setAppInfo] = useState<AppInfo | null>(null);
   const [aboutOpen, setAboutOpen] = useState(false);
+  const terminalRef = useRef<TerminalWorkspaceHandle>(null);
 
   const title = appInfo?.productName ?? appInfo?.name ?? "GenSource Template";
 
@@ -97,6 +100,28 @@ export default function App() {
     };
   }, []);
 
+  const handleTerminalCopy = useCallback(() => {
+    const terminal = terminalRef.current;
+    if (terminal?.hasSelection()) {
+      void terminal.copySelection();
+      return;
+    }
+    if (terminal?.isFocused()) {
+      terminal.sendKeys("\u0003");
+      return;
+    }
+    void copySelection();
+  }, []);
+
+  const handleTerminalPaste = useCallback(() => {
+    const terminal = terminalRef.current;
+    if (terminal?.isFocused()) {
+      void terminal.pasteClipboard();
+      return;
+    }
+    void pasteAtFocus();
+  }, []);
+
   // Every `local`-scope id in other/configs/keybindings.json is mapped here
   // so pressing the shortcut does exactly what clicking the matching menu
   // row does. Global-scope ids (window.show/hide, app.quit) are handled
@@ -106,12 +131,17 @@ export default function App() {
     "content.zoomIn": () => void zoomIn(),
     "content.zoomOut": () => void zoomOut(),
     "content.zoomReset": () => void zoomReset(),
-    "content.copy": () => void copySelection(),
-    "content.paste": () => void pasteAtFocus(),
+    "content.copy": handleTerminalCopy,
+    "content.paste": handleTerminalPaste,
     "content.preferences": () => void invoke("open_configs_folder"),
     "titlebar.toggleWindow": () => void minimizeWindow(),
     "titlebar.toggleMaximize": () => void toggleMaximize(),
     "titlebar.close": () => void closeWindow(),
+    "terminal.newTab": () => terminalRef.current?.newTab(),
+    "terminal.closeTab": () => terminalRef.current?.closeActiveTab(),
+    "terminal.togglePin": () => terminalRef.current?.togglePinActive(),
+    "terminal.search": () => terminalRef.current?.openFind(),
+    "terminal.clear": () => terminalRef.current?.clearActive(),
   });
 
   return (
@@ -121,10 +151,10 @@ export default function App() {
         onContextMenu={(event) => openMenu("titlebar", event)}
       />
       <main
-        className="app-shell__main"
+        className="app-shell__main app-shell__main--terminal"
         onContextMenu={(event) => openMenu("content", event)}
       >
-        <WindowPage />
+        <TerminalWorkspace ref={terminalRef} />
       </main>
 
       {menu.target === "titlebar" && (
@@ -137,6 +167,15 @@ export default function App() {
           productName={title}
           onClose={closeMenu}
           onAbout={() => setAboutOpen(true)}
+          terminal={{
+            onNewTab: () => terminalRef.current?.newTab(),
+            onCloseTab: () => terminalRef.current?.closeActiveTab(),
+            onTogglePin: () => terminalRef.current?.togglePinActive(),
+            onSearch: () => terminalRef.current?.openFind(),
+            onClear: () => terminalRef.current?.clearActive(),
+            onCopy: handleTerminalCopy,
+            onPaste: handleTerminalPaste,
+          }}
         />
       )}
 

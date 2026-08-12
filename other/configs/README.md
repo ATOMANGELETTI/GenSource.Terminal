@@ -21,7 +21,7 @@ App identity (name, product name, identifier, version, publisher, description). 
 
 ## `settings.json`
 
-User preferences for the UI shell. Edit and save — changes apply automatically while the app is running (file watcher).
+User preferences for the UI shell and terminal. Edit and save — changes apply automatically while the app is running (file watcher).
 
 | Key | Description |
 | --- | --- |
@@ -31,8 +31,34 @@ User preferences for the UI shell. Edit and save — changes apply automatically
 | `startMinimized` | If `true`, hide the main window on launch (pair with tray / `window.show`). |
 | `autostart` | If `true`, launch the app when the OS signs in. |
 | `alwaysOnTop` | If `true`, keep the main window above other windows. |
+| `defaultProfile` | Profile `id` used for new tabs and empty launch (`powershell` or `cmd`; default `powershell`). |
+| `terminalFontFamily` | Optional terminal font; omit or `null` to fall back to `fontFamily` (same allowlist / CSS-family rules). |
+| `terminalFontSize` | Optional terminal font size in px; omit or `null` to fall back to `fontSize`. |
+| `scrollbackLines` | xterm scrollback buffer and pin truncate limit (default `5000`; clamped to `[100, 100000]`). |
+| `cursorStyle` | xterm cursor: `block`, `underline`, or `bar` (default `bar`). Invalid values fall back to `bar`. |
+| `cursorBlink` | If `true`, blink the terminal cursor (default `true`). |
+| `profiles` | Array of shell profiles (see below). Empty / missing → built-in PowerShell + CMD. |
 
 Do **not** store window width/height/position here — geometry is handled by the window-state plugin (writing it caused move/flash issues).
+
+Do **not** store pinned tabs here — pins live only in AppData `app-state.json` via the plugin-store key `terminal.pinnedTabs`.
+
+### `profiles` entries
+
+| Field | Description |
+| --- | --- |
+| `id` | Stable key (`powershell`, `cmd`, or a custom id used when spawning by id). |
+| `name` | Display / tab label. |
+| `command` | Executable name or path resolved on `PATH` (e.g. `powershell.exe`). |
+| `args` | Argument list (default `[]`). |
+| `startingDirectory` | Absolute start directory, or `null` / omit for user home. |
+
+Shipped defaults:
+
+1. `powershell` → `powershell.exe` with `["-NoLogo"]`
+2. `cmd` → `cmd.exe` with `[]`
+
+Changing `profiles` / `defaultProfile` affects **subsequent** new tabs only, not running sessions.
 
 ### `theme` values
 
@@ -120,6 +146,18 @@ Modifier names: `Ctrl`, `Shift`, `Alt`, `Super`/`Meta` (platform-dependent).
 | `titlebar.toggleWindow` | `Ctrl+M` | Minimize (macOS-style hide-to-dock/taskbar toggle in this shell) |
 | `titlebar.toggleMaximize` | `Ctrl+Shift+M` | Toggle maximize |
 | `titlebar.close` | `Ctrl+W` | Close |
+
+**Local terminal**
+
+| id | Default | Purpose |
+| --- | --- | --- |
+| `terminal.newTab` | `Ctrl+Shift+T` | New tab (`defaultProfile`) |
+| `terminal.closeTab` | `Ctrl+Shift+W` | Close active tab |
+| `terminal.togglePin` | `Ctrl+Shift+P` | Pin / unpin active tab |
+| `terminal.search` | `Ctrl+F` | Open in-terminal find |
+| `terminal.clear` | `Ctrl+Shift+K` | Clear xterm buffer (does not kill PTY) |
+
+Copy / paste for the terminal reuse `content.copy` / `content.paste` (selection → clipboard; no selection + focused terminal → Ctrl+C to PTY; paste → `pty_write`). Wiring lives in the main window shortcut handlers.
 
 **Tray / extras**
 

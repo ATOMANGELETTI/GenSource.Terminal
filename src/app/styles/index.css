@@ -7,6 +7,10 @@
 @import "./modules/layout/window.css";
 @import "./modules/layout/splash.css";
 @import "./modules/motion/transitions.css";
+@import "./modules/terminal/workspace.css";
+@import "./modules/terminal/tabs.css";
+@import "./modules/terminal/pane.css";
+@import "./modules/terminal/xterm.css";
 @import "./modules/context-menus/menu-shared.css";
 @import "./modules/context-menus/titlebar-content.css";
 @import "./modules/context-menus/content-content.css";

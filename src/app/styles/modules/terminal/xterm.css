@@ -1,0 +1,39 @@
+@import "@xterm/xterm/css/xterm.css";
+
+.terminal-xterm-host {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.terminal-xterm {
+  width: 100%;
+  height: 100%;
+  padding: 6px 8px;
+  box-sizing: border-box;
+}
+
+.terminal-xterm .xterm {
+  height: 100%;
+}
+
+.terminal-xterm .xterm-viewport {
+  overflow-y: auto !important;
+}
+
+/* Canvas-backed xterm: keep restore text assertable without affecting layout. */
+.terminal-e2e-scrollback {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 0;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 1px;
+  line-height: 1;
+  color: transparent;
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+}
