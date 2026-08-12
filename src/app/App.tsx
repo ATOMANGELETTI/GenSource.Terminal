@@ -33,7 +33,7 @@ export default function App() {
   const [aboutOpen, setAboutOpen] = useState(false);
   const terminalRef = useRef<TerminalWorkspaceHandle>(null);
 
-  const title = appInfo?.productName ?? appInfo?.name ?? "GenSource Template";
+  const title = appInfo?.productName ?? appInfo?.name ?? "GenSource Terminal";
 
   const closeMenu = useCallback(() => {
     setMenu(CLOSED_MENU);

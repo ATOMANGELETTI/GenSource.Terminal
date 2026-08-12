@@ -1,6 +1,6 @@
 [[permission]]
 identifier = "allow-app-commands"
-description = "Custom GenSource Template IPC commands (settings, window, quit)."
+description = "Custom GenSource Terminal IPC commands (settings, window, quit)."
 commands.allow = [
   "greet",
   "get_app_info",

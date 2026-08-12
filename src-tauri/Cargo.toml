@@ -1,7 +1,7 @@
 [package]
-name = "gensource-template"
-version = "0.1.1"
-description = "GenSource Tauri v2 desktop app template"
+name = "gensource-terminal"
+version = "0.1.0"
+description = "AI-Native Terminal Application"
 authors = ["GenSource"]
 edition = "2021"
 

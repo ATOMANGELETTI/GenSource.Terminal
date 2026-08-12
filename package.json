@@ -1,9 +1,9 @@
 {
-  "name": "gensource-template",
+  "name": "gensource-terminal",
   "private": true,
-  "version": "0.1.1",
+  "version": "0.1.0",
   "type": "module",
-  "description": "GenSource Tauri v2 desktop app template",
+  "description": "AI-Native Terminal Application",
   "scripts": {
     "dev": "node src/scripts/dev.js",
     "build": "tsc -b && vite build --config src/configs/vite.config.ts",

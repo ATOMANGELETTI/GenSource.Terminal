@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-describe('gensource template', () => {
+describe('gensource terminal', () => {
   it('exposes the product name', () => {
-    expect('GenSource Template').toContain('GenSource');
+    expect('GenSource Terminal').toContain('GenSource');
   });
 });

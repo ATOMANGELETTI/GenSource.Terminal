@@ -130,7 +130,7 @@ export default function TrayMenuWindow() {
     };
   }, []);
 
-  const productName = info?.productName ?? info?.name ?? "GenSource Template";
+  const productName = info?.productName ?? info?.name ?? "GenSource Terminal";
 
   const run = (action: () => void | Promise<void>) => () => {
     void action();

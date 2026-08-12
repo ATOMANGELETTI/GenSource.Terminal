@@ -43,7 +43,7 @@ export default function WindowPage() {
         active={!e2e}
       />
       <div className="window-hero fade-in-up">
-        <h2 className="window-hero__title">GenSource Template</h2>
+        <h2 className="window-hero__title">GenSource Terminal</h2>
         <p className="window-hero__tagline">
           A Tauri v2 desktop suite template — flat Nord chrome, ready to extend.
         </p>

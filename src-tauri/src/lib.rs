@@ -1,4 +1,4 @@
-//! GenSource Template Tauri v2 app library. Registers all desktop plugins,
+//! GenSource Terminal Tauri v2 app library. Registers all desktop plugins,
 //! shared state, and IPC commands, then hands off to the Tauri runtime.
 
 // Prebuilt libsodium (via tauri-plugin-stronghold) emits MSVC LNK4099/LNK4098
@@ -192,7 +192,7 @@ pub fn run() {
                         info.name
                     }
                 })
-                .unwrap_or_else(|| "GenSource Template".into());
+                .unwrap_or_else(|| "GenSource Terminal".into());
 
             {
                 let state = app.state::<AppState>();
@@ -290,11 +290,11 @@ pub fn run() {
 
     builder
         .build(tauri::generate_context!())
-        .expect("error while building the GenSource Template app")
+        .expect("error while building the GenSource Terminal app")
         .run(|app_handle, event| {
             match event {
                 RunEvent::ExitRequested { .. } => {
-                    log::info!("GenSource Template is exiting");
+                    log::info!("GenSource Terminal is exiting");
                     if let Some(pool) = app_handle.try_state::<Arc<pty::PtySessionPool>>() {
                         pool.kill_all();
                     }

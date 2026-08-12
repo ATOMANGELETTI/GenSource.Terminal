@@ -9,7 +9,7 @@ interface TitlebarProps {
 }
 
 export default function Titlebar({
-  title = "GenSource Template",
+  title = "GenSource Terminal",
   onContextMenu,
 }: TitlebarProps) {
   const handleDoubleClick = (event: MouseEvent<HTMLElement>) => {

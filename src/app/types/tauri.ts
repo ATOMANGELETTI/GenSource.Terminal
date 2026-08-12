@@ -5,6 +5,8 @@ export interface AppInfo {
   productName?: string;
   identifier?: string;
   publisher?: string;
+  codename?: string;
+  edition?: number;
 }
 
 export type CursorStyle = "block" | "underline" | "bar";

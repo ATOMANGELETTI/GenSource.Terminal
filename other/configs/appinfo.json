@@ -1,8 +1,10 @@
-{
-  "name": "GenSource Template",
-  "productName": "GenSource Template",
-  "identifier": "com.gensource.template",
-  "version": "0.1.1",
-  "publisher": "GenSource",
-  "description": "Shared Tauri desktop template for the GenSource suite"
-}
+{
+  "name": "GenSource Terminal",
+  "productName": "GenSource Terminal",
+  "identifier": "com.gensource.terminal",
+  "version": "0.1.0",
+  "publisher": "GenSource",
+  "description": "AI-Native Terminal Application",
+  "codename": "terminal",
+  "edition": 2026
+}

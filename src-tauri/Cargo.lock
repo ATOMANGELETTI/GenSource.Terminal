@@ -2149,8 +2149,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "gensource-template"
-version = "0.1.1"
+name = "gensource-terminal"
+version = "0.1.0"
 dependencies = [
  "json_comments",
  "log",

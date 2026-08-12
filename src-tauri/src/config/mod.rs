@@ -301,6 +301,8 @@ pub fn app_info_from_package<R: Runtime>(app: &AppHandle<R>) -> AppInfo {
         product_name: Some(package_info.name.clone()),
         identifier: None,
         publisher: None,
+        codename: None,
+        edition: None,
     }
 }
 
@@ -650,8 +652,10 @@ mod tests {
             .join("other")
             .join("configs");
         let info = load_appinfo(&dir).expect("appinfo.json");
-        assert_eq!(info.identifier, "com.gensource.template");
+        assert_eq!(info.identifier, "com.gensource.terminal");
         assert_eq!(info.version, "0.1.0");
+        assert_eq!(info.codename, "terminal");
+        assert_eq!(info.edition, Some(2026));
     }
 
     #[test]

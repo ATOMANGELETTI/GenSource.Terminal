@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "GenSource Template",
-  "version": "0.1.1",
-  "identifier": "com.gensource.template",
+  "productName": "GenSource Terminal",
+  "version": "0.1.0",
+  "identifier": "com.gensource.terminal",
   "build": {
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build",
@@ -15,7 +15,7 @@
       {
         "label": "splash",
         "url": "index.html?window=splash",
-        "title": "GenSource Template",
+        "title": "GenSource Terminal",
         "width": 520,
         "height": 340,
         "center": true,
@@ -30,7 +30,7 @@
       },
       {
         "label": "main",
-        "title": "GenSource Template",
+        "title": "GenSource Terminal",
         "width": 1100,
         "height": 720,
         "minWidth": 800,
@@ -43,7 +43,7 @@
       {
         "label": "tray-menu",
         "url": "index.html?window=tray-menu",
-        "title": "GenSource Template",
+        "title": "GenSource Terminal",
         "width": 240,
         "height": 214,
         "visible": false,
@@ -83,11 +83,11 @@
   "plugins": {
     "deep-link": {
       "desktop": {
-        "schemes": ["gensource"]
+        "schemes": ["terminal"]
       }
     },
     "cli": {
-      "description": "GenSource Template",
+      "description": "AI-Native Terminal Application",
       "args": []
     },
     "updater": {

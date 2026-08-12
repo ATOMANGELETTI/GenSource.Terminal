@@ -18,6 +18,10 @@ pub struct AppInfo {
     pub identifier: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub publisher: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub codename: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub edition: Option<u16>,
 }
 
 /// On-disk `other/configs/appinfo.json` shape (read-only at runtime).
@@ -34,6 +38,10 @@ pub struct AppInfoFile {
     pub publisher: String,
     #[serde(default)]
     pub description: String,
+    #[serde(default)]
+    pub codename: String,
+    #[serde(default)]
+    pub edition: Option<u16>,
 }
 
 impl AppInfoFile {
@@ -61,6 +69,12 @@ impl AppInfoFile {
             } else {
                 Some(self.publisher)
             },
+            codename: if self.codename.trim().is_empty() {
+                None
+            } else {
+                Some(self.codename)
+            },
+            edition: self.edition,
         }
     }
 }

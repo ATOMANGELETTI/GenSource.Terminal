@@ -8,11 +8,13 @@ const KNOWN_LABELS = new Set<string>(["main", "splash", "tray-menu"]);
 
 /** Fixture identity when Vite e2e has no Tauri backend. */
 export const E2E_APP_INFO: AppInfo = {
-  name: "gensource-template",
-  productName: "GenSource Template",
-  version: "0.1.1",
-  description: "GenSource Tauri v2 desktop app template",
+  name: "gensource-terminal",
+  productName: "GenSource Terminal",
+  version: "0.1.0",
+  description: "AI-Native Terminal Application",
   publisher: "GenSource",
+  codename: "terminal",
+  edition: 2026,
 };
 
 export const E2E_DEFAULT_SETTINGS: AppSettings = {

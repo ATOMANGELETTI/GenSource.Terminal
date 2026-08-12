@@ -26,7 +26,7 @@ const E2E_FROZEN_PROGRESS = 0.6;
  */
 export default function SplashWindow() {
   const e2e = isE2eMode();
-  const [title, setTitle] = useState("GenSource Template");
+  const [title, setTitle] = useState("GenSource Terminal");
   const [progress, setProgress] = useState(e2e ? E2E_FROZEN_PROGRESS : 0);
   const [exiting, setExiting] = useState(false);
   const [particlesActive, setParticlesActive] = useState(!e2e);
@@ -80,7 +80,7 @@ export default function SplashWindow() {
       try {
         const info = await fetchAppInfo();
         if (!cancelled) {
-          setTitle(info.productName || info.name || "GenSource Template");
+          setTitle(info.productName || info.name || "GenSource Terminal");
           mark("appinfo");
         }
       } catch (error) {

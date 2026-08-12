@@ -209,7 +209,7 @@ function main() {
   const pkg = readJson(path.join(root, "package.json"));
   const tauriConf = readJson(path.join(root, "src-tauri", "tauri.conf.json"));
   const version = tauriConf.version ?? pkg.version ?? "0.0.0";
-  const productName = tauriConf.productName ?? "GenSource Template";
+  const productName = tauriConf.productName ?? "GenSource Terminal";
   const productSlug = slugifyProductName(productName);
   const binaryName = readCargoPackageName();
 
