@@ -1,0 +1,60 @@
+other/configs/settings.json
+  h_90ad036e211778 2
+src/scripts/spawn-bin.js
+  s_e1e5a9c0a8e6e0::t_d1bb997636ceac 3-4,9,11-12,15-27
+src/scripts/log-tauri-build.js
+  s_e1e5a9c0a8e6e0::t_bab908fab75be9 7,17-20
+  s_e1e5a9c0a8e6e0::t_c3e6875db52e6f 65
+.cursor/AGENTS.md
+  s_fee1e85539a3b0::t_d906ef6c8c5e84 120
+  s_e8e98daffedb72::t_c1ef95db071c29 115,121
+src/scripts/log-tauri-app.js
+  s_e1e5a9c0a8e6e0::t_7c6a8da59df013 68
+  s_e1e5a9c0a8e6e0::t_f4c1fbf9955971 10,20-23
+.cursor/hooks/state/continual-learning-index.json
+  s_e8e98daffedb72::t_79b0e66fee8a18 3
+  s_e8e98daffedb72::t_611703a290ee66 5-6,8-9,11-12
+other/documents/features.md
+  s_fee1e85539a3b0::t_dfbe12b966d5b3 50-53
+other/configs/README.md
+  s_fee1e85539a3b0::t_02291a445a7a97 1-128
+.cursor/hooks/state/continual-learning.json
+  s_fee1e85539a3b0::t_de59dacdabd3cb 3-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "f939f2d07525ae580a543b421e5991cf4aa2f234",
+  "prompts": {},
+  "humans": {
+    "h_90ad036e211778": {
+      "author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  },
+  "sessions": {
+    "s_e1e5a9c0a8e6e0": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "7ba2fd73-ae36-46d3-b3ee-3148975c7baf",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_e8e98daffedb72": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "3b37fecd-28fe-4cbd-a6ac-b76daf85fc64",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_fee1e85539a3b0": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "d5c9488a-7b29-437e-9823-0a607e364d9a",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
