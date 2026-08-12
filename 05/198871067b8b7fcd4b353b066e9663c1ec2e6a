@@ -1,0 +1,14 @@
+other/documents/notepads/addtotemplate.txt
+  h_90ad036e211778 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "05198871067b8b7fcd4b353b066e9663c1ec2e6a",
+  "prompts": {},
+  "humans": {
+    "h_90ad036e211778": {
+      "author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
