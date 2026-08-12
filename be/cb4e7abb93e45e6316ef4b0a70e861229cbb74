@@ -1,0 +1,171 @@
+.cursor/commands/tester-pro.md
+  s_6de3f94e03564e::t_7c1745aa4d5d4c 1-6
+.cursor/hooks/state/continual-learning-index.json
+  s_022b7f13f2e95e::t_fa4d28ce9f7911 1-330
+public/fonts/nerdfonts/firacode/FiraCodeNerdFont-Bold.ttf
+  s_63cd6427da069f::t_df3863c1c0ef18 1-3
+public/fonts/nerdfonts/firacode/FiraCodeNerdFont-Regular.ttf
+  s_63cd6427da069f::t_e03a2c50509b57 1-3
+public/fonts/nerdfonts/firacode/README.md
+  s_63cd6427da069f::t_c50b163f300a83 1-48
+public/fonts/nerdfonts/terminus/README.md
+  s_63cd6427da069f::t_a4f3f48ee03b04 1-64
+public/fonts/nerdfonts/terminus/TerminessNerdFont-Bold.ttf
+  s_63cd6427da069f::t_cc7a3a6493cb71 1-3
+public/fonts/nerdfonts/terminus/TerminessNerdFont-Regular.ttf
+  s_63cd6427da069f::t_950f7c50b3f2c3 1-3
+public/fonts/nerdfonts/ubuntu/README.md
+  s_63cd6427da069f::t_515c909322df5d 1-72
+public/fonts/nerdfonts/ubuntu/UbuntuNerdFont-Bold.ttf
+  s_63cd6427da069f::t_99038f9a25ff4f 1-3
+public/fonts/nerdfonts/ubuntu/UbuntuNerdFont-Regular.ttf
+  s_63cd6427da069f::t_3a212593b0d4a8 1-3
+src-tauri/icons/128x128.png
+  s_35ce9a6005fece::t_fc8380dc7c5cdb 1-3
+src-tauri/icons/128x128@2x.png
+  s_35ce9a6005fece::t_b609634ba172ac 1-3
+src-tauri/icons/32x32.png
+  s_35ce9a6005fece::t_6108f57c4e3d84 1-3
+src-tauri/icons/64x64.png
+  s_35ce9a6005fece::t_b2bb6201469b6b 1-3
+src-tauri/icons/Square107x107Logo.png
+  s_35ce9a6005fece::t_9248270fc9a5aa 1-3
+src-tauri/icons/Square142x142Logo.png
+  s_35ce9a6005fece::t_cae779f48442ee 1-3
+src-tauri/icons/Square150x150Logo.png
+  s_35ce9a6005fece::t_fa71cb88401288 1-3
+src-tauri/icons/Square284x284Logo.png
+  s_35ce9a6005fece::t_9d783f15b59068 1-3
+src-tauri/icons/Square30x30Logo.png
+  s_35ce9a6005fece::t_fbe3d585ce6a9d 1-3
+src-tauri/icons/Square310x310Logo.png
+  s_35ce9a6005fece::t_1c6a9f34c60e09 1-3
+src-tauri/icons/Square44x44Logo.png
+  s_35ce9a6005fece::t_3abae1d6a1fb23 1-3
+src-tauri/icons/Square71x71Logo.png
+  s_35ce9a6005fece::t_d7bec1feff39e2 1-3
+src-tauri/icons/Square89x89Logo.png
+  s_35ce9a6005fece::t_501d1cdad52461 1-3
+src-tauri/icons/StoreLogo.png
+  s_35ce9a6005fece::t_baeab7cb247b29 1-3
+src-tauri/icons/icon.ico
+  s_35ce9a6005fece::t_531a7cc90604f4 1-3
+src-tauri/icons/icon.png
+  s_35ce9a6005fece::t_7e65f22d67ccfd 1-3
+src-tauri/src/state/state.rs
+  s_6de3f94e03564e::t_b26d3c21a6523e 1-43
+src/app/App.tsx
+  s_6de3f94e03564e::t_5d55103f3837a3 1-148
+src/app/pages/splash/SplashWindow.tsx
+  s_6de3f94e03564e::t_75eb12f209cbd4 1-210
+src/configs/.tsbuildinfo-node
+  s_877cb7265cb618::t_a888743ab25010 1
+src/configs/middleware.d.ts
+  s_dd00ae57f6f6fc::t_8c675735211213 1-6
+src/configs/middleware.d.ts.map
+  s_dd00ae57f6f6fc::t_110b9b3a39a4a3 1
+src/configs/playwright.config.d.ts
+  s_dd00ae57f6f6fc::t_f89827c5305010 1-3
+src/configs/playwright.config.d.ts.map
+  s_6de3f94e03564e::t_cf8a567d1015ef 1
+src/configs/vite.config.d.ts
+  s_dd00ae57f6f6fc::t_d8f1b6472d8151 1-3
+src/configs/vitest.config.d.ts
+  s_dd00ae57f6f6fc::t_bbaf97d7a4e337 1-3
+src/configs/vitest.config.ts
+  s_2568e35912da81::t_58057bc050bb64 1-24
+tests/e2e/baselines/about.spec.ts/about-dialog.png
+  s_6de3f94e03564e::t_d20a9330e2ac42 1-3
+tests/e2e/baselines/fonts.spec.ts/font-fira-code.png
+  s_6de3f94e03564e::t_cfce9ade8475a1 1-3
+tests/e2e/baselines/fonts.spec.ts/font-plus-jakarta-sans.png
+  s_6de3f94e03564e::t_8dcb6446540d88 1-3
+tests/e2e/baselines/fonts.spec.ts/font-terminus.png
+  s_6de3f94e03564e::t_9fda039ae70eb3 1-3
+tests/e2e/baselines/fonts.spec.ts/font-ubuntu.png
+  s_6de3f94e03564e::t_9ec2a39867fcfb 1-3
+tests/e2e/baselines/menus.spec.ts/menu-content.png
+  s_6de3f94e03564e::t_3954c9ccbebdf0 1-3
+tests/e2e/baselines/menus.spec.ts/menu-titlebar.png
+  s_6de3f94e03564e::t_79869c610a2aae 1-3
+tests/e2e/baselines/shell.spec.ts/shell-default.png
+  s_6de3f94e03564e::t_93485f1e970a88 1-3
+tests/e2e/baselines/tray.spec.ts/tray-menu.png
+  s_6de3f94e03564e::t_641a055517b493 1-3
+tests/unit/setup.ts
+  s_2568e35912da81::t_5450e709cee2f1 1
+tests/unit/testing-library.test.tsx
+  s_846b0a29727c75::t_5b3837a9e2245f 1-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "becb4e7abb93e45e6316ef4b0a70e861229cbb74",
+  "prompts": {},
+  "sessions": {
+    "s_022b7f13f2e95e": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "5add6b34-33fb-49be-93e9-4c78060c6f3d",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_2568e35912da81": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "e4219828-d0dd-48fe-a50e-463c2467a387",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_35ce9a6005fece": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "564249ed-a9c8-4be4-8b05-b711486f2ffe",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_63cd6427da069f": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "86b29c55-ee7f-4c06-9b1f-5867603b070b",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_6de3f94e03564e": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "e8bf9586-54bd-4c18-a4eb-a811e48e33c5",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_846b0a29727c75": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "6b35f747-674d-47b7-af1b-316bd80b40a9",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_877cb7265cb618": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "4f1ee95f-4dee-49d1-8f3a-09085b807eba",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_dd00ae57f6f6fc": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "71984593-b4af-4859-9d8a-7566a85474cf",
+        "model": "grok-4.5"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
