@@ -1,0 +1,113 @@
+tests/unit/smoke.test.ts
+  s_f6068af241d839::t_89dffcfa898345 3
+  s_f6068af241d839::t_305d3036e0a110 5
+src-tauri/permissions/app-commands.toml
+  s_f6068af241d839::t_a03e9596a3fc20 3
+src-tauri/src/mdoels/models.rs
+  s_f6068af241d839::t_8dd9eeda492271 21-24,41-44,72-77
+src/app/types/tauri.ts
+  s_f6068af241d839::t_b333f5b7bbf0f3 8-9
+src/app/App.tsx
+  s_f6068af241d839::t_fcba1cfe9be848 36
+src-tauri/tauri.conf.json
+  s_f6068af241d839::t_2fea1dbc75eb6a 86,90
+  s_f6068af241d839::t_77ff8659aa863a 18,33,46
+  s_f6068af241d839::t_f08ad4cf0dd675 3-5
+other/configs/appinfo.json
+  s_f6068af241d839::t_de303c40e67160 1-10
+index.html
+  s_f6068af241d839::t_2f3a015be39e0c 6
+tests/e2e/tray.spec.ts
+  s_f6068af241d839::t_fd69a5d0c3bb8b 10
+src/app/pages/window/window.tsx
+  s_f6068af241d839::t_45e15836d4f517 46
+tests/e2e/about.spec.ts
+  s_f6068af241d839::t_e998edb4e353df 9-10
+src/app/pages/splash/SplashWindow.tsx
+  s_f6068af241d839::t_2eb69b0f0e62c5 29,83
+src/scripts/package.js
+  s_f6068af241d839::t_5825809f2b3d17 212
+src-tauri/Cargo.toml
+  s_f6068af241d839::t_19d92e97a7e55f 2-4
+package.json
+  s_f6068af241d839::t_adbb618aee56e0 2,4,6
+src/app/lib/e2e-window.ts
+  s_f6068af241d839::t_568caaa6004b1e 11-14
+  s_f6068af241d839::t_a76abccfd9d69f 16-17
+src/app/pages/tray-menu/TrayMenuWindow.tsx
+  s_f6068af241d839::t_cd378df11b8440 133
+src-tauri/src/lib.rs
+  s_f6068af241d839::t_26a30447c59373 195
+  s_f6068af241d839::t_49e7bb1ed06ced 293
+  s_f6068af241d839::t_2abec08043cd92 297
+  s_f6068af241d839::t_e57a2d0b336a7d 1
+src-tauri/src/config/mod.rs
+  s_f6068af241d839::t_db1d2a329b20ef 655
+  s_f6068af241d839::t_ca3c50838e4616 304-305
+  s_f6068af241d839::t_6b0ec5de320674 657-658
+src/app/components/layout/Titlebar.tsx
+  s_f6068af241d839::t_bd35f7927289c2 12
+package-lock.json
+  s_f6068af241d839::t_e417b250456dcd 2-3,8-9
+src-tauri/icons/128x128.png
+  s_00da156fc6b17d::t_f3abc4c26b0b48 2-3
+src-tauri/icons/128x128@2x.png
+  s_00da156fc6b17d::t_a2347e9d6e7598 2-3
+src-tauri/icons/32x32.png
+  s_00da156fc6b17d::t_0625817e3d05d6 2-3
+src-tauri/icons/64x64.png
+  s_00da156fc6b17d::t_5bc5d490c5ebfe 2-3
+src-tauri/icons/Square107x107Logo.png
+  s_00da156fc6b17d::t_2b48b7a69ca25c 2-3
+src-tauri/icons/Square142x142Logo.png
+  s_00da156fc6b17d::t_04fb0c31810a44 2-3
+src-tauri/icons/Square150x150Logo.png
+  s_00da156fc6b17d::t_7db69f337f4f79 2-3
+src-tauri/icons/Square284x284Logo.png
+  s_00da156fc6b17d::t_3fab2774496b19 2-3
+src-tauri/icons/Square30x30Logo.png
+  s_00da156fc6b17d::t_9f6e1c4b2af27a 2-3
+src-tauri/icons/Square310x310Logo.png
+  s_00da156fc6b17d::t_aacf34583f3de6 2-3
+src-tauri/icons/Square44x44Logo.png
+  s_00da156fc6b17d::t_4567581942668c 2-3
+src-tauri/icons/Square71x71Logo.png
+  s_00da156fc6b17d::t_583718a209de61 2-3
+src-tauri/icons/Square89x89Logo.png
+  s_00da156fc6b17d::t_04c59af4f02325 2-3
+src-tauri/icons/StoreLogo.png
+  s_00da156fc6b17d::t_1f026fe4b1d97d 2-3
+src-tauri/icons/icon.ico
+  s_00da156fc6b17d::t_4673ce5469f8d1 2-3
+src-tauri/icons/icon.png
+  s_00da156fc6b17d::t_bc0fd24609b2cd 2-3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "c5a63cec40ba6ac1f72c4923c85bb2961b387c9d",
+  "prompts": {},
+  "humans": {
+    "h_90ad036e211778": {
+      "author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  },
+  "sessions": {
+    "s_00da156fc6b17d": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "af4364e8-fb36-461e-ba0b-a0b5d2f5c913",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_f6068af241d839": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "d94765c5-76eb-44d9-9822-420bf3940c33",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
