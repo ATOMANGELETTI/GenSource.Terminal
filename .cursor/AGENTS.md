@@ -129,3 +129,32 @@ top of `~/.cursor/cli-config.json` for sessions in this repo.
 - npm runners live in `src/scripts/` (`dev.js` → Vite `dev`, `log-tauri-app.js` → `tauri:dev` with tee to `other/logging/app/`, `log-tauri-build.js` → `tauri:build` with tee to `other/logging/build/`, `package.js` → `package` / `package:clean`); Windows release packaging targets `release/` with 32- and 64-bit NSIS installers (custom hooks in `src-tauri/nsis/installer.nsh`, per-user or system-wide) plus matching portable zip builds.
 - Project docs: keep the main `README.md` at the repo root for GitHub; longer split docs live under `other/documents/`; app screenshots live under `other/screenshots/`.
 - Tests live under `tests/` (`unit/`, `e2e/` including Playwright visuals); reports/outputs go in `tests/artifacts/`; surface inventory is `tests/surfaces.json` (used by tester-pro).
+
+## Cursor Cloud specific instructions
+
+Cloud Agents run headless Linux (Ubuntu 24.04). This is a Windows-first Tauri
+app, so the desktop GUI and NSIS packaging are not exercised there, but the
+frontend and the Rust backend compile and the web UI runs in a browser.
+
+- **System packages (Rust/Tauri build):** the Tauri backend needs GTK/WebKit
+  dev libraries that are not in the default image. Install
+  `libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev
+  libayatana-appindicator3-dev librsvg2-dev libgtk-3-dev patchelf` (add `xvfb`
+  only if attempting a headless GUI launch).
+- **Rust toolchain:** a transitive crate (`cpufeatures`) requires
+  `edition2024`, so Cargo must be ≥ 1.85. The default image ships 1.83; run
+  `rustup update stable && rustup default stable` before `cargo build`.
+- **Node:** `.node-version` pins Node 22; some dev deps advertise a newer 22.x
+  patch (harmless `EBADENGINE` warnings). `npm ci` is the install command.
+- **Git LFS assets are currently missing on the remote.** All binary assets
+  (`*.png/ico/woff2/exe/dll/ttf`) are LFS-tracked, but the LFS objects 404 on
+  fetch, so `src-tauri/icons/*` and `public/**` are pointer stubs. `npm ci`,
+  lint, typecheck, `vitest`, and `vite build` all pass without them, but
+  `tauri:dev`/`tauri:build` fail at `generate_context!` (`Invalid PNG
+  signature`) until real icons exist. To compile the backend locally, generate
+  a throwaway icon set with `npm run tauri -- icon <source.png>` (do not commit
+  it — it would overwrite the LFS pointers). Re-adding the real LFS objects to
+  the remote is the durable fix.
+- **Runnable surfaces headless:** `npm run dev` (Vite on port 1420) serves the
+  full UI; open `?window=splash` / `?window=tray-menu` for the other window
+  variants. `npm test` and `npm run build` are the core checks.
