@@ -1,0 +1,360 @@
+src/app/styles/index.css
+  s_47f054ca2320ed::t_d411aa90fffab6 11-12
+  s_3bc85c72e9d3d5::t_217a111cb999c2 19
+other/configs/settings.json
+  s_cdc7d8d1425e22::t_a9e52592efd792 5
+src/app/components/terminal/Tab.tsx
+  s_3bc85c72e9d3d5::t_740edd5d59a0d3 121-125
+  s_3bc85c72e9d3d5::t_5e01e3c5330a36 1-7,18,20-22,31,33-35,37-50,58-59,61-66,69,71-88,94,100,109-112,114,126-140,142
+src/app/lib/terminal/nord-xterm-theme.ts
+  s_5ca2e35f629607::t_4a82e38e87a3e6 16-17
+src-tauri/src/mdoels/models.rs
+  s_cdc7d8d1425e22::t_1ecbf91e4a92ef 140-141
+  s_cdc7d8d1425e22::t_4b84c148657bfb 176-179,186
+src/configs/.tsbuildinfo-e2e
+  s_3bc85c72e9d3d5::t_54a3395581a7e4 1
+src/app/hooks/useTerminalSettings.ts
+  s_cdc7d8d1425e22::t_bae4314cb6b2c5 13,17-22,30,51
+src-tauri/src/config/mod.rs
+  s_cdc7d8d1425e22::t_b7f925c44addef 481
+  s_78d2b1d89598e5::t_f31cabd175ab15 462
+.cursor/agents/react-developer.md
+  h_90ad036e211778 1-190
+.cursor/hooks/state/continual-learning-index.json
+  s_af91385ee658ef::t_945355a04e63e9 2-40
+src/app/pages/tray-menu/TrayMenuWindow.tsx
+  s_78d2b1d89598e5::t_47a001c2c3bb9b 233
+  s_78d2b1d89598e5::t_bb087c30db07e2 29
+.cursor/agents/fontend-ui-desiner.md
+  h_90ad036e211778 1-4,6-53
+  h_90ad036e211778 5
+src/configs/.tsbuildinfo-app
+  s_78d2b1d89598e5::t_d73a5dd964da18 1
+.cursor/agents/playwright-tester.md
+  h_90ad036e211778 1-30
+src/app/styles/modules/terminal/tabs.css
+  s_3bc85c72e9d3d5::t_bab48d4f2087cb 82-87,90-91,94-108
+  s_3bc85c72e9d3d5::t_893232efe2a690 35,69,74,77,135
+  s_66a0c7d08d094c::t_5db716eb80d607 17-25
+src/app/styles/modules/context-menus/tab-content.css
+  s_3bc85c72e9d3d5::t_653553bc8dae96 1-5
+src-tauri/src/commands/commands.rs
+  s_78d2b1d89598e5::t_cffb09e9182c95 101-108,110-131
+  s_78d2b1d89598e5::t_4428be984b5a65 5-6
+  s_78d2b1d89598e5::t_4e0a418c1fbd61 8
+  s_78d2b1d89598e5::t_3c21a82673f3e9 109
+src/app/components/terminal/TerminalWorkspace.tsx
+  s_78d2b1d89598e5::t_ecfcfafcc4c459 45-46
+  s_78d2b1d89598e5::t_5dab1c41bbcc36 348-351
+  s_630de0f18f39e4::t_3c1b8a27a4c001 114
+  s_78d2b1d89598e5::t_701edd52172ea4 449,455,462
+  s_630de0f18f39e4::t_f14a48082912b0 759-764
+  s_47f054ca2320ed::t_4916639027a9a1 776-781
+  s_630de0f18f39e4::t_fdb1e9507335eb 98
+  s_5db840266d2a06::t_13570ebf7b428e 602-610,613-639
+  s_47f054ca2320ed::t_5a07c60e1c74aa 861-865,878-893,899-913,915-923,926-932
+  s_3bc85c72e9d3d5::t_ba647a5b5778b1 933-937,939-942,944-945
+  s_3bc85c72e9d3d5::t_95b013972dad69 35,47-51,122,559,561,860
+  s_78d2b1d89598e5::t_7d00d1b8a15371 747-749
+  s_3bc85c72e9d3d5::t_3c9fb4e2660804 658-716
+  s_630de0f18f39e4::t_13f4c6e3d60878 914
+  s_78d2b1d89598e5::t_c2f13678ba0609 359-360,362
+  s_630de0f18f39e4::t_34e08bdc8bfa4d 224,226-228
+  s_78d2b1d89598e5::t_0d3c64b4732efe 408-410
+  s_630de0f18f39e4::t_fd46f4ca3e18bf 371,383-393,419,435-441,451-454,456-461,471,523-527,529-531,539,541,543-558
+  s_78d2b1d89598e5::t_5c9fc7e8d4f8d1 470
+  s_3bc85c72e9d3d5::t_4f466809ac1999 286-287
+  s_630de0f18f39e4::t_c4081382dc6237 294-296,307
+  s_3bc85c72e9d3d5::t_69ca71bdaa0c95 578-579
+  s_78d2b1d89598e5::t_b5960ddf37c3dc 423-429,434
+  s_cdc7d8d1425e22::t_96961219d6afe0 274,280
+  s_78d2b1d89598e5::t_6f1128061a7f93 373-376
+  s_630de0f18f39e4::t_c01982b07809eb 751
+  s_47f054ca2320ed::t_3ade105358f6be 288-290
+  s_cdc7d8d1425e22::t_42486a44508686 72
+  s_78d2b1d89598e5::t_8289d5f95532f9 297-302
+  s_630de0f18f39e4::t_bcae8360800fd5 14,21-23,25-26,28,44
+  s_cdc7d8d1425e22::t_e6c30a321eabb0 894-897
+  s_78d2b1d89598e5::t_6b36e3f0e5878d 24,27
+  s_47f054ca2320ed::t_3a0a7c8f48a7ec 99,115,164-169,191-193,195
+  s_630de0f18f39e4::t_03c7adcf0fcc67 242
+  s_630de0f18f39e4::t_f9f3d9a0cdc077 330-334,340-341
+  s_3bc85c72e9d3d5::t_2ca0ac858f79a7 852,854,857-859
+  s_6b66c72a944628::t_783ed9bacfb6f8 36-37,43
+  s_78d2b1d89598e5::t_33bf754b3b3be1 119-121,123-129,132
+  s_78d2b1d89598e5::t_95d36df473f381 225
+  s_78d2b1d89598e5::t_c1c3a338757137 487-522,528,532-538,540,542,560
+  s_5db840266d2a06::t_4fd6ea1accafb7 938,943
+  s_630de0f18f39e4::t_d80ffb41dc57eb 430-431,443-448,450
+  s_cdc7d8d1425e22::t_cd9fdf792e2bcf 15,29-34,40
+  s_78d2b1d89598e5::t_4c7f742cc5021b 372
+  s_630de0f18f39e4::t_9c19ebf23a2505 584-585,611-612,642-654
+src-tauri/src/lib.rs
+  s_78d2b1d89598e5::t_d3bdf2b9c95238 146
+src/app/lib/quit-flush.ts
+  s_78d2b1d89598e5::t_68c6db322eb196 1-38
+src/app/lib/terminal/terminal-settings.ts
+  s_cdc7d8d1425e22::t_9b59eaa7b1f065 47-55
+  s_cdc7d8d1425e22::t_7dc7c23f8e0c0e 1
+src/app/hooks/usePtySession.ts
+  s_065293b3d47037::t_b4998821d07191 36-41,45-47,71-74,99-113,120,128-129,141-145,151,153,157-159,163,182-210,212-218,221-223,228-231,235-237,239,246-250,264-268
+tests/unit/terminal-workspace-persistence.test.tsx
+  s_78d2b1d89598e5::t_de3b34acf75522 135-136
+  s_78d2b1d89598e5::t_89fae24ea27657 1-134,137-217
+src-tauri/permissions/app-commands.toml
+  s_78d2b1d89598e5::t_b832853745169f 12
+.cursor/rules/git-commit.mdc
+  h_90ad036e211778 1-15
+tests/unit/terminal-settings.test.ts
+  s_cdc7d8d1425e22::t_6ff52b9b080d48 6,25-32
+src/app/styles/modules/terminal/workspace.css
+  s_47f054ca2320ed::t_20d8af6783f3a8 10-24
+  s_cdc7d8d1425e22::t_bab0b4ccda04b7 34-40,45
+src/app/styles/modules/terminal/status-bar.css
+  h_90ad036e211778 13,15
+  s_47f054ca2320ed::t_9230c443797716 1-12,14,16-56
+src/app/types/tauri.ts
+  s_cdc7d8d1425e22::t_6b035c0c23fd9e 14-16,29
+.cursor/agents/tailwind-developer.md
+  h_90ad036e211778 1-56
+tests/unit/pinned-tabs.test.ts
+  s_630de0f18f39e4::t_e107fe004c51b2 151-156
+  s_3bc85c72e9d3d5::t_c208b60e2d7b49 65-88,261-262
+  s_78d2b1d89598e5::t_05c13dc0f1107a 190-242
+  s_630de0f18f39e4::t_fbe1a7bc866658 3,5-6,99-150,157-189,243-252,254-256,258-260
+  s_78d2b1d89598e5::t_786dddb31bc485 265-266,277
+  s_78d2b1d89598e5::t_6333188c6931a2 14
+  s_78d2b1d89598e5::t_9ceca98559b9cb 263-264,267-276,278-296
+  s_78d2b1d89598e5::t_0b29cbe055b6c8 253,257
+  s_78d2b1d89598e5::t_3e3ad3df95d1fe 7-8
+src-tauri/src/pty/pool.rs
+  s_6b66c72a944628::t_783ed9bacfb6f8 5,13
+  s_af91385ee658ef::t_5c4c175471e23a 211,213
+  s_d1f01f7873a06e::t_103c1befdc292f 238-239,254-259
+  s_af91385ee658ef::t_eb53a77cfedb9b 205-210,212,214-237,240-253,260-263
+  s_af91385ee658ef::t_c22c05b37d392a 65-67
+other/configs/appinfo.json
+  h_90ad036e211778 2,4,6,8,10,12,14,16,18,20
+  h_90ad036e211778 1,3,5,7,9,11,13,15,17,19
+src/app/lib/e2e-window.ts
+  s_cdc7d8d1425e22::t_8a1d0d78b77a47 24
+src/app/lib/terminal/pinned-tabs.ts
+  s_78d2b1d89598e5::t_d4a14afefea2f9 85-122
+  s_630de0f18f39e4::t_4801f2badd7be1 21-61,66-68,70-73,77-84
+  s_630de0f18f39e4::t_f6facea8050618 62-65,69,74-76
+src/app/types/index.ts
+  s_cdc7d8d1425e22::t_8e98786de45fb9 9
+src/app/components/terminal/TabBar.tsx
+  s_66a0c7d08d094c::t_a1fceb4d83d92f 1-2,36-61,64-68
+  s_3bc85c72e9d3d5::t_12c7333ed08993 6-14,16,23-25,32-34,77,79-81
+tests/unit/pinned-tabs-store.test.ts
+  s_78d2b1d89598e5::t_130b31721ed49c 1-5,7,9,13-82,84-85,89,91-93,95-96,101,103-106,108-109,111-115
+  s_78d2b1d89598e5::t_0aea7a8202ed64 6,8,10-12
+  s_78d2b1d89598e5::t_4b5d2b2f2285b3 83,86-88,90,94,97-100,102,107,110
+.cursor/agents/rust-developer.md
+  h_90ad036e211778 1-66
+src-tauri/tauri.conf.json
+  s_af91385ee658ef::t_17a0b4ae52614e 79
+.cursor/hooks/state/continual-learning.json
+  s_5ca2e35f629607::t_8a25b74b6b29c8 4-6
+  s_5ca2e35f629607::t_debe6a458998d4 3
+other/configs/README.md
+  s_d1f01f7873a06e::t_cf1e4afe3deef1 66
+  s_cdc7d8d1425e22::t_1a8685c0483e8a 31
+  s_af91385ee658ef::t_fd34171d422206 64-65,67
+  s_cdc7d8d1425e22::t_3cc3ca05f016ae 89-96
+src/app/components/terminal/StatusBar.tsx
+  s_47f054ca2320ed::t_5edf65da3dba71 1-36
+src/app/hooks/usePinnedTabs.ts
+  s_78d2b1d89598e5::t_eb4ababf3a091e 6,12-23,45-53,57-63,68,81,86-88,90
+  s_78d2b1d89598e5::t_fed56333fe21f4 64,66-67,69-80,82-85,89
+  s_78d2b1d89598e5::t_b0afdfa10acbb7 65
+src/app/pages/content-menus/tab-context-menu.tsx
+  s_5db840266d2a06::t_d0d7c33a223db3 10,15,22,27,70-79
+  s_3bc85c72e9d3d5::t_d07da6d53471ca 1-9,11-14,16-21,23-26,28-69,80-83
+src/configs/.tsbuildinfo-test
+  s_78d2b1d89598e5::t_d73a5dd964da18 1
+src/app/components/terminal/SidePanel.tsx
+  s_123e7b132c1e38::t_e95b5443ad78d1 1-6,11-19,28,70-72,83-108
+  s_47f054ca2320ed::t_0d4b262427e0ed 7-10,20-27,29-69,73-82,109-118
+src/app/components/terminal/XtermView.tsx
+  s_630de0f18f39e4::t_fb9941183ea0de 33-34
+  s_78d2b1d89598e5::t_112924a741ae2c 92-136
+  s_78d2b1d89598e5::t_057acce2b10caf 40-42
+  s_78d2b1d89598e5::t_8f68af149db24a 172-175,195-199
+  s_78d2b1d89598e5::t_223a4608cc36a1 73-74
+  s_630de0f18f39e4::t_cf240551f6b03d 181,183-184,189-193
+  s_78d2b1d89598e5::t_cf4478279a7c60 219-220
+  s_630de0f18f39e4::t_f8c4a337a08e1d 59,72,82-84
+  s_78d2b1d89598e5::t_934a8168c91e16 171,182,185-188
+  s_78d2b1d89598e5::t_db40cc57fcfc3c 86-91
+  s_78d2b1d89598e5::t_28b964813e6c4b 252,258,260
+  s_5ca2e35f629607::t_1155d2aa6d6dd2 150
+  s_78d2b1d89598e5::t_a34bed1506c4c8 221
+src/app/components/terminal/TerminalPane.tsx
+  s_630de0f18f39e4::t_f198c0edc5b6c7 102
+  s_630de0f18f39e4::t_453bb5d5c5a32f 15
+  s_630de0f18f39e4::t_eab97ba056a668 40
+src/app/styles/modules/terminal/side-panel.css
+  s_47f054ca2320ed::t_8e0b4dbe23bcbd 1-16,19-20,82-98
+  s_123e7b132c1e38::t_88de7f3cd48620 17-18,21-81
+.cursor/AGENTS.md
+  s_6b66c72a944628::t_40238f6adce017 120-121
+  s_6b66c72a944628::t_1945dc0bacca3a 106,114,122-123,127-128
+other/prompts/nord-powerline.ps1
+  s_af91385ee658ef::t_ea09c3f698d608 14
+  s_2dff82d889d52d::t_6b796b7406d3a3 158,160
+  s_af91385ee658ef::t_b9b01eb7218be8 1-13,15-124,129-131,133-134,136,138-157,159,161-183,187-194,196-202
+  s_af91385ee658ef::t_303a43fd326ac4 186
+  s_af91385ee658ef::t_0bbaf192069902 184-185
+  s_2dff82d889d52d::t_b406a945b62855 125-128
+  s_af91385ee658ef::t_34eb0f6000fd6d 132,135,137
+  s_af91385ee658ef::t_0ddc9035b121c6 195
+src/app/components/terminal/TerminalParticleField.tsx
+  s_cdc7d8d1425e22::t_76fd39ecb4eca8 94
+  s_cdc7d8d1425e22::t_f2b2ef24096632 480-481
+  s_cdc7d8d1425e22::t_65e15dc94df03a 155,158-161
+  s_cdc7d8d1425e22::t_895dd366febfbc 1-74,77-78,83-93,95-129,131-154,156-157,162-230,234-235,237-240,244-363,372-378,381-383,385-426,428,431-435,437-440,443-465,475-479,482-485,487-490,492-505
+  s_cdc7d8d1425e22::t_ec61dbe21b9584 486
+  s_cdc7d8d1425e22::t_bbad15acbbd5db 466-467
+  s_cdc7d8d1425e22::t_2c76a0b04ff24a 79-82
+  s_cdc7d8d1425e22::t_b5d824c3fa89c3 241-243
+  s_cdc7d8d1425e22::t_93b6bc4ce28335 364-371,379-380,384,427,429-430,436,441-442
+  s_cdc7d8d1425e22::t_1a6a64c553ea54 231-233,236
+  s_cdc7d8d1425e22::t_e411c95073b070 468-474,491
+  s_cdc7d8d1425e22::t_3b9a5647830760 75-76
+  s_cdc7d8d1425e22::t_f98487512b9a98 130
+src/app/components/icons/MenuIcons.tsx
+  s_3bc85c72e9d3d5::t_04d439488f1d26 232-240
+  s_47f054ca2320ed::t_fff893aadd4ed2 241-249
+src/app/styles/modules/terminal/pane.css
+  s_cdc7d8d1425e22::t_aa9a4c56fe2408 6
+src/app/styles/modules/terminal/xterm.css
+  h_90ad036e211778 45
+  s_cdc7d8d1425e22::t_633f139f7435f3 18,23-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "00bc44a881f34e84ee863dfd24e6046337fe2138",
+  "prompts": {},
+  "humans": {
+    "h_90ad036e211778": {
+      "author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  },
+  "sessions": {
+    "s_065293b3d47037": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "50e7bd46-f8c6-4ca1-ad8a-3cc97e51eb06",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_123e7b132c1e38": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "e381649d-cf5d-4f3c-91b7-b8e4197815ce",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_2dff82d889d52d": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "88256113-1a9f-4e03-86ca-e39d0cda9c96",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_3bc85c72e9d3d5": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "24f027d4-f67d-4a67-b0de-ae95106ae69d",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_47f054ca2320ed": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "13479713-afa5-46a4-883e-0005a8bc58ad",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_5ca2e35f629607": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "13e12708-906f-4759-800c-5124d8492ec5",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_5db840266d2a06": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "130126ad-0533-4152-822b-9dbd6f4cfaa9",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_630de0f18f39e4": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "cf856868-9f9e-427a-b3a4-1164de53cb97",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_66a0c7d08d094c": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "1e0c4c2a-1eda-45fa-a741-377df6047449",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_6b66c72a944628": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "8eec065b-6ead-48f1-b7fd-2c86f9acc2f8",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_78d2b1d89598e5": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "2a0686fc-a050-49bf-ab4b-76c704cd1fb4",
+        "model": "claude-opus-5-thinking-high"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_af91385ee658ef": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "ed004a36-290d-4e4d-82ca-308d0806e962",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_cdc7d8d1425e22": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "0c632224-d63b-4b2b-8982-b80913559e36",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_d1f01f7873a06e": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "4c371ec6-e746-422e-b777-246b735b6279",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
