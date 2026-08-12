@@ -4,7 +4,7 @@
  * while still streaming to the console. Exit code matches the child process.
  */
 import { createWriteStream, mkdirSync, readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnPackageBin } from "./spawn-bin.js";
 
@@ -13,6 +13,10 @@ const repoRoot = join(__dirname, "..", "..");
 const buildLogDir = join(repoRoot, "other", "logging", "build");
 const appinfoPath = join(repoRoot, "other", "configs", "appinfo.json");
 const packageJsonPath = join(repoRoot, "package.json");
+
+function toProjectPath(absPath) {
+  return relative(repoRoot, absPath).split("\\").join("/");
+}
 
 function stripJsonc(raw) {
   return raw
@@ -58,7 +62,7 @@ const version = readVersion();
 const logPath = join(buildLogDir, formatLogFilename(version));
 const logStream = createWriteStream(logPath, { flags: "a" });
 
-const header = `[build] started ${new Date().toISOString()} version=${version}\n[build] log=${logPath}\n`;
+const header = `[build] started ${new Date().toISOString()} version=${version}\n[build] log=${toProjectPath(logPath)}\n`;
 process.stdout.write(header);
 logStream.write(header);
 

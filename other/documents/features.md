@@ -47,8 +47,10 @@ Shipped beside the installed executable under `other/configs/`:
 | File | Role |
 | --- | --- |
 | `appinfo.json` | Product name, version, identifier (prefer read-only when the platform allows) |
-| `settings.json` | User-editable JSONC — theme, font, and related preferences |
-| `keybindings.json` | User-editable JSONC — menu action shortcuts |
+| `settings.json` | User-editable — theme, font, and related preferences |
+| `keybindings.json` | User-editable — menu action shortcuts |
+| `logging.json` | User-editable — per-level app log filters |
+| `README.md` | Usage docs for the files above |
 
 Opaque app-managed persistence uses `@tauri-apps/plugin-store` (`src/app/lib/app-store.ts` → AppData `app-state.json`). Do not route `other/configs/` through the store.
 

@@ -7,7 +7,7 @@
  * (filtered by logging.json); this wrapper captures the full process transcript.
  */
 import { createWriteStream, mkdirSync, readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnPackageBin } from "./spawn-bin.js";
 
@@ -16,6 +16,10 @@ const repoRoot = join(__dirname, "..", "..");
 const appLogDir = join(repoRoot, "other", "logging", "app");
 const appinfoPath = join(repoRoot, "other", "configs", "appinfo.json");
 const packageJsonPath = join(repoRoot, "package.json");
+
+function toProjectPath(absPath) {
+  return relative(repoRoot, absPath).split("\\").join("/");
+}
 
 function stripJsonc(raw) {
   return raw
@@ -61,7 +65,7 @@ const version = readVersion();
 const logPath = join(appLogDir, formatLogFilename(version));
 const logStream = createWriteStream(logPath, { flags: "a" });
 
-const header = `[app] started ${new Date().toISOString()} version=${version}\n[app] log=${logPath}\n`;
+const header = `[app] started ${new Date().toISOString()} version=${version}\n[app] log=${toProjectPath(logPath)}\n`;
 process.stdout.write(header);
 logStream.write(header);
 

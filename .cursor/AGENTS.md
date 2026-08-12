@@ -112,13 +112,13 @@ top of `~/.cursor/cli-config.json` for sessions in this repo.
 - Do not persist window width or position in `other/configs/settings.json` (geometry writes caused move/flash issues).
 - When implementing an attached plan, do not edit the plan file; reuse existing todos and mark them in progress rather than recreating them.
 - Titlebar, content, and tray context menus should share the same custom flat, theme-aware styling (tray must track app themes like the in-app menus).
-- Keep usage comments in `other/configs/settings.json` and `keybindings.json` (JSONC).
+- Prefer project-relative paths (e.g. `other/logging/...`) over absolute filesystem paths when referring to files, logs, and project locations.
 - Packaged splash and early chrome must follow `settings.json` theme (not a hard-coded dark/Polar Night default).
 
 ## Learned Workspace Facts
 
-- Canonical agent instructions live in `.cursor/AGENTS.md`; root `AGENTS.md` only points there.
-- Runtime app config lives in `other/configs/` (`appinfo.json`, `settings.json`, `keybindings.json`) and ships beside the installed `.exe` under `other/`; `settings.json` and `keybindings.json` are user-editable JSONC; prefer `appinfo.json` visible but read-only when the platform allows.
+- This repo is `GenSource.Terminal`, a new app copied from `GenSource.Template`; treat it as its own product (not the template). Canonical agent instructions live in `.cursor/AGENTS.md`; root `AGENTS.md` only points there.
+- Runtime app config lives in `other/configs/` (`appinfo.json`, `settings.json`, `keybindings.json`, `logging.json`) and ships beside the installed `.exe` under `other/`; keep those JSON files comment-free and document options in `other/configs/README.md` (loader still accepts JSONC); prefer `appinfo.json` visible but read-only when the platform allows.
 - Opaque app-managed persistence uses `@tauri-apps/plugin-store` via `src/app/lib/app-store.ts` (AppData `app-state.json`); do not route `other/configs/` through the store.
 - `settings.json` `autostart` drives `@tauri-apps/plugin-autostart` (enable/disable with that setting).
 - Icon sources live in `public/icons/` (`icon.svg`, `icon.png`, `icon.ico`); tray/taskbar/window icons are the bundled set under `src-tauri/icons/` — regenerate with `npm run tauri -- icon ./public/icons/icon.png` after changing sources (updating `public/icons/` alone does not refresh tray/taskbar).
