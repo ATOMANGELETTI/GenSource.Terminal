@@ -2,7 +2,7 @@
   "theme": "nord-polar-night",
   "fontFamily": "Terminus",
   "fontSize": 14,
-  "particleEffect": "dust",
+  "particleEffect": "constellation",
   "startMinimized": false,
   "autostart": false,
   "alwaysOnTop": false,
