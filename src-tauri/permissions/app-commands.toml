@@ -9,6 +9,7 @@ commands.allow = [
   "get_keybindings",
   "open_configs_folder",
   "hide_main_window",
+  "request_quit",
   "quit_app",
   "pty_create",
   "pty_write",

@@ -459,7 +459,7 @@ pub fn register_keybindings<R: Runtime>(app: &AppHandle<R>, bindings: &Keybindin
                         }
                     }
                     "app.quit" => {
-                        app_handle.exit(0);
+                        crate::commands::request_quit_with_flush(app_handle);
                     }
                     other => {
                         info!("unhandled keybinding id: {other}");
@@ -478,6 +478,7 @@ fn appearance_changed(previous: &AppSettings, next: &AppSettings) -> bool {
     previous.theme != next.theme
         || previous.font_family != next.font_family
         || (previous.font_size - next.font_size).abs() > f64::EPSILON
+        || previous.particle_effect != next.particle_effect
         || previous.start_minimized != next.start_minimized
         || previous.always_on_top != next.always_on_top
         || previous.autostart != next.autostart

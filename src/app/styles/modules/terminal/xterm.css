@@ -15,10 +15,16 @@
 
 .terminal-xterm .xterm {
   height: 100%;
+  background-color: transparent !important;
 }
 
 .terminal-xterm .xterm-viewport {
   overflow-y: auto !important;
+  background-color: transparent !important;
+}
+
+.terminal-xterm .xterm-screen {
+  background-color: transparent !important;
 }
 
 /* Canvas-backed xterm: keep restore text assertable without affecting layout. */
@@ -36,4 +42,5 @@
   opacity: 0;
   pointer-events: none;
   user-select: none;
+  --webkit-user-select: none;
 }

@@ -1,0 +1,56 @@
+.status-bar {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 0.5rem;
+  height: 1.625rem;
+  padding: 0 0.35rem 0 0.15rem;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  line-height: 1;
+  -webkit-user-select: none;
+  user-select: none;
+  --webkit-user-select: none;
+}
+
+.status-bar__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.375rem;
+  padding: 0;
+  border: none;
+  border-radius: 0.25rem;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.status-bar__toggle:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.status-bar__toggle[aria-pressed="true"] {
+  color: var(--accent);
+}
+
+.status-bar__toggle-icon {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+.status-bar__spacer {
+  flex: 1;
+  min-width: 0;
+}
+
+.status-bar__info {
+  padding-right: 0.35rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

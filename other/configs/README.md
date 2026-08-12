@@ -28,6 +28,7 @@ User preferences for the UI shell and terminal. Edit and save — changes apply 
 | `theme` | Theme preference (case-insensitive; short aliases OK). See values below. |
 | `fontFamily` | Font family for app chrome. Known mapped faces: `Terminus` (default), `Ubuntu`, `Fira Code`, `Plus Jakarta Sans`. Any other name is used as a CSS `font-family` with Terminus fallback. |
 | `fontSize` | Base UI font size in CSS pixels (positive number; default `14`). |
+| `particleEffect` | Terminal particle background mode: `dust` (default), `constellation`, or `orbs`. Invalid values fall back to `dust`. Hot-swaps while the app is running. |
 | `startMinimized` | If `true`, hide the main window on launch (pair with tray / `window.show`). |
 | `autostart` | If `true`, launch the app when the OS signs in. |
 | `alwaysOnTop` | If `true`, keep the main window above other windows. |
@@ -60,6 +61,10 @@ Shipped defaults:
 
 Changing `profiles` / `defaultProfile` affects **subsequent** new tabs only, not running sessions.
 
+### Terminal prompt (PowerShell)
+
+PowerShell sessions automatically load the bundled Nord 2-line powerline prompt from `other/prompts/nord-powerline.ps1` (no oh-my-posh). Spawn injects `-ExecutionPolicy Bypass -NoProfile -NoExit -Command` and sets `GENSOURCE_THEME` from the current `theme` setting so segment colors follow Polar Night vs Snow Storm / `*-light` (and OS light/dark for `system` / `frost` / `aurora`). Bypass is **per session / process-scoped only** — it does not change machine or user execution policy. CMD profiles stay a plain shell. Prompt init is automatic — you do not need prompt args on the `powershell` profile. If a profile already uses `-Command` / `-File`, injection is skipped.
+
 ### `theme` values
 
 **Fixed** (ignore OS light/dark):
@@ -80,6 +85,14 @@ Changing `profiles` / `defaultProfile` affects **subsequent** new tabs only, not
 | `system` | — | polar-night ↔ snow-storm |
 | `nord-frost` | `frost` | frost dark ↔ frost light |
 | `nord-aurora` | `aurora` | aurora dark ↔ aurora light |
+
+### `particleEffect` values
+
+| Value | Look |
+| --- | --- |
+| `dust` | Soft layered motes with sine drift (default; quietest) |
+| `constellation` | Dust plus subtle proximity links (no cursor interaction) |
+| `orbs` | Fewer larger soft radial orbs with slow drift |
 
 ---
 

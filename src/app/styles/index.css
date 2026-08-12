@@ -8,12 +8,15 @@
 @import "./modules/layout/splash.css";
 @import "./modules/motion/transitions.css";
 @import "./modules/terminal/workspace.css";
+@import "./modules/terminal/side-panel.css";
+@import "./modules/terminal/status-bar.css";
 @import "./modules/terminal/tabs.css";
 @import "./modules/terminal/pane.css";
 @import "./modules/terminal/xterm.css";
 @import "./modules/context-menus/menu-shared.css";
 @import "./modules/context-menus/titlebar-content.css";
 @import "./modules/context-menus/content-content.css";
+@import "./modules/context-menus/tab-content.css";
 @import "./modules/context-menus/tray-window.css";
 @import "./modules/dialogs/about-dialog.css";
 @import "./app.css";

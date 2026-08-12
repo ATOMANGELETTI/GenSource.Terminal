@@ -3,6 +3,7 @@ import {
   clampScrollbackLines,
   resolveCursorStyle,
   resolveDefaultProfileId,
+  resolveParticleEffect,
   resolveTerminalFontFamily,
   resolveTerminalFontSize,
   ensureProfiles,
@@ -19,6 +20,14 @@ describe("terminal-settings helpers", () => {
   it("resolves cursor style", () => {
     expect(resolveCursorStyle("block")).toBe("block");
     expect(resolveCursorStyle("nope")).toBe("bar");
+  });
+
+  it("resolves particle effect", () => {
+    expect(resolveParticleEffect("dust")).toBe("dust");
+    expect(resolveParticleEffect("Constellation")).toBe("constellation");
+    expect(resolveParticleEffect("orbs")).toBe("orbs");
+    expect(resolveParticleEffect("sparkles")).toBe("dust");
+    expect(resolveParticleEffect("")).toBe("dust");
   });
 
   it("injects builtin profiles when empty", () => {

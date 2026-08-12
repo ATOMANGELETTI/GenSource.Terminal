@@ -2,6 +2,7 @@
 
 use std::collections::HashMap;
 use std::io::{Read, Write};
+use std::path::Path;
 use std::sync::{Arc, Mutex};
 use std::thread;
 
@@ -9,6 +10,7 @@ use portable_pty::{native_pty_system, CommandBuilder, MasterPty, PtySize};
 use tauri::{AppHandle, Emitter, Manager};
 use uuid::Uuid;
 
+use crate::config;
 use crate::mdoels::{AppSettings, PtyExitEvent, PtyOutputEvent};
 
 pub struct PtySessionPool {
@@ -59,6 +61,9 @@ impl PtySessionPool {
         let mut cmd = CommandBuilder::new(&profile.command);
         for arg in &profile.args {
             cmd.arg(arg);
+        }
+        if is_powershell_command(&profile.command) {
+            inject_powershell_nord_prompt(&mut cmd, &profile.args, &settings.theme);
         }
         if let Some(dir) = profile
             .starting_directory
@@ -196,4 +201,63 @@ fn dirs_home() -> Option<std::path::PathBuf> {
     std::env::var_os("USERPROFILE")
         .or_else(|| std::env::var_os("HOME"))
         .map(std::path::PathBuf::from)
+}
+
+fn is_powershell_command(command: &str) -> bool {
+    let name = Path::new(command)
+        .file_name()
+        .and_then(|n| n.to_str())
+        .unwrap_or(command);
+    let lower = name.to_ascii_lowercase();
+    matches!(
+        lower.as_str(),
+        "powershell.exe" | "powershell" | "pwsh.exe" | "pwsh"
+    )
+}
+
+/// True when profile args already drive `-Command` / `-File` (skip prompt inject).
+fn powershell_args_own_entry(args: &[String]) -> bool {
+    args.iter().any(|arg| {
+        let lower = arg.to_ascii_lowercase();
+        lower == "-command"
+            || lower == "-c"
+            || lower.starts_with("-command:")
+            || lower == "-encodedcommand"
+            || lower == "-ec"
+            || lower == "-file"
+            || lower == "-f"
+            || lower.starts_with("-file:")
+    })
+}
+
+fn quote_powershell_single(path: &str) -> String {
+    format!("'{}'", path.replace('\'', "''"))
+}
+
+/// Dot-source bundled Nord powerline prompt; set `GENSOURCE_THEME` from app settings.
+/// Keeps existing `-NoLogo`; adds process-scoped `-ExecutionPolicy Bypass`, `-NoProfile`,
+/// and `-NoExit -Command` when the script is present. Does not change machine/user policy.
+fn inject_powershell_nord_prompt(cmd: &mut CommandBuilder, profile_args: &[String], theme: &str) {
+    cmd.env("GENSOURCE_THEME", theme);
+
+    if powershell_args_own_entry(profile_args) {
+        return;
+    }
+
+    let script = config::resolve_other_subdir("prompts").join("nord-powerline.ps1");
+    if !script.is_file() {
+        return;
+    }
+
+    let path = script.to_string_lossy();
+    let load = format!(". {}", quote_powershell_single(path.as_ref()));
+    // Process-scoped only — allows bundling unsigned nord-powerline.ps1 without
+    // Set-ExecutionPolicy. -NoProfile keeps user profiles from fighting prompt init
+    // (injection already skips when the profile owns -Command/-File).
+    cmd.arg("-ExecutionPolicy");
+    cmd.arg("Bypass");
+    cmd.arg("-NoProfile");
+    cmd.arg("-NoExit");
+    cmd.arg("-Command");
+    cmd.arg(load);
 }

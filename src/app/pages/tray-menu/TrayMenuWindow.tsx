@@ -26,6 +26,7 @@ import {
   isE2eMode,
 } from "../../lib/e2e-window";
 import { useKeybindingLabels } from "../../lib/keybindings";
+import { requestQuit } from "../../lib/quit-flush";
 import {
   hideMainWindow,
   isMainWindowVisible,
@@ -229,7 +230,7 @@ export default function TrayMenuWindow() {
           type="button"
           className="context-menu__item context-menu__item--destructive"
           role="menuitem"
-          onClick={run(() => invoke("quit_app"))}
+          onClick={run(requestQuit)}
         >
           <QuitIcon className="context-menu__icon" />
           <span className="context-menu__label">Quit {productName}</span>

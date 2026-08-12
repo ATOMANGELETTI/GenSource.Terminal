@@ -19,6 +19,108 @@ export function truncateScrollback(text: string, maxLines: number): string {
 }
 
 /**
+ * Prefer live xterm text, then last known good, then restore `initialScrollback`.
+ * Never returns empty when a non-empty fallback exists (avoids wipe-on-restore).
+ */
+export function resolvePinnedScrollback(options: {
+  live?: string | null;
+  lastKnown?: string | null;
+  initial?: string | null;
+}): string {
+  const live = options.live ?? "";
+  if (live.length > 0) {
+    return live;
+  }
+  const lastKnown = options.lastKnown ?? "";
+  if (lastKnown.length > 0) {
+    return lastKnown;
+  }
+  return options.initial ?? "";
+}
+
+/** Pin-relevant fields only — ignores sessionId / status churn. */
+export function pinPersistSignature(
+  tabs: Array<{
+    tabId: string;
+    pinned: boolean;
+    title: string;
+    profileId: string;
+  }>,
+  activeTabId: string | null,
+): string {
+  return JSON.stringify({
+    activeTabId,
+    tabs: tabs.map((t) => ({
+      tabId: t.tabId,
+      pinned: t.pinned,
+      title: t.title,
+      profileId: t.profileId,
+    })),
+  });
+}
+
+/**
+ * True once every tab with restore text has an xterm handle and has finished
+ * its initial write. Tabs without `initialScrollback` do not block.
+ */
+export function areRestoredScrollbacksReady(
+  tabs: Array<{ tabId: string; initialScrollback?: string }>,
+  readyIds: ReadonlySet<string>,
+  handleIds?: ReadonlySet<string>,
+): boolean {
+  for (const tab of tabs) {
+    if (tab.initialScrollback && tab.initialScrollback.length > 0) {
+      if (!readyIds.has(tab.tabId)) {
+        return false;
+      }
+      if (handleIds && !handleIds.has(tab.tabId)) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+/**
+ * Single gate shared by every persist path (debounce, interval, visibility,
+ * unload, effect cleanup, window close). Writing before hydration finishes is
+ * what wiped AppData under StrictMode, so `hydrated` is mandatory.
+ */
+export function shouldPersistPins(options: {
+  hydrated: boolean;
+  tabs: Array<{ tabId: string; initialScrollback?: string }>;
+  readyIds: ReadonlySet<string>;
+  handleIds?: ReadonlySet<string>;
+}): boolean {
+  if (!options.hydrated) {
+    return false;
+  }
+  return areRestoredScrollbacksReady(
+    options.tabs,
+    options.readyIds,
+    options.handleIds,
+  );
+}
+
+/**
+ * Store-level guard: an empty snapshot may only replace stored pins when the
+ * caller explicitly allows it (user unpinned everything after hydration).
+ */
+export function shouldWritePinnedState(options: {
+  next: PinnedTabsState;
+  stored: PinnedTabsState;
+  allowEmpty?: boolean;
+}): boolean {
+  if (options.next.tabs.length > 0) {
+    return true;
+  }
+  if (options.allowEmpty) {
+    return true;
+  }
+  return options.stored.tabs.length === 0;
+}
+
+/**
  * Serialize live tab state into store shape: pinned tabs only, unpinned
  * discarded, at most one `wasActive`.
  */

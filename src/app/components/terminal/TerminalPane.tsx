@@ -12,6 +12,7 @@ export interface TerminalPaneProps {
   cursorStyle: CursorStyle;
   cursorBlink: boolean;
   initialScrollback?: string;
+  onInitialScrollbackReady?: () => void;
   onData: (data: string) => void;
   onResize: (cols: number, rows: number) => void;
   visible: boolean;
@@ -36,6 +37,7 @@ export default function TerminalPane({
   cursorStyle,
   cursorBlink,
   initialScrollback,
+  onInitialScrollbackReady,
   onData,
   onResize,
   visible,
@@ -97,6 +99,7 @@ export default function TerminalPane({
           cursorStyle={cursorStyle}
           cursorBlink={cursorBlink}
           initialScrollback={initialScrollback}
+          onInitialScrollbackReady={onInitialScrollbackReady}
           onData={onData}
           onResize={onResize}
           visible={visible}

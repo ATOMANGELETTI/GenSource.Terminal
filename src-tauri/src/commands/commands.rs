@@ -2,8 +2,10 @@
 //! `invoke_handler![...]` list in `lib.rs`.
 
 use std::sync::Arc;
+use std::thread;
+use std::time::Duration;
 
-use tauri::{AppHandle, Manager, State};
+use tauri::{AppHandle, Emitter, Manager, Runtime, State};
 
 use crate::config;
 use crate::mdoels::{
@@ -96,7 +98,37 @@ pub fn hide_main_window(app: AppHandle) -> Result<(), String> {
     Ok(())
 }
 
-/// Exits the app (used by the tray flyout's "Quit" row).
+/// Event the main webview listens for to flush persisted state before exit.
+const QUIT_REQUESTED_EVENT: &str = "app-quit-requested";
+/// Hard exit deadline if the frontend never calls back (hung or closed webview).
+const QUIT_FLUSH_TIMEOUT_MS: u64 = 1500;
+
+/// Asks the main webview to flush persisted state (pinned tabs + scrollback),
+/// then exit via `quit_app`. Exits immediately when there is no main window,
+/// and always exits once the watchdog deadline passes, so Quit cannot hang.
+pub fn request_quit_with_flush<R: Runtime>(app: &AppHandle<R>) {
+    if app.get_webview_window("main").is_none()
+        || app.emit_to("main", QUIT_REQUESTED_EVENT, ()).is_err()
+    {
+        app.exit(0);
+        return;
+    }
+
+    let handle = app.clone();
+    thread::spawn(move || {
+        thread::sleep(Duration::from_millis(QUIT_FLUSH_TIMEOUT_MS));
+        handle.exit(0);
+    });
+}
+
+/// Quit entry point for the tray flyout and the `app.quit` shortcut: flushes
+/// frontend state first (see [`request_quit_with_flush`]).
+#[tauri::command]
+pub fn request_quit(app: AppHandle) {
+    request_quit_with_flush(&app);
+}
+
+/// Exits the app; called by the frontend once its flush completed.
 #[tauri::command]
 pub fn quit_app(app: AppHandle) {
     app.exit(0);

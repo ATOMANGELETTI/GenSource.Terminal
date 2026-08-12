@@ -3,10 +3,23 @@ import { isE2eMode } from "../lib/e2e-window";
 import {
   PINNED_TABS_KEY,
   normalizePinnedTabsState,
+  shouldWritePinnedState,
 } from "../lib/terminal/pinned-tabs";
 import type { PinnedTabsState } from "../types";
 
 const EMPTY_PINS: PinnedTabsState = { version: 1, tabs: [] };
+
+/** Serializes store writes so a slow older save cannot land after a newer one. */
+let writeQueue: Promise<void> = Promise.resolve();
+let writeSeq = 0;
+
+export interface SavePinnedTabsOptions {
+  /**
+   * Permit replacing stored pins with an empty list. Callers must only set
+   * this once hydration finished and the live tab list really has no pins.
+   */
+  allowEmpty?: boolean;
+}
 
 /** Load pinned tabs from plugin-store (corrupt/missing → empty). */
 export async function loadPinnedTabs(): Promise<PinnedTabsState> {
@@ -29,12 +42,52 @@ export async function loadPinnedTabs(): Promise<PinnedTabsState> {
   }
 }
 
-/** Persist pinned tabs (+ scrollback) to plugin-store only. */
-export async function savePinnedTabs(state: PinnedTabsState): Promise<void> {
+/**
+ * Persist pinned tabs (+ scrollback) to plugin-store only. Writes are queued
+ * in call order, superseded snapshots are dropped, and an empty list never
+ * overwrites stored pins unless `allowEmpty` is set.
+ */
+export async function savePinnedTabs(
+  state: PinnedTabsState,
+  options: SavePinnedTabsOptions = {},
+): Promise<void> {
   if (isE2eMode()) {
     return;
   }
-  await setStoreValue(PINNED_TABS_KEY, state);
+
+  const seq = ++writeSeq;
+  const run = writeQueue.then(async () => {
+    if (seq !== writeSeq) {
+      // A newer full snapshot is already queued; this one is stale.
+      return;
+    }
+    try {
+      if (state.tabs.length === 0) {
+        const stored = normalizePinnedTabsState(
+          await getStoreValue<unknown>(PINNED_TABS_KEY),
+        );
+        if (
+          !shouldWritePinnedState({
+            next: state,
+            stored,
+            allowEmpty: options.allowEmpty,
+          })
+        ) {
+          console.warn(
+            "Refused to overwrite stored pinned tabs with an empty list",
+          );
+          return;
+        }
+      }
+      await setStoreValue(PINNED_TABS_KEY, state);
+    } catch (error) {
+      // Never reject: callers fire this from unload/close paths.
+      console.warn("Failed to save pinned tabs", error);
+    }
+  });
+
+  writeQueue = run;
+  await run;
 }
 
 /**

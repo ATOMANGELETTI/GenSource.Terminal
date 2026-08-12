@@ -11,6 +11,9 @@ export interface AppInfo {
 
 export type CursorStyle = "block" | "underline" | "bar";
 
+/** Terminal particle background mode (`settings.json` `particleEffect`). */
+export type ParticleEffect = "dust" | "constellation" | "orbs";
+
 export interface TerminalProfile {
   id: string;
   name: string;
@@ -23,6 +26,7 @@ export interface AppSettings {
   theme: string;
   fontFamily: string;
   fontSize: number;
+  particleEffect: ParticleEffect | string;
   startMinimized: boolean;
   autostart: boolean;
   alwaysOnTop: boolean;

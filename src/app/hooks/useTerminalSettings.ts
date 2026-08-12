@@ -10,10 +10,16 @@ import {
   ensureProfiles,
   resolveCursorStyle,
   resolveDefaultProfileId,
+  resolveParticleEffect,
   resolveTerminalFontFamily,
   resolveTerminalFontSize,
 } from "../lib/terminal/terminal-settings";
-import type { AppSettings, CursorStyle, TerminalProfile } from "../types";
+import type {
+  AppSettings,
+  CursorStyle,
+  ParticleEffect,
+  TerminalProfile,
+} from "../types";
 
 export interface TerminalSettingsSlice {
   fontFamily: string;
@@ -21,6 +27,7 @@ export interface TerminalSettingsSlice {
   scrollbackLines: number;
   cursorStyle: CursorStyle;
   cursorBlink: boolean;
+  particleEffect: ParticleEffect;
   defaultProfile: string;
   profiles: TerminalProfile[];
   /** Latest full settings payload (null until first load). */
@@ -41,6 +48,7 @@ function toSlice(settings: AppSettings): Omit<TerminalSettingsSlice, "settings">
     scrollbackLines: clampScrollbackLines(settings.scrollbackLines),
     cursorStyle: resolveCursorStyle(String(settings.cursorStyle)),
     cursorBlink: Boolean(settings.cursorBlink),
+    particleEffect: resolveParticleEffect(String(settings.particleEffect ?? "")),
     defaultProfile: resolveDefaultProfileId(settings.defaultProfile, profiles),
     profiles,
   };

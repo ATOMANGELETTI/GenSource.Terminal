@@ -103,7 +103,7 @@ top of `~/.cursor/cli-config.json` for sessions in this repo.
 ## Learned User Preferences
 
 - Keep agent context Cursor-native under `.cursor/` only; do not reintroduce `.agents/` or invent non-native trees such as `personas/`, `memory/`, or `workflows/`.
-- Prefer a flat Nord UI across themes: no gradients, glow, glass, or multi-layer shadows; macOS-like traffic-light titlebar on the left with centered title; keep the titlebar relatively short; traffic lights have no interior glyphs.
+- Prefer a flat Nord UI across themes: no gradients, glow, glass, or multi-layer shadows; macOS-like traffic-light titlebar on the left with centered title; keep the titlebar relatively short; traffic lights have no interior glyphs; terminal prompt should be a modern two-line Powerline style that matches Nord themes.
 - Keep CSS modular under `src/app/styles/modules/`; treat `index.css` as an import hub only.
 - Prefer Terminus as the default UI font; keep bundled Nerd Fonts under `public/fonts/nerdfonts/{firacode,terminus,ubuntu}/` (do not flatten into `public/fonts/`); switch via `settings.json` `fontFamily` (`Terminus`, `Ubuntu`, `Fira Code`, or `Plus Jakarta Sans`).
 - Prefer latest stable package versions, but keep TypeScript on the newest 5.x that `typescript-eslint` supports.
@@ -111,21 +111,21 @@ top of `~/.cursor/cli-config.json` for sessions in this repo.
 - Do not place the square app icon in the main content UI; reserve icon assets for tray, taskbar, and window only (`public/icons/` sources, bundled into `src-tauri/icons/).
 - Do not persist window width or position in `other/configs/settings.json` (geometry writes caused move/flash issues).
 - When implementing an attached plan, do not edit the plan file; reuse existing todos and mark them in progress rather than recreating them.
-- Titlebar, content, and tray context menus should share the same custom flat, theme-aware styling (tray must track app themes like the in-app menus).
+- Titlebar, content, tray, and terminal-tab context menus should share the same custom flat, theme-aware styling; keep terminal tabs uncluttered (no close X on tabs — close/rename via tab menu; show the pin icon only while a tab is pinned).
 - Prefer project-relative paths (e.g. `other/logging/...`) over absolute filesystem paths when referring to files, logs, and project locations.
 - Packaged splash and early chrome must follow `settings.json` theme (not a hard-coded dark/Polar Night default).
 
 ## Learned Workspace Facts
 
-- This repo is `GenSource.Terminal`, a new app copied from `GenSource.Template`; treat it as its own product (not the template). Canonical agent instructions live in `.cursor/AGENTS.md`; root `AGENTS.md` only points there.
-- Runtime app config lives in `other/configs/` (`appinfo.json`, `settings.json`, `keybindings.json`, `logging.json`) and ships beside the installed `.exe` under `other/`; keep those JSON files comment-free and document options in `other/configs/README.md` (loader still accepts JSONC); prefer `appinfo.json` visible but read-only when the platform allows.
-- Opaque app-managed persistence uses `@tauri-apps/plugin-store` via `src/app/lib/app-store.ts` (AppData `app-state.json`); do not route `other/configs/` through the store.
-- `settings.json` `autostart` drives `@tauri-apps/plugin-autostart` (enable/disable with that setting).
+- This repo is `GenSource.Terminal` (product GenSource Terminal, identifier `com.gensource.terminal`, deep-link scheme `terminal`, `appinfo.json` `codename`/`edition`); treat it as its own product, not the template. Canonical agent instructions live in `.cursor/AGENTS.md`; root `AGENTS.md` only points there.
+- Runtime app config lives in `other/configs/` (`appinfo.json`, `settings.json`, `keybindings.json`, `logging.json`) and ships beside the installed `.exe` under `other/`; keep those JSON files comment-free and document options in `other/configs/README.md` (loader still accepts JSONC); terminal prefs/profiles are user-editable in `settings.json`; `settings.json` `autostart` drives `@tauri-apps/plugin-autostart`; prefer `appinfo.json` visible but read-only when the platform allows.
+- Opaque app-managed persistence uses `@tauri-apps/plugin-store` via `src/app/lib/app-store.ts` (AppData `app-state.json`); do not route `other/configs/` through the store; only pinned terminal tabs persist across restarts (custom names + history/scrollback); unpinned tabs are session-only.
+- Terminal PTY uses `portable-pty` (Windows ConPTY) with `pty_create`/`pty_write`/`pty_resize`/`pty_kill` and `pty-output`/`pty-exit` events; shell profiles resolve from `settings.json` (frontend sends `profileId`).
 - Icon sources live in `public/icons/` (`icon.svg`, `icon.png`, `icon.ico`); tray/taskbar/window icons are the bundled set under `src-tauri/icons/` — regenerate with `npm run tauri -- icon ./public/icons/icon.png` after changing sources (updating `public/icons/` alone does not refresh tray/taskbar).
 - Tooling configs stay under `src/configs/`; do not recreate Vite, ESLint, Vitest, or Playwright configs at the repo root.
 - Themes are independent Nord palettes (polar-night, snow-storm, frost, aurora) with fixed `*-dark`/`*-light` variants; `system`, `frost`, and `aurora` follow OS light/dark via `settings.json` `theme`.
-- Custom context menus cover titlebar, content area, and tray; menu action keybindings live in `other/configs/keybindings.json`; exclude the ephemeral `tray-menu` window from `tauri-plugin-window-state` so it does not restore/auto-open on launch.
+- Custom context menus cover titlebar, content area, tray, and terminal tabs; menu action keybindings live in `other/configs/keybindings.json`; exclude the ephemeral `tray-menu` window from `tauri-plugin-window-state` so it does not restore/auto-open on launch.
+- Terminal workspace chrome: blank left side panel (default ~200px, drag-resize on the panel/terminal edge; toggle from a thin bottom status bar); tab strip starts to the right of the panel (not over it); resizing the panel must resize the terminal with it.
 - Runtime app logs belong under `other/logging/app/`; build logs under `other/logging/build/` (tee from packaging/build wrappers); log files named `[TIME]_[DATE]_[APPVERSION].log`; user-runnable maintenance bats live in `other/utilities/scripts/` (`archive-logs.bat` via `other/utilities/7zr.exe` → timestamped `.7z` in `scripts/archive/`, plus `clean-logs-app.bat`, `clean-logs-build.bat`, `clean-logs-archive.bat`).
 - npm runners live in `src/scripts/` (`dev.js` → Vite `dev`, `log-tauri-app.js` → `tauri:dev` with tee to `other/logging/app/`, `log-tauri-build.js` → `tauri:build` with tee to `other/logging/build/`, `package.js` → `package` / `package:clean`); Windows release packaging targets `release/` with 32- and 64-bit NSIS installers (custom hooks in `src-tauri/nsis/installer.nsh`, per-user or system-wide) plus matching portable zip builds.
-- Project docs: keep the main `README.md` at the repo root for GitHub; longer split docs live under `other/documents/`; app screenshots live under `other/screenshots/`.
 - Tests live under `tests/` (`unit/`, `e2e/` including Playwright visuals); reports/outputs go in `tests/artifacts/`; surface inventory is `tests/surfaces.json` (used by tester-pro).

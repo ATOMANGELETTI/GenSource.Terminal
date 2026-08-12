@@ -76,6 +76,7 @@
     "resources": {
       "../other/configs/": "other/configs/",
       "../other/documents/": "other/documents/",
+      "../other/prompts/": "other/prompts/",
       "../other/screenshots/": "other/screenshots/",
       "../other/utilities/": "other/utilities/"
     }

@@ -13,7 +13,8 @@ function cssVar(name: string, fallback: string): string {
 /** Map live Nord semantic tokens into xterm ITheme (no hard-coded purple/glow). */
 export function readNordXtermTheme(): ITheme {
   return {
-    background: cssVar("--bg", "#2e3440"),
+    // rgba keeps alpha reliable for xterm; workspace `--bg` + TerminalParticleField are the backdrop.
+    background: "rgba(0, 0, 0, 0)",
     foreground: cssVar("--text", "#eceff4"),
     cursor: cssVar("--accent", "#88c0d0"),
     cursorAccent: cssVar("--bg", "#2e3440"),

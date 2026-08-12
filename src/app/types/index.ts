@@ -6,6 +6,7 @@ export type {
   GreetResponse,
   Keybinding,
   KeybindingScope,
+  ParticleEffect,
   PinnedTabRecord,
   PinnedTabsState,
   PtyCreateArgs,

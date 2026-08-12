@@ -1,10 +1,20 @@
-{
-  "name": "GenSource Terminal",
-  "productName": "GenSource Terminal",
-  "identifier": "com.gensource.terminal",
-  "version": "0.1.0",
-  "publisher": "GenSource",
-  "description": "AI-Native Terminal Application",
-  "codename": "terminal",
-  "edition": 2026
-}
+{
+
+  "name": "GenSource Terminal",
+
+  "productName": "GenSource Terminal",
+
+  "identifier": "com.gensource.terminal",
+
+  "version": "0.1.0",
+
+  "publisher": "GenSource",
+
+  "description": "AI-Native Terminal Application",
+
+  "codename": "terminal",
+
+  "edition": 2026
+
+}
+

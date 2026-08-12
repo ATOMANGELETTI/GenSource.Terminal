@@ -137,6 +137,8 @@ pub struct AppSettings {
     pub font_family: String,
     #[serde(default = "default_font_size")]
     pub font_size: f64,
+    #[serde(default = "default_particle_effect")]
+    pub particle_effect: String,
     #[serde(default)]
     pub start_minimized: bool,
     #[serde(default)]
@@ -171,12 +173,17 @@ fn default_font_size() -> f64 {
     14.0
 }
 
+fn default_particle_effect() -> String {
+    "dust".into()
+}
+
 impl Default for AppSettings {
     fn default() -> Self {
         Self {
             theme: default_theme(),
             font_family: default_font_family(),
             font_size: default_font_size(),
+            particle_effect: default_particle_effect(),
             start_minimized: false,
             autostart: false,
             always_on_top: false,

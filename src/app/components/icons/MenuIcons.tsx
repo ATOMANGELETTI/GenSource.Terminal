@@ -229,3 +229,21 @@ export function ClearIcon(props: IconProps) {
     </svg>
   );
 }
+
+export function RenameIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M3.5 12.5h9" />
+      <path d="M10.2 3.2l2.1 2.1L6.8 10.8H4.7V8.7z" />
+    </svg>
+  );
+}
+
+export function PanelLeftIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <rect x="2.5" y="2.5" width="11" height="11" rx="0.8" />
+      <path d="M6.5 2.5v11" />
+    </svg>
+  );
+}

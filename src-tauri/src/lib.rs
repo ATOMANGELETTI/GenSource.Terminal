@@ -143,6 +143,7 @@ pub fn run() {
             commands::get_keybindings,
             commands::open_configs_folder,
             commands::hide_main_window,
+            commands::request_quit,
             commands::quit_app,
             commands::pty_create,
             commands::pty_write,

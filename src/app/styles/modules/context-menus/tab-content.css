@@ -1,0 +1,5 @@
+/* Positioning only — visual styling lives in menu-shared.css. */
+.tab-context-menu {
+  position: fixed;
+  min-width: 180px;
+}

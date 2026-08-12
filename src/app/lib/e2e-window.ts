@@ -21,6 +21,7 @@ export const E2E_DEFAULT_SETTINGS: AppSettings = {
   theme: "nord-polar-night",
   fontFamily: "Terminus",
   fontSize: 14,
+  particleEffect: "dust",
   startMinimized: false,
   autostart: false,
   alwaysOnTop: false,

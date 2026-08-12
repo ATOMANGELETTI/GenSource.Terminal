@@ -1,4 +1,4 @@
-import type { CursorStyle, TerminalProfile } from "../../types";
+import type { CursorStyle, ParticleEffect, TerminalProfile } from "../../types";
 import { resolveFontFamily } from "../settings";
 
 const DEFAULT_SCROLLBACK = 5000;
@@ -42,6 +42,15 @@ export function resolveCursorStyle(value: string): CursorStyle {
     return value;
   }
   return "bar";
+}
+
+/** Accept only terminal particle modes; invalid → `"dust"`. */
+export function resolveParticleEffect(value: string): ParticleEffect {
+  const key = value.trim().toLowerCase();
+  if (key === "dust" || key === "constellation" || key === "orbs") {
+    return key;
+  }
+  return "dust";
 }
 
 /** Empty profile list → built-in PowerShell + CMD. */
