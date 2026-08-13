@@ -21,11 +21,6 @@ const TARGETS = [
     archLabel: "x64",
     nsisArch: "x64",
   },
-  {
-    triple: "i686-pc-windows-msvc",
-    archLabel: "x86",
-    nsisArch: "x86",
-  },
 ];
 
 function fail(message) {

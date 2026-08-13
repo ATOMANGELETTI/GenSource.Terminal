@@ -22,7 +22,7 @@ A runnable starting point for GenSource desktop apps: React + TypeScript fronten
 - Custom titlebar with traffic-light controls and flat Nord theming
 - Theme palettes (polar-night, snow-storm, frost, aurora) with light/dark variants
 - Official Tauri desktop plugins pre-wired for filesystem, dialogs, store, updater, and more
-- Windows-first packaging: NSIS installers and portable zips (32- and 64-bit)
+- Windows-first packaging: NSIS installer and portable zip (x64 only)
 - Tooling configs centralized under `src/configs/` (Vite, Vitest, Playwright, ESLint)
 - Cursor-native agent rules, skills, and hooks under `.cursor/`
 
@@ -49,7 +49,7 @@ npm run dev
 | `npm run dev` | Frontend-only Vite dev server |
 | `npm run build` | Typecheck + Vite production build |
 | `npm run tauri:build` | Windows NSIS bundle (logs to `other/logging/build/`) |
-| `npm run package` | 32/64-bit NSIS + portable zips under `release/` |
+| `npm run package` | Windows x64 NSIS + portable zip under `release/` |
 | `npm test` | Vitest unit tests |
 | `npm run test:e2e` | Playwright visual + e2e |
 | `npm run lint` | ESLint |

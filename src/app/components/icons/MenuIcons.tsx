@@ -83,6 +83,56 @@ export function PreferencesIcon(props: IconProps) {
   );
 }
 
+/** Flat sun/palette glyph for Config → Appearance. */
+export function AppearanceIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <circle cx="8" cy="8" r="2.4" />
+      <path d="M8 2.2v1.4M8 12.4v1.4M13.8 8h-1.4M3.6 8H2.2M12.1 3.9l-1 1M4.9 11.1l-1 1M12.1 12.1l-1-1M4.9 4.9l-1-1" />
+    </svg>
+  );
+}
+
+/** Flat window glyph for Config → Window. */
+export function WindowIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <rect x="2.5" y="3.5" width="11" height="9" rx="1" />
+      <path d="M2.5 6.2h11" />
+    </svg>
+  );
+}
+
+/** Flat prompt/chevron glyph for Config → Terminal. */
+export function TerminalIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <rect x="2.5" y="3" width="11" height="10" rx="1.2" />
+      <path d="M5 6.2l2 1.8-2 1.8M8.2 10.2H11" />
+    </svg>
+  );
+}
+
+/** Flat log-lines glyph for Config → Logging. */
+export function LoggingIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M3.5 3.5h9v9h-9z" />
+      <path d="M5.5 6h5M5.5 8h5M5.5 10h3" />
+    </svg>
+  );
+}
+
+/** Flat keyboard glyph for Config → Keyboard. */
+export function KeyboardIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <rect x="2" y="4.5" width="12" height="7" rx="1.2" />
+      <path d="M4.2 6.8h1.2M6.4 6.8h1.2M8.6 6.8h1.2M10.8 6.8h1M4.2 9h7.6" />
+    </svg>
+  );
+}
+
 export function AboutIcon(props: IconProps) {
   return (
     <svg {...base} {...props}>

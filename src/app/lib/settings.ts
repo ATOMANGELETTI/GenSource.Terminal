@@ -1,7 +1,7 @@
 import { invoke } from "@tauri-apps/api/core";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 
-import type { AppInfo, AppSettings } from "../types";
+import type { AppInfo, AppSettings, LoggingSettings } from "../types";
 import { resolveFileIconSet } from "./file-icons";
 import {
   followsSystemScheme,
@@ -83,6 +83,18 @@ export async function fetchSettings(): Promise<AppSettings> {
 
 export async function fetchAppInfo(): Promise<AppInfo> {
   return invoke<AppInfo>("get_app_info");
+}
+
+export async function fetchLogging(): Promise<LoggingSettings> {
+  return invoke<LoggingSettings>("get_logging");
+}
+
+export async function saveSettings(settings: AppSettings): Promise<void> {
+  await invoke("save_settings", { settings });
+}
+
+export async function saveLogging(settings: LoggingSettings): Promise<void> {
+  await invoke("save_logging", { settings });
 }
 
 export async function initSettingsFromBackend(): Promise<AppSettings> {

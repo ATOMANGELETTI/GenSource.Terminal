@@ -3,7 +3,7 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::mpsc;
-use std::sync::{Arc, RwLock};
+use std::sync::{Arc, Mutex, RwLock};
 use std::thread;
 use std::time::{Duration, Instant};
 
@@ -11,6 +11,7 @@ use json_comments::StripComments;
 use log::{info, warn};
 use notify::{EventKind, RecommendedWatcher, RecursiveMode, Watcher};
 use serde::de::DeserializeOwned;
+use serde::Serialize;
 use tauri::{AppHandle, Emitter, Manager, Runtime, WebviewWindow};
 use tauri_plugin_autostart::ManagerExt as AutostartExt;
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
@@ -20,6 +21,12 @@ use crate::mdoels::{
     AppInfo, AppInfoFile, AppSettings, KeybindingScope, KeybindingsFile, LoggingSettings,
 };
 use crate::state::AppState;
+
+/// How long the watcher ignores events after an intentional UI/IPC write.
+const SELF_WRITE_IGNORE: Duration = Duration::from_millis(600);
+
+static SETTINGS_SELF_WRITE_UNTIL: Mutex<Option<Instant>> = Mutex::new(None);
+static LOGGING_SELF_WRITE_UNTIL: Mutex<Option<Instant>> = Mutex::new(None);
 
 pub const SETTINGS_CHANGED_EVENT: &str = "settings-changed";
 
@@ -269,6 +276,128 @@ fn merge_logging_partial(raw: &str) -> Option<LoggingSettings> {
     serde_json::from_value(merged).ok()
 }
 
+/// Pretty-print camelCase JSON (2-space indent, trailing newline, no comments).
+fn write_pretty_json<T: Serialize>(path: &Path, value: &T) -> Result<(), String> {
+    let body = serde_json::to_string_pretty(value)
+        .map_err(|e| format!("serialize {}: {e}", path.display()))?;
+    let mut out = body;
+    if !out.ends_with('\n') {
+        out.push('\n');
+    }
+    fs::write(path, out).map_err(|e| format!("write {}: {e}", path.display()))
+}
+
+fn note_settings_self_write() {
+    match SETTINGS_SELF_WRITE_UNTIL.lock() {
+        Ok(mut guard) => *guard = Some(Instant::now() + SELF_WRITE_IGNORE),
+        Err(poisoned) => {
+            *poisoned.into_inner() = Some(Instant::now() + SELF_WRITE_IGNORE);
+        }
+    }
+}
+
+fn note_logging_self_write() {
+    match LOGGING_SELF_WRITE_UNTIL.lock() {
+        Ok(mut guard) => *guard = Some(Instant::now() + SELF_WRITE_IGNORE),
+        Err(poisoned) => {
+            *poisoned.into_inner() = Some(Instant::now() + SELF_WRITE_IGNORE);
+        }
+    }
+}
+
+fn is_settings_self_write() -> bool {
+    let guard = SETTINGS_SELF_WRITE_UNTIL
+        .lock()
+        .unwrap_or_else(|p| p.into_inner());
+    guard.is_some_and(|until| Instant::now() < until)
+}
+
+fn is_logging_self_write() -> bool {
+    let guard = LOGGING_SELF_WRITE_UNTIL
+        .lock()
+        .unwrap_or_else(|p| p.into_inner());
+    guard.is_some_and(|until| Instant::now() < until)
+}
+
+/// Write normalized `settings.json` (pretty camelCase JSON).
+pub fn write_settings(dir: &Path, settings: &AppSettings) -> Result<(), String> {
+    write_pretty_json(&dir.join(SETTINGS_FILE), settings)
+}
+
+/// Write `logging.json` (pretty camelCase JSON).
+pub fn write_logging(dir: &Path, settings: &LoggingSettings) -> Result<(), String> {
+    write_pretty_json(&dir.join(LOGGING_FILE), settings)
+}
+
+/// Write `keybindings.json` (pretty camelCase JSON).
+pub fn write_keybindings(dir: &Path, file: &KeybindingsFile) -> Result<(), String> {
+    write_pretty_json(&dir.join(KEYBINDINGS_FILE), file)
+}
+
+/// Normalize, persist `settings.json`, update `AppState`, and apply live effects.
+pub fn save_and_apply_settings<R: Runtime>(
+    app: &AppHandle<R>,
+    mut settings: AppSettings,
+) -> Result<AppSettings, String> {
+    normalize_terminal_settings(&mut settings);
+
+    let state = app.state::<AppState>();
+    let configs_dir = state
+        .configs_dir
+        .lock()
+        .unwrap_or_else(|p| p.into_inner())
+        .clone()
+        .ok_or_else(|| "configs dir not initialized".to_string())?;
+
+    note_settings_self_write();
+    write_settings(&configs_dir, &settings)?;
+
+    let previous = state
+        .settings
+        .lock()
+        .unwrap_or_else(|p| p.into_inner())
+        .clone();
+
+    {
+        let mut guard = state.settings.lock().unwrap_or_else(|p| p.into_inner());
+        *guard = settings.clone();
+    }
+
+    if settings.always_on_top != previous.always_on_top {
+        if let Some(window) = app.get_webview_window("main") {
+            apply_always_on_top(&window, &settings);
+        }
+    }
+
+    if settings.autostart != previous.autostart {
+        apply_autostart(app, settings.autostart);
+    }
+
+    if ui_settings_changed(&previous, &settings) {
+        emit_settings_changed(app, &settings);
+    }
+
+    Ok(settings)
+}
+
+/// Persist `logging.json` and re-apply the live log filter (same path as watcher).
+pub fn save_and_apply_logging(
+    configs_dir: &Path,
+    logging: &Arc<RwLock<LoggingSettings>>,
+    next: LoggingSettings,
+) -> Result<LoggingSettings, String> {
+    note_logging_self_write();
+    write_logging(configs_dir, &next)?;
+    apply_logging_settings(logging, next.clone());
+    Ok(next)
+}
+
+/// Persist `keybindings.json`. Global shortcuts still require an app restart;
+/// local bindings are re-fetched by the frontend.
+pub fn save_keybindings_file(configs_dir: &Path, file: &KeybindingsFile) -> Result<(), String> {
+    write_keybindings(configs_dir, file)
+}
+
 pub fn apply_logging_settings(logging: &Arc<RwLock<LoggingSettings>>, next: LoggingSettings) {
     match logging.write() {
         Ok(mut guard) => *guard = next,
@@ -474,14 +603,16 @@ pub fn register_keybindings<R: Runtime>(app: &AppHandle<R>, bindings: &Keybindin
     }
 }
 
-fn appearance_changed(previous: &AppSettings, next: &AppSettings) -> bool {
+/// True when a settings delta needs a frontend `settings-changed` emit.
+///
+/// Window-only fields (`always_on_top`, `autostart`, `start_minimized`) are
+/// applied in Rust and intentionally excluded so toggles do not force UI
+/// re-renders.
+fn ui_settings_changed(previous: &AppSettings, next: &AppSettings) -> bool {
     previous.theme != next.theme
         || previous.font_family != next.font_family
         || (previous.font_size - next.font_size).abs() > f64::EPSILON
         || previous.particle_effect != next.particle_effect
-        || previous.start_minimized != next.start_minimized
-        || previous.always_on_top != next.always_on_top
-        || previous.autostart != next.autostart
         || previous.default_profile != next.default_profile
         || previous.terminal_font_family != next.terminal_font_family
         || previous.terminal_font_size != next.terminal_font_size
@@ -523,7 +654,7 @@ pub fn reload_and_apply_settings<R: Runtime>(app: &AppHandle<R>) -> Result<AppSe
         apply_autostart(app, settings.autostart);
     }
 
-    if appearance_changed(&previous, &settings) {
+    if ui_settings_changed(&previous, &settings) {
         emit_settings_changed(app, &settings);
     }
 
@@ -586,7 +717,10 @@ pub fn start_settings_watcher<R: Runtime>(app: AppHandle<R>, configs_dir: PathBu
                     .is_some_and(|name| name.eq_ignore_ascii_case(LOGGING_FILE))
             });
 
-            if touches_settings && last_settings_apply.elapsed() >= Duration::from_millis(250) {
+            if touches_settings
+                && !is_settings_self_write()
+                && last_settings_apply.elapsed() >= Duration::from_millis(250)
+            {
                 last_settings_apply = Instant::now();
                 thread::sleep(Duration::from_millis(80));
                 match reload_and_apply_settings(&app) {
@@ -595,7 +729,10 @@ pub fn start_settings_watcher<R: Runtime>(app: AppHandle<R>, configs_dir: PathBu
                 }
             }
 
-            if touches_logging && last_logging_apply.elapsed() >= Duration::from_millis(250) {
+            if touches_logging
+                && !is_logging_self_write()
+                && last_logging_apply.elapsed() >= Duration::from_millis(250)
+            {
                 last_logging_apply = Instant::now();
                 thread::sleep(Duration::from_millis(80));
                 let state = app.state::<AppState>();
@@ -693,6 +830,59 @@ mod tests {
     }
 
     #[test]
+    fn writes_pretty_camel_case_settings_roundtrip() {
+        let dir = std::env::temp_dir().join(format!(
+            "gensource-config-settings-{}",
+            std::process::id()
+        ));
+        let _ = fs::remove_dir_all(&dir);
+        fs::create_dir_all(&dir).expect("mkdir");
+        let mut settings = AppSettings::default();
+        settings.theme = "nord-frost".into();
+        settings.font_size = 16.0;
+        write_settings(&dir, &settings).expect("write");
+        let raw = fs::read_to_string(dir.join(SETTINGS_FILE)).expect("read");
+        assert!(raw.contains("\"fontSize\": 16.0") || raw.contains("\"fontSize\": 16"));
+        assert!(raw.contains("\"theme\": \"nord-frost\""));
+        assert!(!raw.contains("//"));
+        let loaded = load_settings(&dir);
+        assert_eq!(loaded.theme, "nord-frost");
+        assert_eq!(loaded.font_size, 16.0);
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn writes_pretty_logging_and_keybindings() {
+        let dir = std::env::temp_dir().join(format!(
+            "gensource-config-logging-{}",
+            std::process::id()
+        ));
+        let _ = fs::remove_dir_all(&dir);
+        fs::create_dir_all(&dir).expect("mkdir");
+        let logging = LoggingSettings {
+            debug: true,
+            ..LoggingSettings::default()
+        };
+        write_logging(&dir, &logging).expect("write logging");
+        let loaded = load_logging(&dir);
+        assert!(loaded.debug);
+
+        let keys = KeybindingsFile {
+            bindings: vec![crate::mdoels::Keybinding {
+                id: "window.show".into(),
+                shortcut: "Ctrl+Shift+T".into(),
+                enabled: true,
+                scope: KeybindingScope::Global,
+            }],
+        };
+        write_keybindings(&dir, &keys).expect("write keys");
+        let loaded_keys = load_keybindings(&dir);
+        assert_eq!(loaded_keys.bindings.len(), 1);
+        assert_eq!(loaded_keys.bindings[0].shortcut, "Ctrl+Shift+T");
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
     fn parses_jsonc_comments() {
         let raw = r#"
             // appearance
@@ -747,6 +937,69 @@ mod tests {
         );
         assert_eq!(system, frost);
         assert_eq!(system, aurora);
+    }
+
+    #[test]
+    fn ui_settings_changed_ignores_window_only_fields() {
+        let base = AppSettings::default();
+        let mut next = base.clone();
+        next.always_on_top = !base.always_on_top;
+        next.autostart = !base.autostart;
+        next.start_minimized = !base.start_minimized;
+        assert!(!ui_settings_changed(&base, &next));
+    }
+
+    #[test]
+    fn ui_settings_changed_detects_theme_and_terminal_fields() {
+        let base = AppSettings::default();
+
+        let mut theme = base.clone();
+        theme.theme = "nord-frost".into();
+        assert!(ui_settings_changed(&base, &theme));
+
+        let mut font = base.clone();
+        font.font_family = "Ubuntu".into();
+        assert!(ui_settings_changed(&base, &font));
+
+        let mut size = base.clone();
+        size.font_size = base.font_size + 2.0;
+        assert!(ui_settings_changed(&base, &size));
+
+        let mut particles = base.clone();
+        particles.particle_effect = "orbs".into();
+        assert!(ui_settings_changed(&base, &particles));
+
+        let mut icons = base.clone();
+        icons.file_icon_set = "seti".into();
+        assert!(ui_settings_changed(&base, &icons));
+
+        let mut cursor = base.clone();
+        cursor.cursor_style = "block".into();
+        assert!(ui_settings_changed(&base, &cursor));
+
+        let mut blink = base.clone();
+        blink.cursor_blink = !base.cursor_blink;
+        assert!(ui_settings_changed(&base, &blink));
+
+        let mut scrollback = base.clone();
+        scrollback.scrollback_lines = 2000.0;
+        assert!(ui_settings_changed(&base, &scrollback));
+
+        let mut profile = base.clone();
+        profile.default_profile = "cmd".into();
+        assert!(ui_settings_changed(&base, &profile));
+
+        let mut term_font = base.clone();
+        term_font.terminal_font_family = Some("Fira Code".into());
+        assert!(ui_settings_changed(&base, &term_font));
+
+        let mut term_size = base.clone();
+        term_size.terminal_font_size = Some(18.0);
+        assert!(ui_settings_changed(&base, &term_size));
+
+        let mut profiles = base.clone();
+        profiles.profiles[0].name = "PS".into();
+        assert!(ui_settings_changed(&base, &profiles));
     }
 }
 

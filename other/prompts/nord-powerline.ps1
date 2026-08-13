@@ -13,6 +13,7 @@ $script:NordPL = @{
   PromptChar = [char]0x276F   # ❯
   FailMark   = [char]0x2717   # ✗
 }
+$script:NordPLPromptShown = $false
 
 function script:Nord-Rgb([int]$r, [int]$g, [int]$b) {
   return @{ R = $r; G = $g; B = $b }
@@ -198,5 +199,10 @@ function global:prompt {
   # Reset native exit code so a failed external command does not stick forever.
   $global:LASTEXITCODE = 0
 
+  # One blank line between command cycles; skip on first paint.
+  if ($script:NordPLPromptShown) {
+    return "`n$line1`n$line2"
+  }
+  $script:NordPLPromptShown = $true
   return "$line1`n$line2"
 }

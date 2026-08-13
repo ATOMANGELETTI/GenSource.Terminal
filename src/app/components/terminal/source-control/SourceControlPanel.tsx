@@ -112,6 +112,11 @@ export default function SourceControlPanel({
       setStatus(emptyStatus());
       setBranches([]);
       setError(null);
+      setMessage("");
+      setBranchMenuOpen(false);
+      setCreateBranchOpen(false);
+      setNewBranchName("");
+      setRowMenu(null);
       return;
     }
     void refresh(folderPath);
@@ -374,6 +379,15 @@ export default function SourceControlPanel({
           <div className="scm-header__actions">
             <button
               type="button"
+              className="scm-header__close"
+              title="Close"
+              aria-label="Close repo"
+              onClick={() => onFolderPathChange(null)}
+            >
+              Close
+            </button>
+            <button
+              type="button"
               className="scm-icon-btn"
               title="Open Folder"
               aria-label="Open Folder"
@@ -435,6 +449,15 @@ export default function SourceControlPanel({
           <span className="scm-header__name">{folderDisplayName(displayRoot)}</span>
         </div>
         <div className="scm-header__actions">
+          <button
+            type="button"
+            className="scm-header__close"
+            title="Close"
+            aria-label="Close repo"
+            onClick={() => onFolderPathChange(null)}
+          >
+            Close
+          </button>
           <button
             type="button"
             className="scm-icon-btn"

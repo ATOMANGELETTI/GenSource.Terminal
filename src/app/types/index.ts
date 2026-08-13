@@ -7,6 +7,8 @@ export type {
   GreetResponse,
   Keybinding,
   KeybindingScope,
+  KeybindingsFile,
+  LoggingSettings,
   ParticleEffect,
   PinnedTabRecord,
   PinnedTabsState,

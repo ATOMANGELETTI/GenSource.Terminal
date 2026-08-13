@@ -147,9 +147,9 @@ pub struct AppSettings {
     pub always_on_top: bool,
     #[serde(default = "default_default_profile")]
     pub default_profile: String,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub terminal_font_family: Option<String>,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub terminal_font_size: Option<f64>,
     #[serde(default = "default_scrollback_lines")]
     pub scrollback_lines: f64,

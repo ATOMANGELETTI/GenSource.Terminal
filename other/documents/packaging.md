@@ -24,19 +24,18 @@ npm run package
 npm run package:clean   # wipe release/ first, then package
 ```
 
-[`src/scripts/package.js`](../../src/scripts/package.js) builds for both:
+[`src/scripts/package.js`](../../src/scripts/package.js) builds for:
 
 - `x86_64-pc-windows-msvc` (x64)
-- `i686-pc-windows-msvc` (x86)
 
-Artifacts land in `release/` as NSIS installers (per-user or system-wide, via the custom installer hooks) and matching portable zip builds.
+Artifacts land in `release/` as an NSIS installer (per-user or system-wide, via the custom installer hooks) and a matching portable zip.
 
 ## Notes
 
-- Platform focus is **Windows x86 + x64 only**; macOS/Linux packaging is out of scope for this template.
-- `tauri:build` defaults to `--target x86_64-pc-windows-msvc`. Use `npm run package` for both architectures.
-- Prefer `package` / `package:clean` when you need both architectures and portable zips in one pass.
-- For a single Tauri NSIS bundle without the multi-arch packaging step, `tauri:build` is enough.
+- Platform focus is **Windows x64 only**; macOS/Linux packaging is out of scope for this template.
+- `tauri:build` defaults to `--target x86_64-pc-windows-msvc`. Use `npm run package` for the x64 installer plus portable zip.
+- Prefer `package` / `package:clean` when you need the NSIS installer and portable zip in one pass.
+- For a single Tauri NSIS bundle without the packaging step, `tauri:build` is enough.
 - After regenerating icons with `npm run tauri -- icon ./public/icons/icon.png`, delete `src-tauri/icons/android/`, `src-tauri/icons/ios/`, and `src-tauri/icons/icon.icns` again (the generator recreates them; this template ships Windows icons only).
 - Reclaim Cargo build artifacts with `npm run cargo:clean` (`src-tauri/target/`). `tauri:dev` will rebuild `target/debug` on the next run.
 - **Logging is never bundled.** `tauri.conf.json` resources list `other/configs|documents|screenshots|utilities` only (not `other/logging/`). Portable zips skip `logging/` the same way. Build/app tee logs stay on the developer machine so NSIS never tries to pack an open log file.

@@ -1,0 +1,301 @@
+/* Config side-panel — left icon rail + compact Nord form fields. */
+
+.config-panel {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  min-height: 0;
+  color: var(--text);
+  background: var(--surface);
+}
+
+.config-panel__rail {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  align-items: stretch;
+  width: 2.5rem;
+  padding: 0.35rem 0;
+  gap: 0.1rem;
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.config-panel__rail-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 2rem;
+  padding: 0;
+  border: none;
+  border-left: 2px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.config-panel__rail-btn:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.config-panel__rail-btn--active {
+  color: var(--text);
+  background: var(--bg);
+  border-left-color: var(--accent);
+}
+
+.config-panel__rail-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.config-panel__rail-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.config-panel__main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+.config-panel__header {
+  flex-shrink: 0;
+  padding: 0.5rem 0.65rem 0.45rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.config-panel__title {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text);
+}
+
+.config-panel__subtitle {
+  margin: 0.15rem 0 0;
+  font-size: 0.6875rem;
+  line-height: 1.35;
+  color: var(--text-muted);
+}
+
+.config-panel__body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 0.45rem 0.65rem 0.65rem;
+}
+
+.config-panel__footer {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 0.35rem 0.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.config-panel__footer-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.45rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.6875rem;
+  cursor: pointer;
+}
+
+.config-panel__footer-btn:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.config-panel__footer-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.config-panel__status {
+  margin: 0 0 0.5rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.config-panel__status--error {
+  color: var(--error, #bf616a);
+}
+
+.config-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.config-form__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: 1.65rem;
+}
+
+.config-form__label {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.75rem;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.config-form__field {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  max-width: 55%;
+}
+
+.config-form__control {
+  width: 100%;
+  min-width: 0;
+  max-width: 9.5rem;
+  height: 1.5rem;
+  padding: 0 0.35rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.75rem;
+}
+
+.config-form__control--narrow {
+  max-width: 5.5rem;
+  text-align: right;
+}
+
+.config-form__control:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.config-form__checkbox {
+  width: 0.875rem;
+  height: 0.875rem;
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.config-form__note {
+  margin: 0.35rem 0 0;
+  font-size: 0.6875rem;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
+.config-form__link {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-size: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.config-form__link:hover {
+  color: var(--text);
+}
+
+.config-keys {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.config-keys__row {
+  display: grid;
+  grid-template-columns: 1fr minmax(4.5rem, 5.5rem) auto;
+  gap: 0.35rem;
+  align-items: center;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.config-keys__row:last-child {
+  border-bottom: none;
+}
+
+.config-keys__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+  min-width: 0;
+}
+
+.config-keys__id {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.6875rem;
+  color: var(--text);
+}
+
+.config-keys__scope {
+  font-size: 0.625rem;
+  color: var(--text-muted);
+  text-transform: lowercase;
+}
+
+.config-keys__shortcut {
+  max-width: none;
+  width: 100%;
+  font-size: 0.6875rem;
+}
+
+.config-keys__enabled {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.625rem;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.config-about {
+  gap: 0.4rem;
+}
+
+.config-about__row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.config-about__row:last-of-type {
+  border-bottom: none;
+}
+
+.config-about__label {
+  font-size: 0.625rem;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+.config-about__value {
+  font-size: 0.75rem;
+  color: var(--text);
+  word-break: break-word;
+}

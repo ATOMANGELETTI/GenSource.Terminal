@@ -34,6 +34,8 @@ export default defineConfig({
         '**/src-tauri/**',
         '**/public/fonts/**',
         '**/tests/artifacts/**',
+        '**/other/configs/**',
+        '**/other/logging/**',
       ],
     },
   },

@@ -3,28 +3,52 @@ import {
   useEffect,
   useRef,
   useState,
+  type MouseEvent as ReactMouseEvent,
   type PointerEvent as ReactPointerEvent,
 } from "react";
 
-import { FolderIcon, SourceControlIcon } from "../icons/MenuIcons";
+import {
+  FolderIcon,
+  PreferencesIcon,
+  SourceControlIcon,
+} from "../icons/MenuIcons";
 import {
   loadScmFolderPath,
+  pickScmFolder,
   saveScmFolderPath,
 } from "../../lib/terminal/git-scm";
+import type { ContextMenuPosition } from "../../types";
+import ConfigPanel from "./config/ConfigPanel";
 import FilesExplorer, { type OpenInTerminalApi } from "./explorer/FilesExplorer";
 import SourceControlPanel from "./source-control/SourceControlPanel";
+import SourceControlTabContextMenu from "./source-control/SourceControlTabContextMenu";
 
 const MIN_WIDTH = 120;
 const MAX_WIDTH = 480;
+const SIDE_PANEL_TAB_STORAGE_KEY = "gensource.sidePanel.tab";
 
 const SIDE_PANEL_TABS = [
   { id: "files", label: "Files", iconOnly: true },
   { id: "source", label: "Source Control", iconOnly: true },
   { id: "tab-3", label: "Tab 3", iconOnly: false },
-  { id: "tab-4", label: "Tab 4", iconOnly: false },
+  { id: "config", label: "Config", iconOnly: true },
 ] as const;
 
 type SidePanelTabId = (typeof SIDE_PANEL_TABS)[number]["id"];
+
+function isSidePanelTabId(value: string): value is SidePanelTabId {
+  return SIDE_PANEL_TABS.some((tab) => tab.id === value);
+}
+
+function readStoredSidePanelTab(): SidePanelTabId {
+  try {
+    const stored = sessionStorage.getItem(SIDE_PANEL_TAB_STORAGE_KEY);
+    if (stored && isSidePanelTabId(stored)) return stored;
+  } catch {
+    // sessionStorage unavailable
+  }
+  return "files";
+}
 
 interface SidePanelProps {
   open: boolean;
@@ -40,8 +64,18 @@ export default function SidePanel({
   openInTerminal,
 }: SidePanelProps) {
   const dragRef = useRef<{ startX: number; startWidth: number } | null>(null);
-  const [activeTab, setActiveTab] = useState<SidePanelTabId>("files");
+  const [activeTab, setActiveTab] = useState<SidePanelTabId>(readStoredSidePanelTab);
   const [scmFolderPath, setScmFolderPath] = useState<string | null>(null);
+  const [sourceTabMenu, setSourceTabMenu] =
+    useState<ContextMenuPosition | null>(null);
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(SIDE_PANEL_TAB_STORAGE_KEY, activeTab);
+    } catch {
+      // sessionStorage unavailable
+    }
+  }, [activeTab]);
 
   useEffect(() => {
     let cancelled = false;
@@ -54,6 +88,36 @@ export default function SidePanel({
     };
   }, []);
 
+  const closeSourceTabMenu = useCallback(() => {
+    setSourceTabMenu(null);
+  }, []);
+
+  useEffect(() => {
+    if (!sourceTabMenu) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closeSourceTabMenu();
+      }
+    };
+    const onPointerDown = (event: PointerEvent) => {
+      const target = event.target;
+      if (!(target instanceof Element)) {
+        closeSourceTabMenu();
+        return;
+      }
+      if (target.closest(".source-control-tab-context-menu")) return;
+      closeSourceTabMenu();
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("pointerdown", onPointerDown, true);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("pointerdown", onPointerDown, true);
+    };
+  }, [sourceTabMenu, closeSourceTabMenu]);
+
   const handleScmFolderPathChange = useCallback((path: string | null) => {
     setScmFolderPath(path);
     void saveScmFolderPath(path);
@@ -64,6 +128,32 @@ export default function SidePanel({
     void saveScmFolderPath(path);
     setActiveTab("source");
   }, []);
+
+  const handleOpenRepo = useCallback(() => {
+    void (async () => {
+      try {
+        const selected = await pickScmFolder();
+        if (!selected) return;
+        handleScmFolderPathChange(selected);
+        setActiveTab("source");
+      } catch {
+        // Picker cancel/failure — leave SCM state unchanged.
+      }
+    })();
+  }, [handleScmFolderPathChange]);
+
+  const handleCloseRepo = useCallback(() => {
+    handleScmFolderPathChange(null);
+  }, [handleScmFolderPathChange]);
+
+  const handleSourceTabContextMenu = useCallback(
+    (event: ReactMouseEvent<HTMLButtonElement>) => {
+      event.preventDefault();
+      event.stopPropagation();
+      setSourceTabMenu({ x: event.clientX, y: event.clientY });
+    },
+    [],
+  );
 
   const handlePointerDown = useCallback(
     (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -107,13 +197,14 @@ export default function SidePanel({
   );
 
   const activeMeta = SIDE_PANEL_TABS.find((tab) => tab.id === activeTab);
-  const flushContent = activeTab === "files" || activeTab === "source";
+  const flushContent =
+    activeTab === "files" ||
+    activeTab === "source" ||
+    activeTab === "config";
 
   return (
     <aside
-      className={
-        open ? "side-panel" : "side-panel side-panel--closed"
-      }
+      className={open ? "side-panel" : "side-panel side-panel--closed"}
       style={{ width: open ? width : 0 }}
       data-testid="side-panel"
       aria-hidden={!open}
@@ -137,6 +228,8 @@ export default function SidePanel({
               folderPath={scmFolderPath}
               onFolderPathChange={handleScmFolderPathChange}
             />
+          ) : activeTab === "config" ? (
+            <ConfigPanel />
           ) : (
             <p className="side-panel__placeholder">
               {activeMeta?.label ?? "Tab"} content
@@ -160,11 +253,16 @@ export default function SidePanel({
                     : "side-panel__tab"
                 }
                 onClick={() => setActiveTab(tab.id)}
+                onContextMenu={
+                  tab.id === "source" ? handleSourceTabContextMenu : undefined
+                }
               >
                 {tab.id === "files" ? (
                   <FolderIcon className="side-panel__tab-icon" />
                 ) : tab.id === "source" ? (
                   <SourceControlIcon className="side-panel__tab-icon" />
+                ) : tab.id === "config" ? (
+                  <PreferencesIcon className="side-panel__tab-icon" />
                 ) : (
                   <span className="side-panel__tab-label">{tab.label}</span>
                 )}
@@ -178,6 +276,16 @@ export default function SidePanel({
           className="side-panel__resizer"
           data-testid="side-panel-resizer"
           onPointerDown={handlePointerDown}
+        />
+      ) : null}
+      {sourceTabMenu ? (
+        <SourceControlTabContextMenu
+          x={sourceTabMenu.x}
+          y={sourceTabMenu.y}
+          hasRepoOpen={scmFolderPath != null}
+          onClose={closeSourceTabMenu}
+          onOpenRepo={handleOpenRepo}
+          onCloseRepo={handleCloseRepo}
         />
       ) : null}
     </aside>

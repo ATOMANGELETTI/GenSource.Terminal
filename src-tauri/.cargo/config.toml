@@ -8,6 +8,3 @@
 
 [target.x86_64-pc-windows-msvc]
 rustflags = ["-C", "link-arg=/IGNORE:4098"]
-
-[target.i686-pc-windows-msvc]
-rustflags = ["-C", "link-arg=/IGNORE:4098"]

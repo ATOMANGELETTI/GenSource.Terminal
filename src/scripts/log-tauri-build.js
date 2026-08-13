@@ -68,8 +68,8 @@ logStream.write(header);
 
 const extraArgs = process.argv.slice(2);
 // Default to Windows x64 so host-arch `target/release` does not grow beside
-// the explicit triples used by `npm run package`. Callers may still pass
-// `--target` (e.g. i686) to override.
+// the packaging triple used by `npm run package`. Callers may still pass
+// `--target` to override.
 const hasTarget = extraArgs.some(
   (arg, i) =>
     arg === "--target" ||

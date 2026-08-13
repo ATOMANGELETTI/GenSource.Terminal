@@ -102,6 +102,21 @@ export interface Keybinding {
   scope: KeybindingScope;
 }
 
+/** On-disk `other/configs/keybindings.json` shape (`save_keybindings`). */
+export interface KeybindingsFile {
+  bindings: Keybinding[];
+}
+
+/** On-disk `other/configs/logging.json` shape (`get_logging` / `save_logging`). */
+export interface LoggingSettings {
+  error: boolean;
+  warn: boolean;
+  info: boolean;
+  debug: boolean;
+  trace: boolean;
+  fatal: boolean;
+}
+
 /** Matches `commands::greet` which returns a bare `String`. */
 export type GreetResponse = string;
 

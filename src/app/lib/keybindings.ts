@@ -1,7 +1,7 @@
 import { invoke } from "@tauri-apps/api/core";
 import { useEffect, useRef, useState } from "react";
 
-import type { Keybinding } from "../types";
+import type { Keybinding, KeybindingsFile } from "../types";
 import { isE2eMode } from "./e2e-window";
 
 export async function fetchKeybindings(): Promise<Keybinding[]> {
@@ -9,6 +9,10 @@ export async function fetchKeybindings(): Promise<Keybinding[]> {
     return [];
   }
   return invoke<Keybinding[]>("get_keybindings");
+}
+
+export async function saveKeybindings(file: KeybindingsFile): Promise<void> {
+  await invoke("save_keybindings", { file });
 }
 
 /**

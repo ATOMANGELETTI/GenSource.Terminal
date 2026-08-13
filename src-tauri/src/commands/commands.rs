@@ -9,8 +9,8 @@ use tauri::{AppHandle, Emitter, Manager, Runtime, State};
 
 use crate::config;
 use crate::mdoels::{
-    AppInfo, AppSettings, Keybinding, PtyCreateArgs, PtyCreateResult, PtyResizeArgs,
-    PtySessionIdArgs, PtyWriteArgs, SystemMetrics,
+    AppInfo, AppSettings, Keybinding, KeybindingsFile, LoggingSettings, PtyCreateArgs,
+    PtyCreateResult, PtyResizeArgs, PtySessionIdArgs, PtyWriteArgs, SystemMetrics,
 };
 use crate::pty::PtySessionPool;
 use crate::state::AppState;
@@ -56,11 +56,62 @@ pub fn get_settings(state: State<'_, AppState>) -> AppSettings {
         .clone()
 }
 
+/// Returns the current in-memory logging toggles (from `logging.json`).
+#[tauri::command]
+pub fn get_logging(state: State<'_, AppState>) -> LoggingSettings {
+    state
+        .logging
+        .read()
+        .unwrap_or_else(|poisoned| poisoned.into_inner())
+        .clone()
+}
+
 /// Reloads `settings.json` from disk, applies always-on-top/autostart, and
 /// emits `settings-changed`. Useful for debugging; the file watcher also does this.
 #[tauri::command]
 pub fn reload_settings(app: AppHandle) -> Result<AppSettings, String> {
     config::reload_and_apply_settings(&app)
+}
+
+/// Normalizes, writes pretty `settings.json`, updates `AppState`, and applies
+/// live effects (always-on-top, autostart; `settings-changed` only for UI fields).
+#[tauri::command]
+pub fn save_settings(app: AppHandle, settings: AppSettings) -> Result<AppSettings, String> {
+    config::save_and_apply_settings(&app, settings)
+}
+
+/// Writes pretty `logging.json` and re-applies the live log filter.
+#[tauri::command]
+pub fn save_logging(
+    state: State<'_, AppState>,
+    settings: LoggingSettings,
+) -> Result<LoggingSettings, String> {
+    let configs_dir = state
+        .configs_dir
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner())
+        .clone()
+        .ok_or_else(|| "configs dir not initialized".to_string())?;
+
+    config::save_and_apply_logging(&configs_dir, &state.logging, settings)
+}
+
+/// Writes pretty `keybindings.json`. Global shortcuts still need an app restart;
+/// the frontend should re-fetch locals after save.
+#[tauri::command]
+pub fn save_keybindings(
+    state: State<'_, AppState>,
+    file: KeybindingsFile,
+) -> Result<KeybindingsFile, String> {
+    let configs_dir = state
+        .configs_dir
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner())
+        .clone()
+        .ok_or_else(|| "configs dir not initialized".to_string())?;
+
+    config::save_keybindings_file(&configs_dir, &file)?;
+    Ok(file)
 }
 
 /// Returns every binding from `keybindings.json` so the frontend can render

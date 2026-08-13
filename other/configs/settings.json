@@ -1,13 +1,14 @@
 {
   "theme": "nord-polar-night",
-  "fontFamily": "Terminus",
-  "fontSize": 14,
+  "fontFamily": "Fira Code",
+  "fontSize": 14.0,
   "particleEffect": "constellation",
   "startMinimized": false,
   "autostart": false,
   "alwaysOnTop": false,
   "defaultProfile": "powershell",
-  "scrollbackLines": 5000,
+  "terminalFontFamily": "Terminus",
+  "scrollbackLines": 5000.0,
   "cursorStyle": "bar",
   "cursorBlink": true,
   "fileIconSet": "catppuccin",
@@ -16,7 +17,9 @@
       "id": "powershell",
       "name": "PowerShell",
       "command": "powershell.exe",
-      "args": ["-NoLogo"],
+      "args": [
+        "-NoLogo"
+      ],
       "startingDirectory": null
     },
     {
