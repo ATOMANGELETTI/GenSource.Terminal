@@ -1,0 +1,23 @@
+other/database/README.md
+  s_2a9a96be4ee489::t_21765dd13a194f 1-28
+.gitignore
+  s_2a9a96be4ee489::t_3c01abb789e644 30-36
+src-tauri/tauri.conf.json
+  s_2a9a96be4ee489::t_fdf48aaf0224d3 96
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "defc8e5ed70f180bae496e5c8df01fe50dc4ba42",
+  "prompts": {},
+  "sessions": {
+    "s_2a9a96be4ee489": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "33af420c-0c6c-445c-bd92-4e7335ab9d79",
+        "model": "cursor-grok-4.6-high-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
