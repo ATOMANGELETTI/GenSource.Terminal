@@ -1,0 +1,169 @@
+src/app/components/terminal/explorer/OpenInTerminalModal.tsx
+  s_e547377596c213::t_13bb31f64ffc8a 1-39
+tests/unit/git-scm.test.ts
+  s_825e6f21ca8504::t_5cd27054317fda 1-41,43-46,48-71,93-100,102-105,118-132
+  s_1d734ba1304a57::t_d50615046760bd 42,47,72-92,101,106-117
+src/app/types/git-scm.ts
+  s_825e6f21ca8504::t_e449c3f847eaea 2,4,6-8,10-11,13,17,21-30,32,35-40,42-45,51-53
+  s_1d734ba1304a57::t_bf2bbba1030f57 1,3,5,9,12,14-16,18-20,31,33-34,41,46-50
+src-tauri/Cargo.toml
+  s_c3c23c2eac716e::t_fd89561a10447a 56
+src/configs/.tsbuildinfo-app
+  s_825e6f21ca8504::t_131b5a4f75656c 1
+src/app/App.tsx
+  s_e547377596c213::t_5cb3e12c27af10 169
+  s_e547377596c213::t_d29778398c0d9d 1
+  s_c3c23c2eac716e::t_f0d5d9846c4127 41-42
+  s_e547377596c213::t_ff0e8b43f4e61b 10,37-40,43-47
+src/app/components/terminal/explorer/FileTreeContextMenu.tsx
+  s_825e6f21ca8504::t_8beb150d7c43b7 11,20,37,54,88-98
+  s_e547377596c213::t_fbd8166ba7e878 8,19,36,79-82
+  s_e547377596c213::t_9c7acf995a370e 83-87
+src/app/lib/terminal/explorer-fs.ts
+  s_e547377596c213::t_cb49321a128b1f 81-99
+src/app/lib/terminal/git-scm.ts
+  s_825e6f21ca8504::t_d185a08c63ddc9 1-8,11-69,75-87,89,91-100,104-121,124-126,128-138,140-154,156
+  s_1d734ba1304a57::t_69b415c726da4f 9-10,70-74,88,90,122-123,127,139,155
+  s_825e6f21ca8504::t_b3b85181f7f2c6 101-103
+src/app/hooks/usePtySession.ts
+  s_a58e93b081335a::t_2f51425cc749f8 15-16
+  s_a58e93b081335a::t_06271ea5dd1660 59,76,98-100
+  s_a58e93b081335a::t_37c797bdbd8144 150,156
+  s_a58e93b081335a::t_544f933f5f20b3 251
+  s_a58e93b081335a::t_d5ef4a52598353 60
+  s_a58e93b081335a::t_a5d7bce43be8d4 17-18
+src/app/lib/terminal/session-manager.ts
+  s_a58e93b081335a::t_0f2f4b1c2d00a3 14-15,41,52
+  s_a58e93b081335a::t_d8564058812375 42,53
+  s_a58e93b081335a::t_be370f679d68ae 16-17
+src/app/styles/index.css
+  s_825e6f21ca8504::t_95b140e7c43fb0 13
+src-tauri/src/commands/git.rs
+  s_c3c23c2eac716e::t_7dc1c37402d6f6 1-66
+src-tauri/src/commands/mod.rs
+  s_c3c23c2eac716e::t_61fb3965eb6794 8,11
+src/app/components/icons/MenuIcons.tsx
+  s_825e6f21ca8504::t_b9983fe37a561f 259-271
+  s_e547377596c213::t_a75b17f5976b61 319-328
+src/app/styles/modules/terminal/explorer.css
+  s_e547377596c213::t_7befe8504b537b 393-429
+src-tauri/src/pty/pool.rs
+  s_a58e93b081335a::t_aec1afdff1b438 42,69-72
+src-tauri/src/git/mod.rs
+  s_c3c23c2eac716e::t_adfe273b08a3db 55
+  s_c3c23c2eac716e::t_4fe56778f8ec9f 1-11,13-51,53-54,56-126,128-142,144,146-150,152-171,173-203,205-340,343-360,362-380,384-402,409-410,412-514,516,520-525,527-530,533-569,572-586,588-610,617-619,621-627,629-674,677-683,685-695,697-700,702-725,727-733,735-794,798-900
+  s_c3c23c2eac716e::t_e6f5bbe902a727 12
+  s_c3c23c2eac716e::t_7f44b844baa0ab 52,127,143,145,151,172,204,341-342,361,381-383,403-408,411,515,517-519,526,531-532,570-571,587,611-616,620,628,684,696,701,726,734,795-797
+  s_c3c23c2eac716e::t_80041aee28b0aa 675-676
+src-tauri/src/mdoels/models.rs
+  s_c3c23c2eac716e::t_997e9648a005ad 386-455
+  s_a58e93b081335a::t_576410b4c98bcb 215-217
+src/app/components/terminal/explorer/FilesExplorer.tsx
+  s_825e6f21ca8504::t_d0e185649631b0 35-38
+  s_825e6f21ca8504::t_cdbe7509a9446e 222-224
+  s_e547377596c213::t_3e94b1ce2ec9c5 4,10,13-14,16,19-22,24-25,42,45,71-101,103-104,221,242-245
+  s_c3c23c2eac716e::t_f0d5d9846c4127 102
+  s_a58e93b081335a::t_f27d9fe4f796f8 15,17-18
+  s_825e6f21ca8504::t_736da14e78a6a1 23
+  s_c3c23c2eac716e::t_4cfc4030163615 246-247
+src/app/components/terminal/source-control/ChangeRowContextMenu.tsx
+  s_1d734ba1304a57::t_809fd9693094f0 1,11,45,47,124-128,130-134
+  s_825e6f21ca8504::t_07009ade983ecf 2-10,12-44,46,48-103,105-123,129,135-137
+  s_825e6f21ca8504::t_0447527a8e5560 104
+src-tauri/src/lib.rs
+  s_c3c23c2eac716e::t_3b25f841ca68fc 10
+  s_c3c23c2eac716e::t_339c1eca686aee 164-173
+src/app/components/terminal/SidePanel.tsx
+  s_e547377596c213::t_e63be2b591795f 33,36-41,45
+  s_825e6f21ca8504::t_18d1d25cf27ee1 3,9-13,15,22,44,46-66,110,124,131-139,164,166-167
+  s_e547377596c213::t_df34e80c059ff2 14
+src/app/components/terminal/TerminalWorkspace.tsx
+  s_a58e93b081335a::t_155fcb7ca1a099 815,873,878-898
+  s_e547377596c213::t_f8799e61e1a56f 945
+  s_a58e93b081335a::t_79301f74179340 951
+  s_e547377596c213::t_ce063684e1f547 68,73-77
+  s_a58e93b081335a::t_69f684698113eb 152-153
+  s_a58e93b081335a::t_49d6d2a4757bbd 56-57,67,69-72
+  s_a58e93b081335a::t_84841c326a8579 138-142,147
+  s_e547377596c213::t_81e869a0600526 283-286
+  s_a58e93b081335a::t_bdcf883fff916e 592,597-598
+  s_e547377596c213::t_dcebe78f5c26f2 870-872,874-877,899-901
+  s_e547377596c213::t_cac9c88e239a98 41
+src/app/types/tauri.ts
+  s_825e6f21ca8504::t_f35fc60785f71b 126-131,134-137
+  s_a58e93b081335a::t_5c91617a5e6488 50-51
+  s_1d734ba1304a57::t_26e7b4790ed0c2 132-133
+src/app/components/terminal/source-control/SourceControlPanel.tsx
+  s_1d734ba1304a57::t_4070c3598a0393 663-665
+  s_825e6f21ca8504::t_31749139811fa7 1
+  s_825e6f21ca8504::t_ad26ae56bac304 2-79,81-193,196-200,202-203,205-213,219-269,271-288,290-294,296-297,300-495,497-499,501-597,599-662,666-670
+  s_1d734ba1304a57::t_802adedd3c623e 289,295,298-299
+  s_825e6f21ca8504::t_94a49cd7d361b8 194-195,201,204,217-218
+  s_1d734ba1304a57::t_d105f6e5668fa9 214-216
+  s_1d734ba1304a57::t_7a53ced30edd21 496,500
+  s_1d734ba1304a57::t_670922d76a5371 80
+  s_1d734ba1304a57::t_7626b694c73eac 270
+  s_1d734ba1304a57::t_35818138225a63 598
+src/app/styles/modules/terminal/source-control.css
+  s_825e6f21ca8504::t_7977326292d98b 1-510,514-517,519-572
+  s_1d734ba1304a57::t_705b74475aa0e8 511-513,518
+src-tauri/src/commands/commands.rs
+  s_a58e93b081335a::t_8cc9a5ba3b62ed 150-157
+src/app/types/index.ts
+  s_1d734ba1304a57::t_22a2c1f0e6e228 41-42
+  s_825e6f21ca8504::t_047e5e38cc8453 37-40,43-47
+src/configs/.tsbuildinfo-test
+  s_825e6f21ca8504::t_131b5a4f75656c 1
+src-tauri/permissions/app-commands.toml
+  s_c3c23c2eac716e::t_1967a3cd2f413a 29-38
+src-tauri/Cargo.lock
+  s_c3c23c2eac716e::t_988336a6cc2369 205-213,457-471,628-638,694-699,916-924,1317-1330,1848-1857,2264,2397-3209,3385-3393,3436-3440,3451-3460,3561-3566,3857-3866,4419-4427,4595-4600,5491-5501,6554-6563,6616,6629-6638,8485-8493,8541-8546
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "648665c40fbaa29df80360ae84dcc2782f341e38",
+  "prompts": {},
+  "sessions": {
+    "s_1d734ba1304a57": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "2f3ebdc2-e49f-430f-b1b1-6523b5fbf49c",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_825e6f21ca8504": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "75a0274b-88da-4a65-95c4-7fbeddac43da",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_a58e93b081335a": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "2769e14b-a7a3-4f3a-a0f8-f768344b0041",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_c3c23c2eac716e": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "46034ec2-1db8-4476-b064-7e62f1bc5e07",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_e547377596c213": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "b71cd8dd-62b9-4ed3-8999-ac018be06354",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
