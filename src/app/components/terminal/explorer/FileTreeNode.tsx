@@ -6,7 +6,7 @@ import {
 } from "react";
 
 import { ChevronRightIcon } from "../../icons/MenuIcons";
-import type { ExplorerDraft, FsEntry } from "../../../types";
+import type { ExplorerDraft, FileIconSet, FsEntry } from "../../../types";
 import { fileTypeIcon } from "./fileTypeIcon";
 import type { VisibleRow } from "./useFileTree";
 
@@ -14,6 +14,7 @@ interface FileTreeNodeProps {
   row: VisibleRow;
   selected: boolean;
   draft: ExplorerDraft | null;
+  iconSet: FileIconSet;
   onSelect: (entry: FsEntry) => void;
   onActivate: (entry: FsEntry) => void;
   onContextMenu: (entry: FsEntry, x: number, y: number) => void;
@@ -30,6 +31,7 @@ export default function FileTreeNode({
   row,
   selected,
   draft,
+  iconSet,
   onSelect,
   onActivate,
   onContextMenu,
@@ -135,7 +137,7 @@ export default function FileTreeNode({
         >
           <ChevronRightIcon />
         </span>
-        {fileTypeIcon(entry)}
+        {fileTypeIcon(entry, { expanded, iconSet })}
         {renaming && draft ? (
           <input
             ref={inputRef}
@@ -164,6 +166,7 @@ export default function FileTreeNode({
         <DraftRow
           depth={depth + 1}
           draft={draft}
+          iconSet={iconSet}
           onDraftChange={onDraftChange}
           onDraftCommit={onDraftCommit}
           onDraftCancel={onDraftCancel}
@@ -200,6 +203,7 @@ export default function FileTreeNode({
 interface DraftRowProps {
   depth: number;
   draft: ExplorerDraft;
+  iconSet: FileIconSet;
   onDraftChange: (name: string) => void;
   onDraftCommit: () => void;
   onDraftCancel: () => void;
@@ -208,6 +212,7 @@ interface DraftRowProps {
 function DraftRow({
   depth,
   draft,
+  iconSet,
   onDraftChange,
   onDraftCommit,
   onDraftCancel,
@@ -257,7 +262,7 @@ function DraftRow({
       >
         <ChevronRightIcon />
       </span>
-      {fileTypeIcon(fake)}
+      {fileTypeIcon(fake, { iconSet })}
       <input
         ref={inputRef}
         className="file-tree-node__input"

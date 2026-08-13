@@ -29,6 +29,7 @@ export const E2E_DEFAULT_SETTINGS: AppSettings = {
   scrollbackLines: 5000,
   cursorStyle: "bar",
   cursorBlink: true,
+  fileIconSet: "catppuccin",
   profiles: [
     {
       id: "powershell",

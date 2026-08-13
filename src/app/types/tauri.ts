@@ -14,6 +14,9 @@ export type CursorStyle = "block" | "underline" | "bar";
 /** Terminal particle background mode (`settings.json` `particleEffect`). */
 export type ParticleEffect = "dust" | "constellation" | "orbs";
 
+/** File explorer icon set (`settings.json` `fileIconSet`). */
+export type FileIconSet = "material" | "catppuccin" | "nord";
+
 export interface TerminalProfile {
   id: string;
   name: string;
@@ -36,6 +39,7 @@ export interface AppSettings {
   scrollbackLines: number;
   cursorStyle: CursorStyle | string;
   cursorBlink: boolean;
+  fileIconSet: FileIconSet | string;
   profiles: TerminalProfile[];
 }
 
@@ -112,4 +116,8 @@ export interface SystemMetrics {
   ramTotalBytes: number;
   netUpBps: number;
   netDownBps: number;
+  /** Omitted when thermal sensors are unavailable. */
+  cpuTempCelsius?: number;
+  gpuTempCelsius?: number;
+  ramTempCelsius?: number;
 }

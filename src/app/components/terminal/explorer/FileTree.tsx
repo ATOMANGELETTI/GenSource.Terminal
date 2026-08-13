@@ -5,7 +5,7 @@ import {
   type MouseEvent as ReactMouseEvent,
 } from 'react';
 
-import type { ExplorerDraft, FsEntry } from '../../../types';
+import type { ExplorerDraft, FileIconSet, FsEntry } from '../../../types';
 import FileTreeNode from './FileTreeNode';
 import type { VisibleRow } from './useFileTree';
 
@@ -13,6 +13,7 @@ interface FileTreeProps {
   rows: VisibleRow[];
   selectedPath: string | null;
   draft: ExplorerDraft | null;
+  iconSet: FileIconSet;
   rootLoading: boolean;
   rootError: string | null;
   filtering: boolean;
@@ -40,6 +41,7 @@ export default function FileTree({
   rows,
   selectedPath,
   draft,
+  iconSet,
   rootLoading,
   rootError,
   filtering,
@@ -159,6 +161,7 @@ export default function FileTree({
           row={row}
           selected={pathsEqual(row.entry.path, selectedPath)}
           draft={draft}
+          iconSet={iconSet}
           onSelect={handleSelect}
           onActivate={handleActivate}
           onContextMenu={onContextMenu}

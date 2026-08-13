@@ -1,10 +1,16 @@
 //! System metrics collector (CPU, RAM, network rates, Windows GPU via PDH).
 
+#[cfg(windows)]
+mod lhm;
+mod thermal;
+
 use std::time::Instant;
 
 use sysinfo::{Networks, System};
 
 use crate::mdoels::SystemMetrics;
+
+use thermal::ThermalSampler;
 
 struct NetSnapshot {
     received: u64,
@@ -19,6 +25,7 @@ pub struct MetricsCollector {
     last_net: Option<NetSnapshot>,
     #[cfg(windows)]
     gpu: Option<GpuPdh>,
+    thermal: ThermalSampler,
 }
 
 impl MetricsCollector {
@@ -39,6 +46,7 @@ impl MetricsCollector {
             last_net: None,
             #[cfg(windows)]
             gpu,
+            thermal: ThermalSampler::new(),
         }
     }
 
@@ -62,6 +70,8 @@ impl MetricsCollector {
         #[cfg(not(windows))]
         let gpu_percent: Option<f32> = None;
 
+        let temps = self.thermal.sample();
+
         SystemMetrics {
             cpu_percent,
             gpu_percent,
@@ -69,6 +79,9 @@ impl MetricsCollector {
             ram_total_bytes,
             net_up_bps,
             net_down_bps,
+            cpu_temp_celsius: temps.cpu_temp_celsius,
+            gpu_temp_celsius: temps.gpu_temp_celsius,
+            ram_temp_celsius: temps.ram_temp_celsius,
         }
     }
 

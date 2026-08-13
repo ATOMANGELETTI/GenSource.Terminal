@@ -488,6 +488,7 @@ fn appearance_changed(previous: &AppSettings, next: &AppSettings) -> bool {
         || (previous.scrollback_lines - next.scrollback_lines).abs() > f64::EPSILON
         || previous.cursor_style != next.cursor_style
         || previous.cursor_blink != next.cursor_blink
+        || previous.file_icon_set != next.file_icon_set
         || previous.profiles != next.profiles
 }
 

@@ -74,6 +74,10 @@ vi.mock("@/hooks/useTerminalSettings", () => ({
   }),
 }));
 
+vi.mock("@/hooks/useFileIconSet", () => ({
+  useFileIconSet: () => "catppuccin",
+}));
+
 // xterm needs a real canvas; stand in for the pane and report restore-ready.
 vi.mock("@/components/terminal/TerminalPane", async () => {
   const React = await import("react");

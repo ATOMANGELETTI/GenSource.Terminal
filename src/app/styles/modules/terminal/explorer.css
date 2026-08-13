@@ -223,17 +223,17 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   flex-shrink: 0;
 }
 
 .file-type-icon--drive {
-  color: color-mix(in srgb, var(--text-muted) 82%, var(--accent) 18%);
+  color: color-mix(in srgb, var(--text-muted) 55%, var(--accent) 45%);
 }
 
 .file-type-icon--folder {
-  color: var(--text-muted);
+  color: color-mix(in srgb, var(--text-muted) 35%, var(--accent) 65%);
 }
 
 .file-type-icon--kit {
@@ -242,6 +242,56 @@
 
 .file-type-icon--kit svg {
   display: block;
+}
+
+/* Nord-native category tints */
+.file-type-icon--nord-code {
+  color: var(--accent);
+}
+
+.file-type-icon--nord-config {
+  color: var(--nord13);
+}
+
+.file-type-icon--nord-markup {
+  color: var(--nord14);
+}
+
+.file-type-icon--nord-style {
+  color: var(--nord15);
+}
+
+.file-type-icon--nord-shell {
+  color: var(--nord7);
+}
+
+.file-type-icon--nord-media {
+  color: var(--nord9);
+}
+
+.file-type-icon--nord-default {
+  color: var(--text-muted);
+}
+
+.file-type-icon--nord.file-type-icon--drive {
+  color: color-mix(in srgb, var(--info) 55%, var(--accent) 45%);
+}
+
+.file-type-icon--nord.file-type-icon--folder {
+  color: color-mix(in srgb, var(--accent) 72%, var(--text) 28%);
+}
+
+/* Light themes: boost filled icon legibility */
+[data-theme="nord-snow-storm"][data-file-icon-set="material"] .file-type-icon--kit,
+[data-theme="nord-frost-light"][data-file-icon-set="material"] .file-type-icon--kit,
+[data-theme="nord-aurora-light"][data-file-icon-set="material"] .file-type-icon--kit {
+  filter: contrast(1.08) saturate(1.05);
+}
+
+[data-theme="nord-snow-storm"][data-file-icon-set="catppuccin"] .file-type-icon--kit,
+[data-theme="nord-frost-light"][data-file-icon-set="catppuccin"] .file-type-icon--kit,
+[data-theme="nord-aurora-light"][data-file-icon-set="catppuccin"] .file-type-icon--kit {
+  filter: contrast(1.06) saturate(1.04);
 }
 
 .file-tree-context-menu {

@@ -2,6 +2,7 @@ export type {
   AppInfo,
   AppSettings,
   CursorStyle,
+  FileIconSet,
   GreetArgs,
   GreetResponse,
   Keybinding,

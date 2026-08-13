@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
+import { useFileIconSet } from '../../../hooks/useFileIconSet';
 import type { ContextMenuPosition, FsEntry } from '../../../types';
 import ExplorerHeader from './ExplorerHeader';
 import FileAboutModal from './FileAboutModal';
@@ -18,6 +19,7 @@ function pathsEqual(a: string | null | undefined, b: string | null | undefined) 
 
 export default function FilesExplorer() {
   const tree = useFileTree();
+  const iconSet = useFileIconSet();
   const [menu, setMenu] = useState<MenuState | null>(null);
 
   const closeMenu = useCallback(() => setMenu(null), []);
@@ -137,6 +139,7 @@ export default function FilesExplorer() {
         rows={tree.visibleRows}
         selectedPath={tree.selectedPath}
         draft={tree.draft}
+        iconSet={iconSet}
         rootLoading={tree.rootLoading}
         rootError={tree.rootError}
         filtering={tree.searchQuery.trim().length > 0}

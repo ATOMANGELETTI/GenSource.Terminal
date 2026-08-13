@@ -11,6 +11,7 @@
 @import "./modules/terminal/side-panel.css";
 @import "./modules/terminal/explorer.css";
 @import "./modules/terminal/status-bar.css";
+@import "./modules/terminal/metric-tooltip.css";
 @import "./modules/terminal/tabs.css";
 @import "./modules/terminal/pane.css";
 @import "./modules/terminal/xterm.css";

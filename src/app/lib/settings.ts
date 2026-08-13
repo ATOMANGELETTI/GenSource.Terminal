@@ -2,6 +2,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 
 import type { AppInfo, AppSettings } from "../types";
+import { resolveFileIconSet } from "./file-icons";
 import {
   followsSystemScheme,
   resolveTheme,
@@ -30,6 +31,7 @@ export function applySettingsToDom(settings: AppSettings): void {
 
   const root = document.documentElement;
   root.dataset.theme = resolveTheme(settings.theme || "nord-polar-night");
+  root.dataset.fileIconSet = resolveFileIconSet(settings.fileIconSet);
   root.style.setProperty(
     "--font-sans",
     resolveFontFamily(settings.fontFamily),
@@ -73,6 +75,7 @@ export function resolveFontFamily(name: string): string {
 }
 
 export { FONT_FAMILY_MAP };
+export { resolveFileIconSet } from "./file-icons";
 
 export async function fetchSettings(): Promise<AppSettings> {
   return invoke<AppSettings>("get_settings");

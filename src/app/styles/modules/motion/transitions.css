@@ -47,6 +47,28 @@
   }
 }
 
+@keyframes metric-tooltip-enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes status-bar-metrics-swap {
+  from {
+    opacity: 0.35;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .terminal-tab-enter {
     animation: terminal-tab-enter 160ms ease-out both;
@@ -54,6 +76,14 @@
 
   .find-bar-enter {
     animation: find-bar-enter 180ms ease-out both;
+  }
+
+  .metric-tooltip-enter {
+    animation: metric-tooltip-enter 160ms ease-out both;
+  }
+
+  .status-bar__metrics-swap {
+    animation: status-bar-metrics-swap 120ms ease-out both;
   }
 
   .tab-bar__tab {
@@ -84,7 +114,9 @@
   }
 
   .terminal-tab-enter,
-  .find-bar-enter {
+  .find-bar-enter,
+  .metric-tooltip-enter,
+  .status-bar__metrics-swap {
     animation: none;
   }
 

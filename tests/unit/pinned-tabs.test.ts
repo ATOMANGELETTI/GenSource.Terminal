@@ -107,6 +107,19 @@ describe("sanitizePinnedScrollback", () => {
     expect(sanitizePinnedScrollback("\n\n  \n")).toBe("");
   });
 
+  it("clears nord powerline row-1 prompts (U+E0B0 separators)", () => {
+    const row1 = " DUSTI@msi-laptop \uE0B0 ~ \uE0B0";
+    expect(sanitizePinnedScrollback(row1)).toBe("");
+    expect(
+      sanitizePinnedScrollback(
+        [row1, row1, row1, row1, row1].join("\n"),
+      ),
+    ).toBe("");
+    expect(
+      sanitizePinnedScrollback(`${row1}\n❯\n${row1}\n`),
+    ).toBe("");
+  });
+
   it("keeps command text after a prompt marker", () => {
     expect(sanitizePinnedScrollback("❯ git status")).toBe("❯ git status");
     expect(sanitizePinnedScrollback("$ ls -la")).toBe("$ ls -la");
@@ -123,6 +136,14 @@ describe("sanitizePinnedScrollback", () => {
     ].join("\n");
     expect(sanitizePinnedScrollback(input)).toBe(
       ["❯ git status", "On branch main", "nothing to commit"].join("\n"),
+    );
+  });
+
+  it("strips nord powerline row-1 before real command output", () => {
+    const row1 = " DUSTI@msi-laptop \uE0B0 ~ \uE0B0";
+    const input = [row1, "❯ npm", "Usage:", "npm install"].join("\n");
+    expect(sanitizePinnedScrollback(input)).toBe(
+      ["❯ npm", "Usage:", "npm install"].join("\n"),
     );
   });
 

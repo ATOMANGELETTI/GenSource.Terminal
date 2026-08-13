@@ -1,19 +1,27 @@
+import { useState } from "react";
+
 import {
-  ArrowDownIcon,
-  ArrowUpIcon,
   CpuIcon,
+  GaugeIcon,
   GpuIcon,
   MemoryIcon,
   PanelLeftIcon,
+  ThermometerIcon,
 } from "../icons/MenuIcons";
 import { useSystemMetrics } from "../../hooks/useSystemMetrics";
 import {
   formatPercent,
+  formatRamDetail,
   formatRamGiB,
-  formatRate,
-  metricLoadLevel,
+  formatTempDetail,
   ramLoadPercent,
 } from "../../lib/terminal/format-metrics";
+import {
+  readStoredMetricMode,
+  writeStoredMetricMode,
+  type StatusBarMetricMode,
+} from "../../lib/terminal/status-bar-mode";
+import { MetricTooltip } from "./MetricTooltip";
 
 interface StatusBarProps {
   panelOpen: boolean;
@@ -21,21 +29,6 @@ interface StatusBarProps {
   shellName: string;
   cols: number;
   rows: number;
-}
-
-function MetricBar({ percent }: { percent: number | null }) {
-  const width =
-    percent == null || !Number.isFinite(percent)
-      ? 0
-      : Math.max(0, Math.min(100, percent));
-  return (
-    <span className="status-bar__metric-bar" aria-hidden="true">
-      <span
-        className="status-bar__metric-bar-fill"
-        style={{ width: `${width}%` }}
-      />
-    </span>
-  );
 }
 
 export default function StatusBar({
@@ -46,6 +39,9 @@ export default function StatusBar({
   rows,
 }: StatusBarProps) {
   const metrics = useSystemMetrics();
+  const [metricMode, setMetricMode] = useState<StatusBarMetricMode>(() =>
+    readStoredMetricMode(),
+  );
 
   const cpu = metrics?.cpuPercent ?? null;
   const gpu = metrics?.gpuPercent ?? null;
@@ -55,8 +51,24 @@ export default function StatusBar({
     ramUsed != null && ramTotal != null
       ? ramLoadPercent(ramUsed, ramTotal)
       : null;
+  const cpuTemp = metrics?.cpuTempCelsius ?? null;
+  const gpuTemp = metrics?.gpuTempCelsius ?? null;
+  const ramTemp = metrics?.ramTempCelsius ?? null;
   const netUp = metrics?.netUpBps ?? 0;
   const netDown = metrics?.netDownBps ?? 0;
+
+  const gpuDetail =
+    gpu == null || !Number.isFinite(gpu)
+      ? "Unavailable"
+      : "GPU utilization";
+
+  const toggleMetricMode = () => {
+    setMetricMode((prev) => {
+      const next: StatusBarMetricMode = prev === "usage" ? "temp" : "usage";
+      writeStoredMetricMode(next);
+      return next;
+    });
+  };
 
   return (
     <footer className="status-bar" data-testid="status-bar">
@@ -71,61 +83,102 @@ export default function StatusBar({
         <PanelLeftIcon className="status-bar__toggle-icon" aria-hidden="true" />
       </button>
 
-      <div
-        className="status-bar__metrics"
-        data-testid="status-bar-metrics"
-        aria-label="System metrics"
-      >
-        <span
-          className="status-bar__metric"
-          data-load={metricLoadLevel(cpu)}
-          title="CPU"
-        >
-          <CpuIcon className="status-bar__metric-icon" aria-hidden="true" />
-          <span className="status-bar__metric-label">CPU</span>
-          <MetricBar percent={cpu} />
-          <span className="status-bar__metric-value">{formatPercent(cpu)}</span>
-        </span>
-
-        <span
-          className="status-bar__metric"
-          data-load={metricLoadLevel(gpu)}
-          title="GPU"
-        >
-          <GpuIcon className="status-bar__metric-icon" aria-hidden="true" />
-          <span className="status-bar__metric-label">GPU</span>
-          <MetricBar percent={gpu} />
-          <span className="status-bar__metric-value">{formatPercent(gpu)}</span>
-        </span>
-
-        <span
-          className="status-bar__metric"
-          data-load={metricLoadLevel(ramPct)}
-          title="RAM"
-        >
-          <MemoryIcon className="status-bar__metric-icon" aria-hidden="true" />
-          <span className="status-bar__metric-label">RAM</span>
-          <MetricBar percent={ramPct} />
-          <span className="status-bar__metric-value">
-            {ramUsed != null ? formatRamGiB(ramUsed) : "—"}
-          </span>
-        </span>
-
-        <span className="status-bar__metric status-bar__metric--net" title="Network">
-          <ArrowUpIcon className="status-bar__metric-icon" aria-hidden="true" />
-          <span className="status-bar__metric-value">{formatRate(netUp)}</span>
-          <ArrowDownIcon
-            className="status-bar__metric-icon"
-            aria-hidden="true"
-          />
-          <span className="status-bar__metric-value">{formatRate(netDown)}</span>
-        </span>
-      </div>
-
       <div className="status-bar__spacer" />
+
       <div className="status-bar__info" data-testid="status-bar-info">
         {shellName} · {cols}×{rows}
       </div>
+
+      <div
+        key={metricMode}
+        className="status-bar__metrics status-bar__metrics-swap"
+        data-testid="status-bar-metrics"
+        aria-label="System metrics"
+      >
+        {metricMode === "usage" ? (
+          <>
+            <MetricTooltip
+              label="CPU"
+              Icon={CpuIcon}
+              percent={cpu}
+              value={formatPercent(cpu)}
+              detail="System processor usage"
+            />
+
+            <MetricTooltip
+              label="GPU"
+              Icon={GpuIcon}
+              percent={gpu}
+              value={formatPercent(gpu)}
+              detail={gpuDetail}
+            />
+
+            <MetricTooltip
+              label="RAM"
+              Icon={MemoryIcon}
+              percent={ramPct}
+              value={ramUsed != null ? formatRamGiB(ramUsed) : "—"}
+              tooltipValue={formatPercent(ramPct)}
+              detail={
+                ramUsed != null && ramTotal != null
+                  ? formatRamDetail(ramUsed, ramTotal)
+                  : "—"
+              }
+            />
+          </>
+        ) : (
+          <>
+            <MetricTooltip
+              kind="temperature"
+              label="CPU"
+              Icon={CpuIcon}
+              celsius={cpuTemp}
+              detail={formatTempDetail("CPU", cpuTemp)}
+            />
+
+            <MetricTooltip
+              kind="temperature"
+              label="GPU"
+              Icon={GpuIcon}
+              celsius={gpuTemp}
+              detail={formatTempDetail("GPU", gpuTemp)}
+            />
+
+            <MetricTooltip
+              kind="temperature"
+              label="RAM"
+              Icon={MemoryIcon}
+              celsius={ramTemp}
+              detail={formatTempDetail("RAM", ramTemp)}
+            />
+          </>
+        )}
+
+        <MetricTooltip kind="network" netUp={netUp} netDown={netDown} />
+      </div>
+
+      <button
+        type="button"
+        className="status-bar__mode-toggle"
+        aria-pressed={metricMode === "temp"}
+        aria-label={
+          metricMode === "usage" ? "Show temperatures" : "Show usage"
+        }
+        data-testid="status-bar-mode-toggle"
+        onClick={toggleMetricMode}
+      >
+        {metricMode === "usage" ? (
+          <ThermometerIcon
+            className="status-bar__mode-toggle-icon"
+            aria-hidden="true"
+          />
+        ) : (
+          <GaugeIcon
+            className="status-bar__mode-toggle-icon"
+            aria-hidden="true"
+          />
+        )}
+      </button>
     </footer>
   );
 }

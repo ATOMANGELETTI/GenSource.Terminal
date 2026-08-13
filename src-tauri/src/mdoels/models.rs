@@ -157,6 +157,8 @@ pub struct AppSettings {
     pub cursor_style: String,
     #[serde(default = "default_cursor_blink")]
     pub cursor_blink: bool,
+    #[serde(default = "default_file_icon_set")]
+    pub file_icon_set: String,
     #[serde(default = "default_profiles")]
     pub profiles: Vec<TerminalProfile>,
 }
@@ -177,6 +179,10 @@ fn default_particle_effect() -> String {
     "dust".into()
 }
 
+fn default_file_icon_set() -> String {
+    "catppuccin".into()
+}
+
 impl Default for AppSettings {
     fn default() -> Self {
         Self {
@@ -193,6 +199,7 @@ impl Default for AppSettings {
             scrollback_lines: default_scrollback_lines(),
             cursor_style: default_cursor_style(),
             cursor_blink: default_cursor_blink(),
+            file_icon_set: default_file_icon_set(),
             profiles: default_profiles(),
         }
     }
@@ -363,4 +370,13 @@ pub struct SystemMetrics {
     pub ram_total_bytes: u64,
     pub net_up_bps: f64,
     pub net_down_bps: f64,
+    /// Package / thermal-zone proxy (°C). `None` when WMI sensors are unavailable.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cpu_temp_celsius: Option<f32>,
+    /// Vendor GPU die temp (°C) when exposed via WMI; often `None` on consumer PCs.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub gpu_temp_celsius: Option<f32>,
+    /// DIMM / memory sensor (°C) when exposed; frequently `None` without vendor drivers.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ram_temp_celsius: Option<f32>,
 }

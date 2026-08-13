@@ -2,6 +2,13 @@
 
 User-editable preferences shipped beside the installed `.exe` under `other/configs/`.
 
+## Hardware temperatures (status bar)
+
+CPU / GPU / RAM °C use LibreHardwareMonitor (`lhm-sys`) first, then NVML (NVIDIA GPU) and WMI fallbacks.
+
+- **Build:** Windows builds that enable LHM need **.NET SDK 8** (`winget install Microsoft.DotNet.SDK.8`) so the NativeAOT bridge can compile.
+- **Runtime:** The first time the sensor driver loads, Windows may prompt for **administrator elevation** (same class of requirement as Speccy / LibreHardwareMonitor). Decline or failure is fine — usage metrics still work; missing sensors show as `—`.
+
 | Location | Path |
 | --- | --- |
 | Dev | `<repo>/other/configs/` |
@@ -38,6 +45,7 @@ User preferences for the UI shell and terminal. Edit and save — changes apply 
 | `scrollbackLines` | xterm scrollback buffer and pin truncate limit (default `5000`; clamped to `[100, 100000]`). |
 | `cursorStyle` | xterm cursor: `block`, `underline`, or `bar` (default `bar`). Invalid values fall back to `bar`. |
 | `cursorBlink` | If `true`, blink the terminal cursor (default `true`). |
+| `fileIconSet` | File explorer icon style: `catppuccin` (default), `material`, or `nord`. Aliases: `cat`, `mat`, `nord-native`. Hot-swaps while the app is running. |
 | `profiles` | Array of shell profiles (see below). Empty / missing → built-in PowerShell + CMD. |
 
 Do **not** store window width/height/position here — geometry is handled by the window-state plugin (writing it caused move/flash issues).

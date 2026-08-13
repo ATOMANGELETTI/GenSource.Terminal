@@ -378,3 +378,22 @@ export function ArrowDownIcon(props: IconProps) {
     </svg>
   );
 }
+
+export function ThermometerIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M8 2.5a1.25 1.25 0 0 0-1.25 1.25v5.35a2.5 2.5 0 1 0 2.5 0V3.75A1.25 1.25 0 0 0 8 2.5z" />
+      <path d="M8 10.2v1.3" />
+    </svg>
+  );
+}
+
+export function GaugeIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M3.2 11.2a5.5 5.5 0 1 1 9.6 0" />
+      <path d="M8 11.2l2.4-3.2" />
+      <circle cx="8" cy="11.2" r="0.7" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}

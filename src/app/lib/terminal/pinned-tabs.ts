@@ -6,7 +6,8 @@ export const PINNED_TABS_KEY = "terminal.pinnedTabs";
 
 const EMPTY: PinnedTabsState = { version: 1, tabs: [] };
 
-const PROMPT_MARKERS = ["❯", "$", "#", "%", ">"] as const;
+/** Shell markers plus Nord powerline separators (U+E0B0/E0B1 from nord-powerline.ps1). */
+const PROMPT_MARKERS = ["❯", "$", "#", "%", ">", "\uE0B0", "\uE0B1"] as const;
 
 /**
  * True for blank lines and idle shell prompts with no command text after the

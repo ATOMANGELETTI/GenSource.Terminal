@@ -1,1 +1,2 @@
 1. Changed hard links and paths to relative paths in the project
+2. Changed to 64bit Windows systems only at build/package time
