@@ -1,0 +1,207 @@
+src/app/types/tauri.ts
+  s_8167d45f48656c::t_a5ddd7554ed8fb 105-119
+src/app/styles/index.css
+  s_8167d45f48656c::t_c171c89324166d 14
+src/app/components/terminal/source-control/SourceControlTabContextMenu.tsx
+  s_4d3ea479be10fc::t_7064f235392710 1-56
+src/app/styles/modules/terminal/config-panel.css
+  s_8167d45f48656c::t_1f022e51393417 1-301
+src/app/components/terminal/config/ConfigField.tsx
+  s_8167d45f48656c::t_2e26aabfe77cac 1-22
+src/configs/.tsbuildinfo-app
+  s_ed0b1a1dea1ae8::t_b9eafd1efadc5e 1
+src/configs/.tsbuildinfo-test
+  s_ed0b1a1dea1ae8::t_b9eafd1efadc5e 1
+src/app/types/index.ts
+  s_8167d45f48656c::t_678633be3ef1c5 10-11
+README.md
+  s_5588ba75253be6::t_82e1781594fa34 52
+  s_5588ba75253be6::t_df3dd036b7d741 25
+src-tauri/src/config/mod.rs
+  s_45b167e6beb58e::t_482bf40e0c05a0 6,14,25-29
+  s_45b167e6beb58e::t_f67143d37c6436 279-375,377-400
+  s_62e45941b5d9d4::t_74d6a7dfe1509b 993
+  s_62e45941b5d9d4::t_a249b936dca689 376
+  s_45b167e6beb58e::t_54c9efd5ae18f9 834-839,843-844,848,851,856-861,866-867,878-879,882
+  s_62e45941b5d9d4::t_666e39451b237d 606-611
+  s_62e45941b5d9d4::t_e4c932956f80b2 832,941-992,994-1003
+  s_62e45941b5d9d4::t_ef7e066470a6f2 657
+  s_45b167e6beb58e::t_7a0332893fbbf2 720-723,732-735
+  s_45b167e6beb58e::t_cbabe150ec716e 833,840-842,845-847,849-850,852-855,862-865,868-877,880-881,883-884
+  s_62e45941b5d9d4::t_ec0dec152ef0a6 30
+src-tauri/src/commands/commands.rs
+  s_45b167e6beb58e::t_ff9c14aca07b04 12-13,115-116
+  s_62e45941b5d9d4::t_2483f60489677e 77
+  s_45b167e6beb58e::t_968fd4df4ed2a1 59-68,76,78-114
+src/app/components/terminal/SidePanel.tsx
+  s_4d3ea479be10fc::t_d55ffcd6c2cc0f 134-141
+  s_4d3ea479be10fc::t_af3be6a0b5f8b7 6,10-14,17,20-21,24,34,69-70,91-120,132-133,142-157,200-203,207,231-232,256-258,264-265,281-290
+  s_464d8c3fd8496d::t_014aca2fc22608 28,39-52,67,71-78
+src-tauri/src/lib.rs
+  s_45b167e6beb58e::t_b869c990f00791 143,145-147
+src/app/components/terminal/config/LoggingPage.tsx
+  s_8167d45f48656c::t_e2d2d59aa940bc 1-38
+src-tauri/permissions/app-commands.toml
+  s_45b167e6beb58e::t_ec2d437798357a 8,10-12
+src/app/components/terminal/config/WindowPage.tsx
+  s_8167d45f48656c::t_95e9c99e4152c5 1-47
+.cursor/hooks/state/continual-learning.json
+  s_e7048e82f727e6::t_8d4c01918ccceb 3,5
+  s_e7048e82f727e6::t_f51bc8291ba72b 4
+  s_e7048e82f727e6::t_e89b442c2bfc6e 6
+src/configs/vite.config.ts
+  s_464d8c3fd8496d::t_2878e1279af494 37-38
+src/app/styles/modules/terminal/source-control.css
+  s_4d3ea479be10fc::t_e94f23101c1fb6 79-82
+  s_4d3ea479be10fc::t_b997155cf1ec94 53-78
+src/scripts/log-tauri-build.js
+  s_5588ba75253be6::t_4a2da7108570d4 71-72
+.cursor/AGENTS.md
+  s_e7048e82f727e6::t_d3bd396c250763 106,114,116,121-123,127-128
+  s_5588ba75253be6::t_c2d43227ed10f8 130
+src/app/components/terminal/config/TerminalPage.tsx
+  s_8167d45f48656c::t_c833d140aa476d 1-163
+src/app/lib/settings.ts
+  s_8167d45f48656c::t_a5502f15271d72 4
+  s_8167d45f48656c::t_d9a0743bc30d27 88-99
+src/app/components/terminal/config/ConfigPanel.tsx
+  s_8167d45f48656c::t_d1373b671f5a91 1-34,36-56,71-106,108-118,127-390,394-403,405-407,409-425
+  s_464d8c3fd8496d::t_f45c0aa2aba1bc 35,57-70
+  s_b6f50d910aecee::t_f649f2be9b767c 391-393,408
+  s_8167d45f48656c::t_2093a9c898c689 404
+  s_464d8c3fd8496d::t_c049cef8cd565e 107,119-126
+src/app/components/terminal/config/AboutPage.tsx
+  s_8167d45f48656c::t_59942ddb938088 1-38
+src/app/components/terminal/source-control/SourceControlPanel.tsx
+  s_4d3ea479be10fc::t_bc8a76da0055e3 460
+  s_4d3ea479be10fc::t_a72a9583eef34a 115-119
+  s_4d3ea479be10fc::t_417ae88b6e4d4e 388
+  s_4d3ea479be10fc::t_221036ac2c40e9 454-459
+  s_4d3ea479be10fc::t_829b200288a0c4 380-387,452-453
+.cursor/hooks/state/continual-learning-index.json
+  s_e7048e82f727e6::t_8d4c01918ccceb 1-146
+other/prompts/nord-powerline.ps1
+  s_599af9a848aa56::t_56d9203c97272e 202-206
+  s_7cfcce5f53ff65::t_a977224b2b3a54 16
+src/app/lib/keybindings.ts
+  s_8167d45f48656c::t_813ce6b18a312c 4,14-17
+src/app/components/terminal/config/AppearancePage.tsx
+  s_8167d45f48656c::t_37187c0bb806cc 1-128
+other/documents/packaging.md
+  s_5588ba75253be6::t_e4f0dd06d291e4 27,31,35-38
+src/app/components/terminal/config/KeyboardPage.tsx
+  s_e7d8154a2af09a::t_f3e4dcf5000bbb 27-29
+  s_8167d45f48656c::t_bb6411943d38a6 1-26,30-83
+src/configs/.tsbuildinfo-node
+  s_ed0b1a1dea1ae8::t_b9eafd1efadc5e 1
+src-tauri/src/mdoels/models.rs
+  s_45b167e6beb58e::t_71f4b793ec5b36 150,152
+src/app/components/icons/MenuIcons.tsx
+  s_8167d45f48656c::t_2361670269b653 86-135
+src/configs/vite.config.d.ts.map
+  s_ed0b1a1dea1ae8::t_5478a2bd6ff4f0 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "515a2fd31aec2c85576917e8a63c0da31194788e",
+  "prompts": {},
+  "sessions": {
+    "s_45b167e6beb58e": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "de5789f6-e7d7-40ba-b658-62259601a58b",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_464d8c3fd8496d": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "160f056f-b136-4926-b99d-bea7c82ac4f2",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_4d3ea479be10fc": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "40f71623-4467-4b39-99ef-81aa1b1b756e",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_5588ba75253be6": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "c1948121-8ed1-42c0-aa36-2cc2363f330b",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_599af9a848aa56": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "f654c40a-b5fb-4908-88e4-8d222804da6f",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_62e45941b5d9d4": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "b3efc40b-48bc-4e48-b970-8d450204b014",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_7cfcce5f53ff65": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "368bf28d-e1b4-4b81-937c-9ecc250c82e2",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_8167d45f48656c": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "789a9ec7-5665-42d1-930c-500cf0212c9d",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_b6f50d910aecee": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "c98f6b31-9444-4e11-8c44-d17411967cbd",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_e7048e82f727e6": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "06f2483e-5b29-49b4-b655-b05b613cf7a8",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_e7d8154a2af09a": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "25bc1379-9a10-4663-9eba-bcc3f8851545",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_ed0b1a1dea1ae8": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "e04b84ea-7cd4-44c2-85e6-1192d280ee91",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
