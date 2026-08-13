@@ -1,0 +1,118 @@
+src/app/components/icons/MenuIcons.tsx
+  s_2a9a96be4ee489::t_1ffd859c04d097 323-341
+src/app/lib/context-menu-popup.ts
+  s_aa1d801b0e7f93::t_8cffc5b9bc8d1d 120
+  s_aa1d801b0e7f93::t_7e63795c25f6af 119,124-125
+  s_aa1d801b0e7f93::t_a1f43f863ee41f 111
+src/app/components/terminal/config/AgentsPage.tsx
+  s_2a9a96be4ee489::t_79a50026888d41 1-2,5-11,28-66,68-74,76,83-84,88-166,183-184,202-205,207-339
+  s_2a9a96be4ee489::t_31d8b67beb7254 67
+  s_2a9a96be4ee489::t_48708fbed8081b 198-201
+tests/unit/packaging-invariants.test.ts
+  s_2a9a96be4ee489::t_70ee1dedbecaed 20
+src/app/lib/agent.ts
+  s_2a9a96be4ee489::t_72f54d1cffdb49 10,13,15,17
+  s_2a9a96be4ee489::t_156b207bb64188 258-309
+  s_2a9a96be4ee489::t_6b3917d4ab733d 28-65
+src/app/types/agent.ts
+  s_2a9a96be4ee489::t_bade4c4aab9289 58-77
+src/app/components/terminal/agent/AgentShell.tsx
+  s_2a9a96be4ee489::t_c01a76406d0ba8 1-3,5-196
+  s_2a9a96be4ee489::t_1c9802c64f042c 4
+src/app/pages/context-menu/ContextMenuWindow.tsx
+  s_aa1d801b0e7f93::t_269d6413fc55f8 103-105
+src-tauri/src/db/mod.rs
+  s_2a9a96be4ee489::t_62ec1a572d63d1 7-10
+  s_2a9a96be4ee489::t_3eef06286b10f0 37,40
+  s_2a9a96be4ee489::t_0b9af79f94a867 1-4,6,11-36,38-39,41-113
+  s_2a9a96be4ee489::t_15c744ac895f5c 5
+src-tauri/src/db/chats.rs
+  s_2a9a96be4ee489::t_de78bdb8ea635e 318
+  s_2a9a96be4ee489::t_86374d9d9fcae6 1-317,319-432
+src-tauri/permissions/app-commands.toml
+  s_2a9a96be4ee489::t_407b9a94348c92 48,53-60
+src-tauri/src/agent/session.rs
+  s_2a9a96be4ee489::t_bfb03e47481693 11-44
+src/app/lib/agent-vault.ts
+  s_2a9a96be4ee489::t_1307c6d1e33d8c 19,21-22
+  s_2a9a96be4ee489::t_1aeffeeef6f26b 1-18,20,23-84
+src-tauri/src/agent/mod.rs
+  s_2a9a96be4ee489::t_db6f81ed216c9b 6
+  s_2a9a96be4ee489::t_a9c64dc5540589 25,27-28
+  s_2a9a96be4ee489::t_52546d5373d4fd 67,69,72-82
+  s_2a9a96be4ee489::t_e747011c24ea96 113-114,134-144,147,167-172,184,234-240
+  s_2a9a96be4ee489::t_1f247824f4298f 384,386-393
+  s_2a9a96be4ee489::t_3027aa3dcf0a1d 55-62
+src/configs/.tsbuildinfo-app
+  s_aa1d801b0e7f93::t_7cf09690e6c5b1 1
+src-tauri/src/config/mod.rs
+  s_2a9a96be4ee489::t_8f5b84295a3884 1095,1115
+  s_2a9a96be4ee489::t_fa098d70f20237 1096-1114,1116-1126
+  s_2a9a96be4ee489::t_41ee2cb7c11918 462-463
+src/app/components/terminal/config/ConfigPanel.tsx
+  s_2a9a96be4ee489::t_c1a19eccb5318e 109
+src-tauri/capabilities/default.json
+  s_aa1d801b0e7f93::t_95a1391051ccfd 21
+  s_2a9a96be4ee489::t_eb25a426c4661f 38-39
+  s_2a9a96be4ee489::t_4dd2c26a9ca6a8 4
+tests/unit/agent-chat.test.ts
+  s_2a9a96be4ee489::t_dc16f92ff494f0 3-8
+  s_2a9a96be4ee489::t_5e37f2679087c3 95-115
+src/app/types/index.ts
+  s_2a9a96be4ee489::t_dcbe6cf9a6d69d 57,62,65
+src/app/components/terminal/agent/PreviousChats.tsx
+  s_2a9a96be4ee489::t_0aaeb227f286ce 1-155
+src/app/styles/modules/terminal/agent.css
+  s_2a9a96be4ee489::t_c013ffe0622a70 321-404
+  s_2a9a96be4ee489::t_b83d4eb3266a86 3-66
+src-tauri/src/lib.rs
+  s_2a9a96be4ee489::t_e1984fd2742e51 54
+  s_2a9a96be4ee489::t_fba5c3bf9c1a8d 11
+  s_2a9a96be4ee489::t_1e892ea052d516 190,195-202
+  s_2a9a96be4ee489::t_7b68c414a74c13 234-236
+  s_2a9a96be4ee489::t_7074b0dd0fcbcb 143-144
+  s_2a9a96be4ee489::t_fd16627b736534 206-207,210-214
+src/app/components/terminal/SidePanel.tsx
+  s_aa1d801b0e7f93::t_9c09d12c4bf244 87-90
+  s_2a9a96be4ee489::t_b0af82facc391b 27
+  s_aa1d801b0e7f93::t_4f23bf112babf7 22
+  s_2a9a96be4ee489::t_d681cfe3759b23 294
+other/configs/README.md
+  s_2a9a96be4ee489::t_f009f23b73bdd1 124-126,131,152
+src/configs/.tsbuildinfo-test
+  s_aa1d801b0e7f93::t_7cf09690e6c5b1 1
+src-tauri/src/mdoels/models.rs
+  s_2a9a96be4ee489::t_e7f27051d1d9d8 573
+  s_2a9a96be4ee489::t_b29cb7bb8de28f 588-600,605
+  s_2a9a96be4ee489::t_5985802375d458 536-572,574-587,601-604,606-614
+src/app/components/terminal/agent/AgentPanel.tsx
+  s_2a9a96be4ee489::t_26f71e2ee9d2d4 7,12,27,30,41,44,58-63,68-70,72-74,77,87,101,114,127,131,137,155,167,179,207,210-212,215-216,222,241-242,269,288-297,302,405,417
+src-tauri/src/agent/tools.rs
+  s_2a9a96be4ee489::t_8a0dfdb6c8955a 38
+  s_2a9a96be4ee489::t_661b37408c55bd 16
+  s_2a9a96be4ee489::t_2b7dfddd8ec4f7 52,55-70
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "8a733e4d3eb538279171f411dafc41666a3abcee",
+  "prompts": {},
+  "sessions": {
+    "s_2a9a96be4ee489": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "33af420c-0c6c-445c-bd92-4e7335ab9d79",
+        "model": "cursor-grok-4.6-high-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_aa1d801b0e7f93": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "65a9d27b-7163-447e-b5d9-deceed843321",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
