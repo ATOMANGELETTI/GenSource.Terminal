@@ -43,7 +43,19 @@ const DEFAULT_SETTINGS_JSON: &str = include_str!("../../../other/configs/setting
 const DEFAULT_KEYBINDINGS_JSON: &str = include_str!("../../../other/configs/keybindings.json");
 const DEFAULT_APPINFO_JSON: &str = include_str!("../../../other/configs/appinfo.json");
 const DEFAULT_LOGGING_JSON: &str = include_str!("../../../other/configs/logging.json");
-const DEFAULT_AGENT_JSON: &str = include_str!("../../../other/configs/agent.json");
+/// Shipped default for a missing `agent.json`. Keep `apiKey` empty so a local
+/// plaintext key is never baked into the binary via `include_str!`.
+const DEFAULT_AGENT_JSON: &str = r#"{
+  "activeProvider": "gemini",
+  "providers": {
+    "gemini": {
+      "apiKey": "",
+      "model": "gemini-3.6-flash"
+    }
+  },
+  "systemPrompt": "You are GenSource Terminal's agent. Reply in the Agents chat panel. Use tools for files, git, and settings when helpful. Only use the terminal tool when the user asks you to run a shell command."
+}
+"#;
 
 /// Resolve a directory under the live `other/` tree (no `AppHandle` required).
 ///
@@ -114,6 +126,41 @@ pub fn ensure_logging_dirs() -> Result<(), String> {
     fs::create_dir_all(&app_dir).map_err(|e| format!("create logging app dir: {e}"))?;
     fs::create_dir_all(&build_dir).map_err(|e| format!("create logging build dir: {e}"))?;
     Ok(())
+}
+
+/// Ensure the portable SQLite + Stronghold folders exist under `other/database/`.
+pub fn ensure_database_dirs() -> Result<(), String> {
+    for subdir in [
+        "database/sqlite/agents/chats",
+        "database/sqlite/agents/memory",
+        "database/sqlite/app",
+        "database/stronghold",
+    ] {
+        let path = resolve_other_subdir(subdir);
+        fs::create_dir_all(&path).map_err(|e| format!("create {subdir}: {e}"))?;
+    }
+    Ok(())
+}
+
+/// Stronghold salt file: `other/database/stronghold/salt.txt`.
+pub fn resolve_stronghold_salt_path() -> PathBuf {
+    resolve_other_subdir("database/stronghold").join("salt.txt")
+}
+
+/// Stronghold vault snapshot: `other/database/stronghold/vault.hold`.
+pub fn resolve_stronghold_vault_path() -> PathBuf {
+    resolve_other_subdir("database/stronghold").join("vault.hold")
+}
+
+/// Agent chats SQLite file: `other/database/sqlite/agents/chats/chats.db`.
+pub fn resolve_chats_db_path() -> PathBuf {
+    resolve_other_subdir("database/sqlite/agents/chats").join("chats.db")
+}
+
+/// Display a filesystem path without a Windows `\\?\` prefix (for IPC / Stronghold).
+pub fn path_to_portable_string(path: &Path) -> String {
+    let raw = path.to_string_lossy();
+    raw.strip_prefix(r"\\?\").unwrap_or(raw.as_ref()).to_string()
 }
 
 /// Ensure the config files exist. Never overwrites an existing
@@ -405,13 +452,22 @@ pub fn emit_agent_changed<R: Runtime>(app: &AppHandle<R>, config: &AgentConfig) 
     }
 }
 
-/// Persist `agent.json` and notify the frontend (API key stays in this payload for Config UI only).
+/// Clear provider API keys before writing `agent.json` (keys live in Stronghold).
+pub fn strip_agent_api_keys(config: &mut AgentConfig) {
+    for provider in config.providers.values_mut() {
+        provider.api_key.clear();
+    }
+}
+
+/// Persist `agent.json` and notify the frontend. API keys are stripped — they
+/// belong in the Stronghold vault, not JSON.
 pub fn save_and_emit_agent<R: Runtime>(
     app: &AppHandle<R>,
     config: AgentConfig,
 ) -> Result<AgentConfig, String> {
     let mut config = config;
     normalize_agent_config(&mut config);
+    strip_agent_api_keys(&mut config);
 
     let state = app.state::<AppState>();
     let configs_dir = state
