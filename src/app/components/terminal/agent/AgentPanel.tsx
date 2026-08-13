@@ -4,11 +4,12 @@ import Markdown from "react-markdown";
 import {
   agentChatCancel,
   agentChatClear,
+  agentChatLoad,
   agentChatSend,
   agentConfirmResponse,
   agentHasApiKey,
   applyAgentChunk,
-  CHAT_STORE_KEY,
+  getConversationMessages,
   mergeAssistantReply,
   subscribeAgentChunk,
   subscribeAgentConfirm,
@@ -16,18 +17,17 @@ import {
   subscribeAgentError,
   subscribeAgentTool,
 } from "../../../lib/agent";
-import { getStoreValue, setStoreValue } from "../../../lib/app-store";
 import type {
   AgentChatMessage,
   AgentConfirmEvent,
   AgentTerminalContext,
 } from "../../../types";
 
-const DEFAULT_CONVERSATION_ID = "main";
-
 interface AgentPanelProps {
+  conversationId: string;
   terminal?: AgentTerminalContext | null;
   onOpenAgentsConfig?: () => void;
+  onNewChat?: () => void;
 }
 
 function createId(): string {
@@ -38,8 +38,10 @@ function createId(): string {
 }
 
 export default function AgentPanel({
+  conversationId,
   terminal,
   onOpenAgentsConfig,
+  onNewChat,
 }: AgentPanelProps) {
   const [messages, setMessages] = useState<AgentChatMessage[]>([]);
   const [draft, setDraft] = useState("");
@@ -53,17 +55,26 @@ export default function AgentPanel({
 
   useEffect(() => {
     let cancelled = false;
+    setHydrated(false);
+    setMessages([]);
+    setError(null);
+    setConfirm(null);
+    setBusy(false);
+    streamingId.current = null;
     void (async () => {
       try {
         const [keyOk, stored] = await Promise.all([
           agentHasApiKey(),
-          getStoreValue<AgentChatMessage[]>(CHAT_STORE_KEY),
+          conversationId
+            ? getConversationMessages(conversationId)
+            : Promise.resolve([]),
         ]);
+        if (conversationId) {
+          await agentChatLoad(conversationId);
+        }
         if (cancelled) return;
         setHasKey(keyOk);
-        if (Array.isArray(stored) && stored.length > 0) {
-          setMessages(stored);
-        }
+        setMessages(stored);
       } catch {
         if (!cancelled) setHasKey(false);
       } finally {
@@ -73,12 +84,7 @@ export default function AgentPanel({
     return () => {
       cancelled = true;
     };
-  }, []);
-
-  useEffect(() => {
-    if (!hydrated) return;
-    void setStoreValue(CHAT_STORE_KEY, messages);
-  }, [messages, hydrated]);
+  }, [conversationId]);
 
   useEffect(() => {
     const el = listRef.current;
@@ -92,7 +98,7 @@ export default function AgentPanel({
 
     void (async () => {
       const u1 = await subscribeAgentChunk((event) => {
-        if (event.conversationId !== DEFAULT_CONVERSATION_ID) return;
+        if (event.conversationId !== conversationId) return;
         setMessages((prev) => {
           const next = applyAgentChunk(
             prev,
@@ -105,7 +111,7 @@ export default function AgentPanel({
         });
       });
       const u2 = await subscribeAgentTool((event) => {
-        if (event.conversationId !== DEFAULT_CONVERSATION_ID) return;
+        if (event.conversationId !== conversationId) return;
         setMessages((prev) => [
           ...prev,
           {
@@ -118,17 +124,17 @@ export default function AgentPanel({
         ]);
       });
       const u3 = await subscribeAgentDone((event) => {
-        if (event.conversationId !== DEFAULT_CONVERSATION_ID) return;
+        if (event.conversationId !== conversationId) return;
         setBusy(false);
       });
       const u4 = await subscribeAgentError((event) => {
-        if (event.conversationId !== DEFAULT_CONVERSATION_ID) return;
+        if (event.conversationId !== conversationId) return;
         streamingId.current = null;
         setBusy(false);
         setError(event.message);
       });
       const u5 = await subscribeAgentConfirm((event) => {
-        if (event.conversationId !== DEFAULT_CONVERSATION_ID) return;
+        if (event.conversationId !== conversationId) return;
         setConfirm(event);
       });
       if (cancelled) {
@@ -146,7 +152,7 @@ export default function AgentPanel({
       cancelled = true;
       for (const stop of unlisteners) stop();
     };
-  }, []);
+  }, [conversationId]);
 
   const refreshKey = useCallback(async () => {
     try {
@@ -158,7 +164,7 @@ export default function AgentPanel({
 
   const handleSend = useCallback(async () => {
     const text = draft.trim();
-    if (!text || busy) return;
+    if (!text || busy || !conversationId) return;
     setError(null);
     setDraft("");
     setBusy(true);
@@ -170,7 +176,7 @@ export default function AgentPanel({
 
     try {
       const reply = await agentChatSend({
-        conversationId: DEFAULT_CONVERSATION_ID,
+        conversationId,
         message: text,
         sessionId: terminal?.sessionId ?? null,
         cwd: terminal?.cwd ?? null,
@@ -198,20 +204,22 @@ export default function AgentPanel({
       streamingId.current = null;
       setBusy(false);
     }
-  }, [busy, draft, refreshKey, terminal]);
+  }, [busy, conversationId, draft, refreshKey, terminal]);
 
   const handleCancel = useCallback(() => {
-    void agentChatCancel(DEFAULT_CONVERSATION_ID);
-  }, []);
+    if (!conversationId) return;
+    void agentChatCancel(conversationId);
+  }, [conversationId]);
 
   const handleClear = useCallback(() => {
-    void agentChatClear(DEFAULT_CONVERSATION_ID);
+    if (!conversationId) return;
+    void agentChatClear(conversationId);
     streamingId.current = null;
     setMessages([]);
     setError(null);
     setConfirm(null);
     setBusy(false);
-  }, []);
+  }, [conversationId]);
 
   const handleConfirm = useCallback(async (approved: boolean) => {
     if (!confirm) return;
@@ -230,8 +238,8 @@ export default function AgentPanel({
         <div className="agent-panel__empty">
           <p className="agent-panel__empty-title">Gemini API key required</p>
           <p className="agent-panel__empty-body">
-            Add your key in Config → Agents (saved to other/configs/agent.json).
-            Keys stay in Rust — the chat UI never calls Google directly.
+            Unlock or create the vault in Config → Agents. The key stays in
+            Stronghold and Rust — the chat UI never calls Google directly.
           </p>
           {onOpenAgentsConfig ? (
             <button
@@ -258,7 +266,7 @@ export default function AgentPanel({
     <div className="agent-panel" data-testid="agent-panel">
       <header className="agent-panel__header">
         <div className="agent-panel__title-wrap">
-          <h2 className="agent-panel__title">Agents</h2>
+          <h2 className="agent-panel__title">Chat</h2>
           <p className="agent-panel__subtitle">
             {terminal?.cwd
               ? `cwd ${terminal.cwd}`
@@ -277,11 +285,21 @@ export default function AgentPanel({
               Cancel
             </button>
           ) : null}
+          {onNewChat ? (
+            <button
+              type="button"
+              className="agent-panel__btn"
+              onClick={onNewChat}
+              disabled={busy}
+            >
+              New chat
+            </button>
+          ) : null}
           <button
             type="button"
             className="agent-panel__btn"
             onClick={handleClear}
-            disabled={busy && !messages.length}
+            disabled={(busy && !messages.length) || !hydrated}
           >
             Clear
           </button>
@@ -384,7 +402,7 @@ export default function AgentPanel({
           rows={3}
           value={draft}
           placeholder="Message the agent…"
-          disabled={busy || hasKey === null}
+          disabled={busy || hasKey === null || !conversationId}
           onChange={(event) => setDraft(event.target.value)}
           onKeyDown={(event) => {
             if (event.key === "Enter" && !event.shiftKey) {
@@ -396,7 +414,7 @@ export default function AgentPanel({
         <button
           type="submit"
           className="agent-panel__btn agent-panel__btn--primary agent-panel__send"
-          disabled={busy || !draft.trim() || hasKey === null}
+          disabled={busy || !draft.trim() || hasKey === null || !conversationId}
         >
           {busy ? "…" : "Send"}
         </button>

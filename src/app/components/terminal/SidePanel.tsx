@@ -19,11 +19,12 @@ import {
   saveScmFolderPath,
 } from "../../lib/terminal/git-scm";
 import {
+  hideContextMenuPopup,
   listenContextMenuAction,
   openContextMenuPopup,
 } from "../../lib/context-menu-popup";
 import type { AgentTerminalContext, ContextMenuPosition } from "../../types";
-import AgentPanel from "./agent/AgentPanel";
+import AgentShell from "./agent/AgentShell";
 import ConfigPanel from "./config/ConfigPanel";
 import FilesExplorer, { type OpenInTerminalApi } from "./explorer/FilesExplorer";
 import SourceControlPanel from "./source-control/SourceControlPanel";
@@ -83,6 +84,10 @@ export default function SidePanel({
     } catch {
       // sessionStorage unavailable
     }
+    // Drop any open explorer/SCM popup when leaving that tab so actions
+    // are not emitted after the panel unmounts its listeners.
+    void hideContextMenuPopup();
+    setSourceTabMenu(null);
   }, [activeTab]);
 
   useEffect(() => {
@@ -286,7 +291,7 @@ export default function SidePanel({
               onFolderPathChange={handleScmFolderPathChange}
             />
           ) : activeTab === "agent" ? (
-            <AgentPanel
+            <AgentShell
               terminal={agentTerminal}
               onOpenAgentsConfig={openAgentsConfig}
             />

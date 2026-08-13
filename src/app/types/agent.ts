@@ -55,6 +55,26 @@ export interface AgentChatMessage {
   toolStatus?: string;
 }
 
+export interface AgentConversation {
+  id: string;
+  title: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface AgentStoredMessage extends AgentChatMessage {
+  conversationId: string;
+  createdAt: number;
+  sortIndex: number;
+}
+
+export interface PortableDataPaths {
+  chatsDb: string;
+  vaultPath: string;
+  saltPath: string;
+  vaultExists: boolean;
+}
+
 export interface AgentTerminalContext {
   sessionId: string | null;
   cwd: string | null;

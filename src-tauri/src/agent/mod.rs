@@ -3,7 +3,7 @@
 mod session;
 mod tools;
 
-pub use session::AgentSessionStore;
+pub use session::{AgentApiKeyCache, AgentSessionStore};
 pub use tools::AgentToolHost;
 
 use std::sync::Arc;
@@ -22,9 +22,10 @@ use crate::agent::tools::{
     OpenPathTool, PatchSettingsTool, RevealPathTool, TerminalReadRecentTool, TerminalWriteTool,
 };
 use crate::config;
+use crate::db::ChatDb;
 use crate::mdoels::{
-    AgentChatSendArgs, AgentChunkEvent, AgentConfig, AgentConfirmResponseArgs, AgentDoneEvent,
-    AgentErrorEvent,
+    AgentCacheApiKeyArgs, AgentChatSendArgs, AgentChunkEvent, AgentConfig, AgentConfirmResponseArgs,
+    AgentDoneEvent, AgentErrorEvent,
 };
 use crate::pty::PtySessionPool;
 use crate::state::AppState;
@@ -51,16 +52,34 @@ pub fn get_agent_config(app: AppHandle, state: State<'_, AppState>) -> AgentConf
 }
 
 #[tauri::command]
-pub fn save_agent_config(app: AppHandle, config: AgentConfig) -> Result<AgentConfig, String> {
+pub fn save_agent_config(
+    app: AppHandle,
+    cache: State<'_, Arc<AgentApiKeyCache>>,
+    mut config: AgentConfig,
+) -> Result<AgentConfig, String> {
+    if cache.has() {
+        config::strip_agent_api_keys(&mut config);
+    }
     config::save_and_emit_agent(&app, config)
 }
 
 #[tauri::command]
-pub fn agent_chat_clear(
+pub async fn agent_chat_clear(
     sessions: State<'_, Arc<AgentSessionStore>>,
+    db: State<'_, ChatDb>,
     conversation_id: String,
 ) -> Result<(), String> {
-    sessions.clear(conversation_id.trim());
+    let id = conversation_id.trim();
+    sessions.clear(id);
+    db.clear_messages(id).await
+}
+
+#[tauri::command]
+pub fn agent_cache_api_key(
+    cache: State<'_, Arc<AgentApiKeyCache>>,
+    args: AgentCacheApiKeyArgs,
+) -> Result<(), String> {
+    cache.set(args.api_key);
     Ok(())
 }
 
@@ -91,6 +110,8 @@ pub async fn agent_chat_send(
     pool: State<'_, Arc<PtySessionPool>>,
     state: State<'_, AppState>,
     sessions: State<'_, Arc<AgentSessionStore>>,
+    cache: State<'_, Arc<AgentApiKeyCache>>,
+    db: State<'_, ChatDb>,
     args: AgentChatSendArgs,
 ) -> Result<String, String> {
     let conversation_id = args.conversation_id.trim().to_string();
@@ -110,10 +131,20 @@ pub async fn agent_chat_send(
         .unwrap_or_else(|| config::resolve_configs_dir(&app));
     let agent_cfg = config::load_agent(&configs_dir);
     let provider = agent_cfg.active();
-    let api_key = provider.api_key.trim().to_string();
+    let api_key = cache
+        .get()
+        .or_else(|| {
+            let from_json = provider.api_key.trim().to_string();
+            if from_json.is_empty() {
+                None
+            } else {
+                Some(from_json)
+            }
+        })
+        .unwrap_or_default();
     if api_key.is_empty() {
         return Err(
-            "Gemini API key missing. Set it in Config → Agents or other/configs/agent.json.".into(),
+            "Gemini API key missing. Unlock the vault in Config → Agents.".into(),
         );
     }
     if agent_cfg.active_provider != "gemini"
@@ -133,6 +164,12 @@ pub async fn agent_chat_send(
         provider.model.trim().to_string()
     };
 
+    db.ensure_conversation(&conversation_id).await?;
+    db.insert_message(&conversation_id, "user", &message, None, None, None)
+        .await?;
+    db.maybe_set_title_from_message(&conversation_id, &message)
+        .await?;
+
     let cancel = sessions.begin_turn(&conversation_id);
     let mut history = sessions.history(&conversation_id);
 
@@ -144,6 +181,7 @@ pub async fn agent_chat_send(
         recent_output: args.recent_output.clone(),
         pool: pool.inner().clone(),
         sessions: sessions.inner().clone(),
+        db: db.inner().clone(),
     };
 
     let mut tool_context = ToolContext::new();
@@ -193,7 +231,13 @@ pub async fn agent_chat_send(
 
     match result {
         Ok(reply) => {
-            sessions.set_history(&conversation_id, history);
+            sessions.set_history(&conversation_id, history.clone());
+            if !reply.trim().is_empty() {
+                let _ = db
+                    .insert_message(&conversation_id, "assistant", reply.trim(), None, None, None)
+                    .await;
+            }
+            let _ = db.set_llm_history(&conversation_id, &history).await;
             let _ = app.emit(
                 AGENT_DONE_EVENT,
                 AgentDoneEvent {
@@ -337,9 +381,16 @@ where
     Ok(visible)
 }
 
-/// Convenience: whether agent.json has a usable key (for UI empty state).
+/// Convenience: whether a usable key is in the vault cache or leftover JSON.
 #[tauri::command]
-pub fn agent_has_api_key(app: AppHandle, state: State<'_, AppState>) -> bool {
+pub fn agent_has_api_key(
+    app: AppHandle,
+    state: State<'_, AppState>,
+    cache: State<'_, Arc<AgentApiKeyCache>>,
+) -> bool {
+    if cache.has() {
+        return true;
+    }
     let configs_dir = state
         .configs_dir
         .lock()

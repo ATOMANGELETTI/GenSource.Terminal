@@ -533,6 +533,85 @@ impl AgentConfig {
     }
 }
 
+/// Runtime-resolved portable data paths (no machine-specific literals in source).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PortableDataPaths {
+    pub chats_db: String,
+    pub vault_path: String,
+    pub salt_path: String,
+    pub vault_exists: bool,
+}
+
+/// Conversation row for the Agents Previous chats list.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AgentConversation {
+    pub id: String,
+    pub title: String,
+    pub created_at: i64,
+    pub updated_at: i64,
+}
+
+/// Persisted chat bubble (UI + SQLite).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AgentStoredMessage {
+    pub id: String,
+    pub conversation_id: String,
+    pub role: String,
+    pub content: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tool_name: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tool_status: Option<String>,
+    pub created_at: i64,
+    pub sort_index: i64,
+}
+
+/// Args for creating a conversation (optional title).
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CreateConversationArgs {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub title: Option<String>,
+}
+
+/// Args for renaming a conversation.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RenameConversationArgs {
+    pub id: String,
+    pub title: String,
+}
+
+/// One-shot import of plugin-store chat bubbles (UI shape, no SQL ids required).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AgentLegacyMessage {
+    pub id: String,
+    pub role: String,
+    pub content: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tool_name: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tool_status: Option<String>,
+}
+
+/// One-shot import of plugin-store chat bubbles.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ImportLegacyMessagesArgs {
+    pub messages: Vec<AgentLegacyMessage>,
+}
+
+/// Cache the Gemini key in Rust after Stronghold unlock/create.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AgentCacheApiKeyArgs {
+    pub api_key: String,
+}
+
 /// Frontend → Rust: start an agent turn.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

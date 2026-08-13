@@ -13,6 +13,7 @@ use thiserror::Error;
 
 use crate::agent::session::AgentSessionStore;
 use crate::config;
+use crate::db::ChatDb;
 use crate::git;
 use crate::mdoels::{AgentConfirmEvent, AgentToolEvent, AppSettings};
 use crate::pty::PtySessionPool;
@@ -34,6 +35,7 @@ pub struct AgentToolHost {
     pub recent_output: Option<String>,
     pub pool: Arc<PtySessionPool>,
     pub sessions: Arc<AgentSessionStore>,
+    pub db: ChatDb,
 }
 
 #[derive(Debug, Error)]
@@ -47,9 +49,25 @@ fn emit_tool(host: &AgentToolHost, name: &str, status: &str, detail: Option<Stri
             conversation_id: host.conversation_id.clone(),
             name: name.into(),
             status: status.into(),
-            detail,
+            detail: detail.clone(),
         },
     );
+    let db = host.db.clone();
+    let conversation_id = host.conversation_id.clone();
+    let name = name.to_string();
+    let status = status.to_string();
+    tauri::async_runtime::spawn(async move {
+        let _ = db
+            .insert_message(
+                &conversation_id,
+                "tool",
+                detail.as_deref().unwrap_or(status.as_str()),
+                Some(name.as_str()),
+                Some(status.as_str()),
+                None,
+            )
+            .await;
+    });
 }
 
 async fn require_confirm(host: &AgentToolHost, tool: &str, summary: &str) -> Result<(), ToolErr> {

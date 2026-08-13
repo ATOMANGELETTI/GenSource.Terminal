@@ -54,12 +54,15 @@ export type {
   AgentChunkEvent,
   AgentConfig,
   AgentConfirmEvent,
+  AgentConversation,
   AgentDoneEvent,
   AgentErrorEvent,
   AgentMessageRole,
   AgentProviderConfig,
+  AgentStoredMessage,
   AgentTerminalContext,
   AgentToolEvent,
+  PortableDataPaths,
 } from "./agent";
 
 export interface ContextMenuPosition {

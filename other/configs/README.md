@@ -121,12 +121,14 @@ Build logs under `other/logging/build/` are full transcripts and ignore this fil
 
 ## `agent.json`
 
-AI agent provider settings for the **Agents** side-panel tab. Multi-provider-ready schema; **Gemini** is the only wired provider in v1. API keys are loaded by Rust for the chat/tool loop (Config → Agents can edit the key; the webview never calls Google HTTP APIs directly).
+AI agent provider settings for the **Agents** side-panel tab. Multi-provider-ready schema; **Gemini** is the only wired provider in v1.
+
+The Gemini **API key is not stored here**. It lives in the portable Stronghold vault under `other/database/stronghold/` (password set in **Config → Agents**). Rust caches the key after unlock for the chat/tool loop; the webview never calls Google HTTP APIs directly.
 
 | Key | Description |
 | --- | --- |
 | `activeProvider` | Provider id under `providers` (default `gemini`). |
-| `providers.gemini.apiKey` | Gemini API key (empty until you set it). Prefer not committing real keys. |
+| `providers.gemini.apiKey` | Always empty in the shipped file. Leftover plaintext keys are copied into the vault on unlock/create, then cleared. |
 | `providers.gemini.model` | Model id (default `gemini-3.6-flash`). |
 | `systemPrompt` | Optional system preamble for the agent. A fixed chat-vs-terminal routing policy is always appended in Rust and cannot be removed via this field. |
 
@@ -147,7 +149,7 @@ Shipped default:
 }
 ```
 
-Edit via **Config → Agents**, or by hand. The configs watcher reloads when the file changes on disk.
+Edit model via **Config → Agents**, or by hand. Create or unlock the vault there to set the API key. The configs watcher reloads when the file changes on disk. See [`other/database/README.md`](../database/README.md) for vault + SQLite layout.
 
 ---
 

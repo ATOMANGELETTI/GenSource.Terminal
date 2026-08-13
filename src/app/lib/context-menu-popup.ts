@@ -108,7 +108,7 @@ export function canUseContextMenuPopup(): boolean {
 
 /**
  * Convert client (CSS) coords inside the main webview to physical screen
- * pixels using the main window's outer position and DPI scale.
+ * pixels using the main window's inner (client-area) position and DPI scale.
  */
 export async function clientToScreen(
   clientX: number,
@@ -116,13 +116,13 @@ export async function clientToScreen(
 ): Promise<{ x: number; y: number } | null> {
   try {
     const win = getCurrentWindow();
-    const [outer, scale] = await Promise.all([
-      win.outerPosition(),
+    const [inner, scale] = await Promise.all([
+      win.innerPosition(),
       win.scaleFactor(),
     ]);
     return {
-      x: Math.round(outer.x + clientX * scale),
-      y: Math.round(outer.y + clientY * scale),
+      x: Math.round(inner.x + clientX * scale),
+      y: Math.round(inner.y + clientY * scale),
     };
   } catch (error) {
     console.warn("clientToScreen failed", error);

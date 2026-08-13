@@ -8,6 +8,7 @@
 mod agent;
 mod commands;
 mod config;
+mod db;
 mod git;
 mod logging;
 #[path = "mdoels/models.rs"]
@@ -50,6 +51,7 @@ pub fn run() {
     let early_configs = config::resolve_other_subdir("configs");
     let _ = config::ensure_config_files(&early_configs);
     let _ = config::ensure_logging_dirs();
+    let _ = config::ensure_database_dirs();
 
     let logging_settings = Arc::new(RwLock::new(config::load_logging(&early_configs)));
     let log_filter_state = Arc::clone(&logging_settings);
@@ -138,6 +140,8 @@ pub fn run() {
         ))
         .manage(Arc::new(pty::PtySessionPool::default()))
         .manage(Arc::new(agent::AgentSessionStore::new()))
+        .manage(Arc::new(agent::AgentApiKeyCache::new()))
+        .manage(db::ChatDb::new())
         .manage(git::GitWatcher::default())
         .invoke_handler(tauri::generate_handler![
             commands::greet,
@@ -183,23 +187,31 @@ pub fn run() {
             agent::get_agent_config,
             agent::save_agent_config,
             agent::agent_has_api_key,
+            agent::agent_cache_api_key,
             agent::agent_chat_send,
             agent::agent_chat_cancel,
             agent::agent_chat_clear,
             agent::agent_confirm_response,
+            db::get_portable_data_paths,
+            db::list_conversations,
+            db::create_conversation,
+            db::rename_conversation,
+            db::delete_conversation,
+            db::get_conversation_messages,
+            db::agent_chat_load,
+            db::import_legacy_messages,
         ])
         .setup(|app| {
             // Stronghold needs a filesystem path for its key-derivation
-            // salt, which is only resolvable once the app handle exists, so
-            // it is registered here instead of the plugin chain above.
+            // salt, which is only resolvable once dirs exist, so it is
+            // registered here instead of the plugin chain above.
             // Vaults are opened lazily via the `stronghold.initialize`
             // frontend/JS command with a user-supplied password — nothing
-            // here touches disk or panics at startup.
-            let salt_path = app
-                .path()
-                .app_local_data_dir()
-                .expect("app_local_data_dir should be resolvable")
-                .join("stronghold-salt.txt");
+            // here touches the vault snapshot or panics at startup.
+            if let Err(err) = config::ensure_database_dirs() {
+                log::warn!("ensure database dirs: {err}");
+            }
+            let salt_path = config::resolve_stronghold_salt_path();
             app.handle()
                 .plugin(tauri_plugin_stronghold::Builder::with_argon2(&salt_path).build())?;
 
@@ -218,6 +230,9 @@ pub fn run() {
             }
             if let Err(err) = config::ensure_logging_dirs() {
                 log::warn!("ensure logging dirs: {err}");
+            }
+            if let Err(err) = config::ensure_database_dirs() {
+                log::warn!("ensure database dirs: {err}");
             }
 
             let settings = config::load_settings(&configs_dir);

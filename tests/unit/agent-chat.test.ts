@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { applyAgentChunk, mergeAssistantReply } from "@/lib/agent";
+import {
+  applyAgentChunk,
+  conversationTitleFromMessage,
+  formatRelativeTime,
+  mergeAssistantReply,
+} from "@/lib/agent";
 import type { AgentChatMessage } from "@/types";
 
 function msg(
@@ -85,5 +90,26 @@ describe("applyAgentChunk", () => {
     expect(next.messages.filter((m) => m.role === "assistant")).toHaveLength(1);
     expect(next.messages[1].content).toBe("Hi there");
     expect(next.streamingId).toBe("a1");
+  });
+});
+
+describe("conversationTitleFromMessage", () => {
+  it("uses the first non-empty line and truncates", () => {
+    expect(conversationTitleFromMessage("Hello world")).toBe("Hello world");
+    expect(conversationTitleFromMessage("  \nHi")).toBe("Hi");
+    expect(conversationTitleFromMessage("")).toBe("New chat");
+    const long = "a".repeat(80);
+    const title = conversationTitleFromMessage(long);
+    expect([...title].length).toBeLessThanOrEqual(61);
+    expect(title.endsWith("…")).toBe(true);
+  });
+});
+
+describe("formatRelativeTime", () => {
+  it("formats recent timestamps", () => {
+    const now = 1_700_000_000_000;
+    expect(formatRelativeTime(now - 5_000, now)).toBe("just now");
+    expect(formatRelativeTime(now - 120_000, now)).toBe("2m ago");
+    expect(formatRelativeTime(now - 3_600_000, now)).toBe("1h ago");
   });
 });

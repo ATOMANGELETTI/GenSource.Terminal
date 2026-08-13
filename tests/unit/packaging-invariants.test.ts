@@ -17,6 +17,7 @@ describe("packaging excludes logging", () => {
     expect(sources).toEqual(
       expect.arrayContaining([
         "../other/configs/",
+        "../other/database/",
         "../other/documents/",
         "../other/screenshots/",
         "../other/utilities/",

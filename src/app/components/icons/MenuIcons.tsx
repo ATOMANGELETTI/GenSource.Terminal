@@ -320,6 +320,25 @@ export function BotIcon(props: IconProps) {
   );
 }
 
+/** Speech-bubble glyph for Agents → Chat. */
+export function ChatIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M3.2 3.8h9.6a1.2 1.2 0 0 1 1.2 1.2v5.2a1.2 1.2 0 0 1-1.2 1.2H6.4L3.2 13.8V5a1.2 1.2 0 0 1 1.2-1.2z" />
+    </svg>
+  );
+}
+
+/** Clock glyph for Agents → Previous chats. */
+export function HistoryIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <circle cx="8" cy="8" r="5.4" />
+      <path d="M8 5.2V8l2.1 1.4" />
+    </svg>
+  );
+}
+
 /** Flat SCM / git-branch glyph for the Source Control side-panel tab. */
 export function SourceControlIcon(props: IconProps) {
   return (

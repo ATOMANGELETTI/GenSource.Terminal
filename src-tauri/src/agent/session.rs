@@ -8,6 +8,40 @@ use rig::message::Message;
 use tokio::sync::oneshot;
 use uuid::Uuid;
 
+/// In-memory Gemini API key (populated after Stronghold unlock/create).
+#[derive(Default)]
+pub struct AgentApiKeyCache {
+    key: Mutex<Option<String>>,
+}
+
+impl AgentApiKeyCache {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn get(&self) -> Option<String> {
+        self.key
+            .lock()
+            .unwrap_or_else(|p| p.into_inner())
+            .clone()
+            .filter(|k| !k.trim().is_empty())
+    }
+
+    pub fn set(&self, key: String) {
+        let trimmed = key.trim().to_string();
+        let mut guard = self.key.lock().unwrap_or_else(|p| p.into_inner());
+        if trimmed.is_empty() {
+            *guard = None;
+        } else {
+            *guard = Some(trimmed);
+        }
+    }
+
+    pub fn has(&self) -> bool {
+        self.get().is_some()
+    }
+}
+
 /// Shared runtime state for Agents panel conversations.
 #[derive(Default)]
 pub struct AgentSessionStore {

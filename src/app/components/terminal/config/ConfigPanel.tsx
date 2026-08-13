@@ -106,7 +106,7 @@ const CATEGORY_META: Record<
   },
   agents: {
     title: "Agents",
-    subtitle: "Gemini provider (agent.json)",
+    subtitle: "Gemini provider and Stronghold vault",
   },
   about: {
     title: "About",

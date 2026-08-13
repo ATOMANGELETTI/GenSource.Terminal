@@ -459,15 +459,14 @@ pub fn strip_agent_api_keys(config: &mut AgentConfig) {
     }
 }
 
-/// Persist `agent.json` and notify the frontend. API keys are stripped — they
-/// belong in the Stronghold vault, not JSON.
+/// Persist `agent.json` and notify the frontend.
+/// Callers that have an unlocked vault should strip API keys first.
 pub fn save_and_emit_agent<R: Runtime>(
     app: &AppHandle<R>,
     config: AgentConfig,
 ) -> Result<AgentConfig, String> {
     let mut config = config;
     normalize_agent_config(&mut config);
-    strip_agent_api_keys(&mut config);
 
     let state = app.state::<AppState>();
     let configs_dir = state
@@ -1091,6 +1090,38 @@ mod tests {
             splash_background_rgb("aurora-light"),
             (0xec, 0xef, 0xf4)
         );
+    }
+
+    #[test]
+    fn portable_database_paths_use_other_database() {
+        let chats = path_to_portable_string(&resolve_chats_db_path()).replace('\\', "/");
+        let vault = path_to_portable_string(&resolve_stronghold_vault_path()).replace('\\', "/");
+        let salt = path_to_portable_string(&resolve_stronghold_salt_path()).replace('\\', "/");
+        assert!(
+            chats.contains("other/database/sqlite/agents/chats/chats.db"),
+            "chats={chats}"
+        );
+        assert!(
+            vault.contains("other/database/stronghold/vault.hold"),
+            "vault={vault}"
+        );
+        assert!(
+            salt.contains("other/database/stronghold/salt.txt"),
+            "salt={salt}"
+        );
+        assert!(!chats.contains("C:/Users/"), "must not hardcode a user home");
+    }
+
+    #[test]
+    fn strip_agent_api_keys_clears_providers() {
+        let mut config = AgentConfig::default();
+        config
+            .providers
+            .get_mut("gemini")
+            .expect("gemini")
+            .api_key = "should-not-persist".into();
+        strip_agent_api_keys(&mut config);
+        assert!(config.active().api_key.is_empty());
     }
 
     #[test]

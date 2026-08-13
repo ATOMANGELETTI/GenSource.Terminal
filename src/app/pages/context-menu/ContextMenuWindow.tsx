@@ -100,6 +100,9 @@ export default function ContextMenuWindow() {
           request.screenX,
           request.screenY,
         );
+        if (cancelled) {
+          await hideContextMenuPopup();
+        }
       } catch (error) {
         if (!cancelled) {
           console.warn("Failed to position context-menu popup", error);
