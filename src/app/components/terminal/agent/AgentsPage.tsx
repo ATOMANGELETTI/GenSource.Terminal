@@ -9,11 +9,17 @@ import {
   unlockAgentVault,
   vaultExists,
 } from "../../../lib/agent-vault";
-import { ConfigCard, ConfigRow } from "./ConfigField";
+import {
+  ConfigCard,
+  ConfigRow,
+  ConfigSwitch,
+} from "../config/ConfigField";
 
 interface AgentsPageProps {
   config: AgentConfig;
   onChange: (next: AgentConfig) => void;
+  envVaultPassword?: string;
+  envGeminiApiKey?: string;
 }
 
 const MODEL_OPTIONS = [
@@ -23,15 +29,25 @@ const MODEL_OPTIONS = [
   { value: "gemini-3.1-pro-preview", label: "Gemini 3.1 Pro" },
 ] as const;
 
-export default function AgentsPage({ config, onChange }: AgentsPageProps) {
+export default function AgentsPage({
+  config,
+  onChange,
+  envVaultPassword = "",
+  envGeminiApiKey = "",
+}: AgentsPageProps) {
   const provider = activeProvider(config);
   const jsonKey = provider.apiKey.trim();
+  const envPassword = envVaultPassword.trim();
+  const envKey = envGeminiApiKey.trim();
 
   const [exists, setExists] = useState<boolean | null>(null);
   const [unlocked, setUnlocked] = useState(isAgentVaultUnlocked());
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [apiKeyDraft, setApiKeyDraft] = useState(jsonKey);
+  const [apiKeyDraft, setApiKeyDraft] = useState(jsonKey || envKey);
+  const [savePasswordInJson, setSavePasswordInJson] = useState(
+    Boolean(config.vaultPassword?.trim()),
+  );
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -56,36 +72,52 @@ export default function AgentsPage({ config, onChange }: AgentsPageProps) {
     }
   }, [apiKeyDraft, jsonKey, unlocked]);
 
-  const persistModelOnly = useCallback(
-    (model: string) => {
+  const persistAgent = useCallback(
+    (patch: {
+      model?: string;
+      vaultPassword?: string;
+    }) => {
       onChange({
         ...config,
+        vaultPassword:
+          patch.vaultPassword !== undefined
+            ? patch.vaultPassword
+            : savePasswordInJson
+              ? (config.vaultPassword ?? "")
+              : "",
         activeProvider: "gemini",
         providers: {
           ...config.providers,
           gemini: {
-            apiKey: unlocked ? "" : jsonKey,
-            model,
+            apiKey: "",
+            model: patch.model ?? provider.model,
           },
         },
       });
     },
-    [config, onChange],
+    [config, onChange, provider.model, savePasswordInJson],
   );
 
-  const persistClearedJsonKey = useCallback(() => {
-    onChange({
-      ...config,
-      activeProvider: "gemini",
-      providers: {
-        ...config.providers,
-        gemini: {
-          apiKey: "",
-          model: provider.model,
-        },
-      },
-    });
-  }, [config, onChange, provider.model]);
+  const passwordForJson = useCallback(() => {
+    return (
+      password.trim() || envPassword || (config.vaultPassword ?? "").trim()
+    );
+  }, [config.vaultPassword, envPassword, password]);
+
+  const handleSavePasswordToggle = useCallback(
+    (checked: boolean) => {
+      const pwd = passwordForJson();
+      if (checked && !pwd) {
+        setError("Enter a password to save it in agent.json.");
+        setSavePasswordInJson(false);
+        return;
+      }
+      setSavePasswordInJson(checked);
+      setError(null);
+      persistAgent({ vaultPassword: checked ? pwd : "" });
+    },
+    [passwordForJson, persistAgent],
+  );
 
   const handleCreate = useCallback(async () => {
     if (password.length < 4) {
@@ -104,7 +136,9 @@ export default function AgentsPage({ config, onChange }: AgentsPageProps) {
     setError(null);
     try {
       await createAgentVault(password, apiKeyDraft.trim());
-      persistClearedJsonKey();
+      persistAgent({
+        vaultPassword: savePasswordInJson ? password : "",
+      });
       setUnlocked(true);
       setExists(true);
       setPassword("");
@@ -115,7 +149,13 @@ export default function AgentsPage({ config, onChange }: AgentsPageProps) {
     } finally {
       setBusy(false);
     }
-  }, [apiKeyDraft, confirmPassword, password, persistClearedJsonKey]);
+  }, [
+    apiKeyDraft,
+    confirmPassword,
+    password,
+    persistAgent,
+    savePasswordInJson,
+  ]);
 
   const handleUnlock = useCallback(async () => {
     if (!password) {
@@ -131,9 +171,13 @@ export default function AgentsPage({ config, onChange }: AgentsPageProps) {
         await saveVaultApiKey(jsonKey);
         key = jsonKey;
       }
-      if (jsonKey) {
-        persistClearedJsonKey();
+      if (!key && envKey) {
+        await saveVaultApiKey(envKey);
+        key = envKey;
       }
+      persistAgent({
+        vaultPassword: savePasswordInJson ? password : "",
+      });
       if (key) {
         setApiKeyDraft(key);
       }
@@ -145,7 +189,7 @@ export default function AgentsPage({ config, onChange }: AgentsPageProps) {
     } finally {
       setBusy(false);
     }
-  }, [jsonKey, password, persistClearedJsonKey]);
+  }, [envKey, jsonKey, password, persistAgent, savePasswordInJson]);
 
   const handleSaveKey = useCallback(async () => {
     if (!apiKeyDraft.trim()) {
@@ -156,14 +200,14 @@ export default function AgentsPage({ config, onChange }: AgentsPageProps) {
     setError(null);
     try {
       await saveVaultApiKey(apiKeyDraft.trim());
-      persistClearedJsonKey();
+      persistAgent({});
       setStatus("API key saved to the vault.");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Could not save key");
     } finally {
       setBusy(false);
     }
-  }, [apiKeyDraft, persistClearedJsonKey]);
+  }, [apiKeyDraft, persistAgent]);
 
   return (
     <>
@@ -174,14 +218,14 @@ export default function AgentsPage({ config, onChange }: AgentsPageProps) {
         <ConfigRow
           label="Model"
           hint="Used by the Agents panel"
-          htmlFor="config-agent-model"
+          htmlFor="agent-settings-model"
         >
           <select
-            id="config-agent-model"
+            id="agent-settings-model"
             className="config-form__control"
             value={provider.model}
             disabled={!unlocked && exists !== false}
-            onChange={(event) => persistModelOnly(event.target.value)}
+            onChange={(event) => persistAgent({ model: event.target.value })}
           >
             {MODEL_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
@@ -192,6 +236,28 @@ export default function AgentsPage({ config, onChange }: AgentsPageProps) {
               <option value={provider.model}>{provider.model}</option>
             ) : null}
           </select>
+        </ConfigRow>
+      </ConfigCard>
+
+      <ConfigCard
+        label="Vault password"
+        footer={
+          envPassword
+            ? "Dev .env supplied the vault password. It is not written to agent.json unless you enable this option."
+            : "Optional for portable packaged builds. Dev .env GENSOURCE_VAULT_PASSWORD is never copied here automatically."
+        }
+      >
+        <ConfigRow
+          label="Save in agent.json"
+          hint="Unlocks the vault on the Agents tab without typing the password"
+          htmlFor="agent-settings-save-password"
+        >
+          <ConfigSwitch
+            id="agent-settings-save-password"
+            checked={savePasswordInJson}
+            onChange={handleSavePasswordToggle}
+            label="Save password in agent.json"
+          />
         </ConfigRow>
       </ConfigCard>
 
@@ -206,12 +272,12 @@ export default function AgentsPage({ config, onChange }: AgentsPageProps) {
         >
           <ConfigRow
             label="Password"
-            hint="First run — you will need this each session"
-            htmlFor="config-agent-vault-password"
+            hint="First run — you will need this each session unless saved or provided via .env"
+            htmlFor="agent-settings-vault-password"
             layout="stack"
           >
             <input
-              id="config-agent-vault-password"
+              id="agent-settings-vault-password"
               className="config-form__control"
               type="password"
               autoComplete="new-password"
@@ -221,11 +287,11 @@ export default function AgentsPage({ config, onChange }: AgentsPageProps) {
           </ConfigRow>
           <ConfigRow
             label="Confirm"
-            htmlFor="config-agent-vault-confirm"
+            htmlFor="agent-settings-vault-confirm"
             layout="stack"
           >
             <input
-              id="config-agent-vault-confirm"
+              id="agent-settings-vault-confirm"
               className="config-form__control"
               type="password"
               autoComplete="new-password"
@@ -236,11 +302,11 @@ export default function AgentsPage({ config, onChange }: AgentsPageProps) {
           <ConfigRow
             label="API key"
             hint="Stored in the vault; requests stay in Rust"
-            htmlFor="config-agent-api-key"
+            htmlFor="agent-settings-api-key"
             layout="stack"
           >
             <input
-              id="config-agent-api-key"
+              id="agent-settings-api-key"
               className="config-form__control"
               type="password"
               autoComplete="off"
@@ -270,11 +336,11 @@ export default function AgentsPage({ config, onChange }: AgentsPageProps) {
         >
           <ConfigRow
             label="Password"
-            htmlFor="config-agent-unlock"
+            htmlFor="agent-settings-unlock"
             layout="stack"
           >
             <input
-              id="config-agent-unlock"
+              id="agent-settings-unlock"
               className="config-form__control"
               type="password"
               autoComplete="current-password"
@@ -306,11 +372,11 @@ export default function AgentsPage({ config, onChange }: AgentsPageProps) {
           <ConfigRow
             label="API key"
             hint="Saved to the vault; requests stay in Rust"
-            htmlFor="config-agent-api-key-edit"
+            htmlFor="agent-settings-api-key-edit"
             layout="stack"
           >
             <input
-              id="config-agent-api-key-edit"
+              id="agent-settings-api-key-edit"
               className="config-form__control"
               type="password"
               autoComplete="off"

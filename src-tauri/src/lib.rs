@@ -48,6 +48,8 @@ pub fn run() {
         }));
     }
 
+    config::load_dev_dotenv();
+
     let early_configs = config::resolve_other_subdir("configs");
     let _ = config::ensure_config_files(&early_configs);
     let _ = config::ensure_logging_dirs();
@@ -188,6 +190,7 @@ pub fn run() {
             agent::save_agent_config,
             agent::agent_has_api_key,
             agent::agent_cache_api_key,
+            agent::agent_dev_env_secrets,
             agent::agent_chat_send,
             agent::agent_chat_cancel,
             agent::agent_chat_clear,

@@ -66,7 +66,7 @@ export async function createAgentVault(
 
 export async function saveVaultApiKey(apiKey: string): Promise<void> {
   if (!sessionVault) {
-    throw new Error("Vault is locked. Unlock it in Config → Agents first.");
+    throw new Error("Vault is locked. Unlock it in Agents settings first.");
   }
   const client = await clientFor(sessionVault);
   const store = client.getStore();
@@ -81,4 +81,90 @@ export function isAgentVaultUnlocked(): boolean {
 
 export function lockAgentVaultSession(): void {
   sessionVault = null;
+}
+
+export interface AutoUnlockResult {
+  unlocked: boolean;
+  created: boolean;
+  fromEnv: boolean;
+  shouldClearJsonKey: boolean;
+}
+
+/**
+ * Unlock order: dev `.env` password, then `agent.json` vaultPassword.
+ * Auto-creates the vault in dev when both env password and GEMINI_API_KEY are set.
+ */
+export async function autoUnlockAgentVault(input: {
+  jsonVaultPassword: string;
+  jsonApiKey: string;
+  envVaultPassword: string;
+  envGeminiApiKey: string;
+}): Promise<AutoUnlockResult> {
+  const fromEnv = Boolean(input.envVaultPassword.trim());
+  const password =
+    input.envVaultPassword.trim() || input.jsonVaultPassword.trim();
+  const jsonKey = input.jsonApiKey.trim();
+  const envKey = input.envGeminiApiKey.trim();
+
+  const fail = (): AutoUnlockResult => ({
+    unlocked: isAgentVaultUnlocked(),
+    created: false,
+    fromEnv,
+    shouldClearJsonKey: false,
+  });
+
+  try {
+    if (isAgentVaultUnlocked()) {
+      if (jsonKey) {
+        await saveVaultApiKey(jsonKey);
+        return {
+          unlocked: true,
+          created: false,
+          fromEnv,
+          shouldClearJsonKey: true,
+        };
+      }
+      return {
+        unlocked: true,
+        created: false,
+        fromEnv,
+        shouldClearJsonKey: false,
+      };
+    }
+
+    const exists = await vaultExists();
+
+    if (!exists && password && envKey) {
+      await createAgentVault(password, envKey);
+      return {
+        unlocked: true,
+        created: true,
+        fromEnv,
+        shouldClearJsonKey: Boolean(jsonKey),
+      };
+    }
+
+    if (exists && password) {
+      const unlocked = await unlockAgentVault(password);
+      let key = unlocked.apiKey;
+      let shouldClearJsonKey = Boolean(jsonKey);
+      if (!key && jsonKey) {
+        await saveVaultApiKey(jsonKey);
+        key = jsonKey;
+      }
+      if (!key && envKey) {
+        await saveVaultApiKey(envKey);
+      }
+      return {
+        unlocked: true,
+        created: false,
+        fromEnv,
+        shouldClearJsonKey,
+      };
+    }
+  } catch {
+    return fail();
+  }
+
+  return fail();
 }

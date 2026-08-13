@@ -7,6 +7,13 @@ export interface AgentConfig {
   activeProvider: string;
   providers: Record<string, AgentProviderConfig>;
   systemPrompt: string;
+  /** Optional packaged unlock password. Omit or empty to skip serializing. */
+  vaultPassword?: string;
+}
+
+export interface AgentDevEnvSecrets {
+  vaultPassword: string;
+  geminiApiKey: string;
 }
 
 export interface AgentChatSendArgs {
@@ -45,7 +52,9 @@ export interface AgentConfirmEvent {
   summary: string;
 }
 
-export type AgentMessageRole = "user" | "assistant" | "tool";
+export type AgentMessageRole = "user" | "assistant" | "tool" | "confirm";
+
+export type AgentConfirmDecision = "allowed" | "denied" | "expired";
 
 export interface AgentChatMessage {
   id: string;
@@ -53,6 +62,8 @@ export interface AgentChatMessage {
   content: string;
   toolName?: string;
   toolStatus?: string;
+  confirmRequestId?: string;
+  confirmDecision?: AgentConfirmDecision;
 }
 
 export interface AgentConversation {

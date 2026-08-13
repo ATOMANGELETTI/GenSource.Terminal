@@ -46,6 +46,7 @@ commands.allow = [
   "save_agent_config",
   "agent_has_api_key",
   "agent_cache_api_key",
+  "agent_dev_env_secrets",
   "agent_chat_send",
   "agent_chat_cancel",
   "agent_chat_clear",

@@ -25,7 +25,7 @@ use crate::config;
 use crate::db::ChatDb;
 use crate::mdoels::{
     AgentCacheApiKeyArgs, AgentChatSendArgs, AgentChunkEvent, AgentConfig, AgentConfirmResponseArgs,
-    AgentDoneEvent, AgentErrorEvent,
+    AgentDevEnvSecrets, AgentDoneEvent, AgentErrorEvent,
 };
 use crate::pty::PtySessionPool;
 use crate::state::AppState;
@@ -54,13 +54,21 @@ pub fn get_agent_config(app: AppHandle, state: State<'_, AppState>) -> AgentConf
 #[tauri::command]
 pub fn save_agent_config(
     app: AppHandle,
-    cache: State<'_, Arc<AgentApiKeyCache>>,
-    mut config: AgentConfig,
+    config: AgentConfig,
 ) -> Result<AgentConfig, String> {
-    if cache.has() {
-        config::strip_agent_api_keys(&mut config);
-    }
     config::save_and_emit_agent(&app, config)
+}
+
+#[tauri::command]
+pub fn agent_dev_env_secrets() -> AgentDevEnvSecrets {
+    if !tauri::is_dev() {
+        return AgentDevEnvSecrets::default();
+    }
+    config::load_dev_dotenv();
+    AgentDevEnvSecrets {
+        vault_password: std::env::var("GENSOURCE_VAULT_PASSWORD").unwrap_or_default(),
+        gemini_api_key: std::env::var("GEMINI_API_KEY").unwrap_or_default(),
+    }
 }
 
 #[tauri::command]
@@ -131,20 +139,10 @@ pub async fn agent_chat_send(
         .unwrap_or_else(|| config::resolve_configs_dir(&app));
     let agent_cfg = config::load_agent(&configs_dir);
     let provider = agent_cfg.active();
-    let api_key = cache
-        .get()
-        .or_else(|| {
-            let from_json = provider.api_key.trim().to_string();
-            if from_json.is_empty() {
-                None
-            } else {
-                Some(from_json)
-            }
-        })
-        .unwrap_or_default();
+    let api_key = cache.get().unwrap_or_default();
     if api_key.is_empty() {
         return Err(
-            "Gemini API key missing. Unlock the vault in Config → Agents.".into(),
+            "Gemini API key missing. Unlock the vault in Agents settings.".into(),
         );
     }
     if agent_cfg.active_provider != "gemini"
@@ -381,23 +379,10 @@ where
     Ok(visible)
 }
 
-/// Convenience: whether a usable key is in the vault cache or leftover JSON.
+/// Whether a usable key is cached in Rust after Stronghold unlock.
 #[tauri::command]
-pub fn agent_has_api_key(
-    app: AppHandle,
-    state: State<'_, AppState>,
-    cache: State<'_, Arc<AgentApiKeyCache>>,
-) -> bool {
-    if cache.has() {
-        return true;
-    }
-    let configs_dir = state
-        .configs_dir
-        .lock()
-        .unwrap_or_else(|p| p.into_inner())
-        .clone()
-        .unwrap_or_else(|| config::resolve_configs_dir(&app));
-    config::load_agent(&configs_dir).has_api_key()
+pub fn agent_has_api_key(cache: State<'_, Arc<AgentApiKeyCache>>) -> bool {
+    cache.has()
 }
 
 #[cfg(test)]

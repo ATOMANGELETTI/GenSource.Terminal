@@ -255,15 +255,6 @@ export default function SidePanel({
     activeTab === "agent" ||
     activeTab === "config";
 
-  const openAgentsConfig = useCallback(() => {
-    try {
-      sessionStorage.setItem("gensource.config.category", "agents");
-    } catch {
-      // sessionStorage unavailable
-    }
-    setActiveTab("config");
-  }, []);
-
   return (
     <aside
       className={open ? "side-panel" : "side-panel side-panel--closed"}
@@ -291,10 +282,7 @@ export default function SidePanel({
               onFolderPathChange={handleScmFolderPathChange}
             />
           ) : activeTab === "agent" ? (
-            <AgentShell
-              terminal={agentTerminal}
-              onOpenAgentsConfig={openAgentsConfig}
-            />
+            <AgentShell terminal={agentTerminal} />
           ) : activeTab === "config" ? (
             <ConfigPanel />
           ) : null}

@@ -123,13 +123,20 @@ Build logs under `other/logging/build/` are full transcripts and ignore this fil
 
 AI agent provider settings for the **Agents** side-panel tab. Multi-provider-ready schema; **Gemini** is the only wired provider in v1.
 
-The Gemini **API key is not stored here**. It lives in the portable Stronghold vault under `other/database/stronghold/` (password set in **Config → Agents**). Rust caches the key after unlock for the chat/tool loop; the webview never calls Google HTTP APIs directly.
+The Gemini **API key is not stored here**. It lives in the portable Stronghold vault under `other/database/stronghold/`. Set the vault password and key on the **Agents** side-panel tab (third rail icon: Agent settings). Rust caches the key after unlock for the chat/tool loop; the webview never calls Google HTTP APIs directly.
+
+**Unlock order**
+
+1. **Dev** (`tauri dev`) — gitignored repo-root `.env` / `.env.local` / `.env.dev` `GENSOURCE_VAULT_PASSWORD` (optional `GEMINI_API_KEY` for first-time vault create). Rust loads these only when `tauri::is_dev()`. Packaged builds ignore `.env`. See [`.env.example`](../../.env.example) for names only.
+2. **Packaged / portable** — optional `vaultPassword` on this file, or type the password on Agents settings.
+3. **Manual** — Agents settings if neither is set.
 
 | Key | Description |
 | --- | --- |
 | `activeProvider` | Provider id under `providers` (default `gemini`). |
-| `providers.gemini.apiKey` | Always empty in the shipped file. Leftover plaintext keys are copied into the vault on unlock/create, then cleared. |
+| `providers.gemini.apiKey` | Always empty. Leftover plaintext keys are copied into the vault on unlock/create, then stripped on every save. |
 | `providers.gemini.model` | Model id (default `gemini-3.6-flash`). |
+| `vaultPassword` | Optional. When set, the Agents tab auto-unlocks the vault. Omit or leave empty — the field is not written. Never copy a `.env` password here automatically; use **Save password in agent.json** on Agents settings if you want a portable copy. |
 | `systemPrompt` | Optional system preamble for the agent. A fixed chat-vs-terminal routing policy is always appended in Rust and cannot be removed via this field. |
 
 Later providers (`openai`, `anthropic`, …) add sibling objects under `providers` without reshaping the file.
@@ -149,7 +156,7 @@ Shipped default:
 }
 ```
 
-Edit model via **Config → Agents**, or by hand. Create or unlock the vault there to set the API key. The configs watcher reloads when the file changes on disk. See [`other/database/README.md`](../database/README.md) for vault + SQLite layout.
+Edit the model via **Agents → Agent settings** (third rail icon), or by hand. Create or unlock the vault there to set the API key. The configs watcher reloads when the file changes on disk. See [`other/database/README.md`](../database/README.md) for vault + SQLite layout.
 
 ---
 

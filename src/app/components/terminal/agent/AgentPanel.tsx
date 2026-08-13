@@ -8,9 +8,12 @@ import {
   agentChatSend,
   agentConfirmResponse,
   agentHasApiKey,
+  appendConfirmMessage,
   applyAgentChunk,
+  expirePendingConfirmMessages,
   getConversationMessages,
   mergeAssistantReply,
+  resolveConfirmMessage,
   subscribeAgentChunk,
   subscribeAgentConfirm,
   subscribeAgentDone,
@@ -19,14 +22,14 @@ import {
 } from "../../../lib/agent";
 import type {
   AgentChatMessage,
-  AgentConfirmEvent,
+  AgentConfirmDecision,
   AgentTerminalContext,
 } from "../../../types";
 
 interface AgentPanelProps {
   conversationId: string;
   terminal?: AgentTerminalContext | null;
-  onOpenAgentsConfig?: () => void;
+  onOpenSettings?: () => void;
   onNewChat?: () => void;
 }
 
@@ -37,10 +40,25 @@ function createId(): string {
   return `msg-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
+function confirmStatusClass(
+  decision: AgentConfirmDecision | undefined,
+): string {
+  if (!decision) return "agent-panel__confirm";
+  return `agent-panel__confirm agent-panel__confirm--${decision}`;
+}
+
+function confirmTitle(message: AgentChatMessage): string {
+  const tool = message.toolName ?? "tool";
+  if (message.confirmDecision === "allowed") return `Allowed ${tool}`;
+  if (message.confirmDecision === "denied") return `Denied ${tool}`;
+  if (message.confirmDecision === "expired") return `Expired ${tool}`;
+  return "Allow tool?";
+}
+
 export default function AgentPanel({
   conversationId,
   terminal,
-  onOpenAgentsConfig,
+  onOpenSettings,
   onNewChat,
 }: AgentPanelProps) {
   const [messages, setMessages] = useState<AgentChatMessage[]>([]);
@@ -48,7 +66,6 @@ export default function AgentPanel({
   const [busy, setBusy] = useState(false);
   const [hasKey, setHasKey] = useState<boolean | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [confirm, setConfirm] = useState<AgentConfirmEvent | null>(null);
   const [hydrated, setHydrated] = useState(false);
   const listRef = useRef<HTMLDivElement | null>(null);
   const streamingId = useRef<string | null>(null);
@@ -58,7 +75,6 @@ export default function AgentPanel({
     setHydrated(false);
     setMessages([]);
     setError(null);
-    setConfirm(null);
     setBusy(false);
     streamingId.current = null;
     void (async () => {
@@ -74,7 +90,7 @@ export default function AgentPanel({
         }
         if (cancelled) return;
         setHasKey(keyOk);
-        setMessages(stored);
+        setMessages(expirePendingConfirmMessages(stored));
       } catch {
         if (!cancelled) setHasKey(false);
       } finally {
@@ -90,7 +106,7 @@ export default function AgentPanel({
     const el = listRef.current;
     if (!el) return;
     el.scrollTop = el.scrollHeight;
-  }, [messages, busy, confirm]);
+  }, [messages, busy]);
 
   useEffect(() => {
     const unlisteners: Array<() => void> = [];
@@ -132,10 +148,11 @@ export default function AgentPanel({
         streamingId.current = null;
         setBusy(false);
         setError(event.message);
+        setMessages((prev) => expirePendingConfirmMessages(prev));
       });
       const u5 = await subscribeAgentConfirm((event) => {
         if (event.conversationId !== conversationId) return;
-        setConfirm(event);
+        setMessages((prev) => appendConfirmMessage(prev, event, createId));
       });
       if (cancelled) {
         u1();
@@ -217,20 +234,21 @@ export default function AgentPanel({
     streamingId.current = null;
     setMessages([]);
     setError(null);
-    setConfirm(null);
     setBusy(false);
   }, [conversationId]);
 
-  const handleConfirm = useCallback(async (approved: boolean) => {
-    if (!confirm) return;
-    const requestId = confirm.requestId;
-    setConfirm(null);
-    try {
-      await agentConfirmResponse(requestId, approved);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Confirm failed");
-    }
-  }, [confirm]);
+  const handleConfirm = useCallback(
+    async (requestId: string, approved: boolean) => {
+      const decision: AgentConfirmDecision = approved ? "allowed" : "denied";
+      setMessages((prev) => resolveConfirmMessage(prev, requestId, decision));
+      try {
+        await agentConfirmResponse(requestId, approved);
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Confirm failed");
+      }
+    },
+    [],
+  );
 
   if (hasKey === false) {
     return (
@@ -238,14 +256,14 @@ export default function AgentPanel({
         <div className="agent-panel__empty">
           <p className="agent-panel__empty-title">Gemini API key required</p>
           <p className="agent-panel__empty-body">
-            Unlock or create the vault in Config → Agents. The key stays in
+            Unlock or create the vault in Agents settings. The key stays in
             Stronghold and Rust — the chat UI never calls Google directly.
           </p>
-          {onOpenAgentsConfig ? (
+          {onOpenSettings ? (
             <button
               type="button"
               className="agent-panel__btn agent-panel__btn--primary"
-              onClick={onOpenAgentsConfig}
+              onClick={onOpenSettings}
             >
               Open Agents settings
             </button>
@@ -329,6 +347,47 @@ export default function AgentPanel({
               </div>
             );
           }
+          if (message.role === "confirm") {
+            const pending = !message.confirmDecision;
+            const requestId = message.confirmRequestId;
+            return (
+              <div
+                key={message.id}
+                className={confirmStatusClass(message.confirmDecision)}
+              >
+                <p className="agent-panel__confirm-title">
+                  {confirmTitle(message)}
+                </p>
+                <p className="agent-panel__confirm-body">
+                  {pending ? (
+                    <>
+                      <strong>{message.toolName}</strong> — {message.content}
+                    </>
+                  ) : (
+                    message.content
+                  )}
+                </p>
+                {pending && requestId ? (
+                  <div className="agent-panel__confirm-actions">
+                    <button
+                      type="button"
+                      className="agent-panel__btn"
+                      onClick={() => void handleConfirm(requestId, false)}
+                    >
+                      Deny
+                    </button>
+                    <button
+                      type="button"
+                      className="agent-panel__btn agent-panel__btn--primary"
+                      onClick={() => void handleConfirm(requestId, true)}
+                    >
+                      Allow
+                    </button>
+                  </div>
+                ) : null}
+              </div>
+            );
+          }
           return (
             <div
               key={message.id}
@@ -363,31 +422,6 @@ export default function AgentPanel({
         <p className="agent-panel__error" role="alert">
           {error}
         </p>
-      ) : null}
-
-      {confirm ? (
-        <div className="agent-panel__confirm" role="dialog" aria-modal="true">
-          <p className="agent-panel__confirm-title">Allow tool?</p>
-          <p className="agent-panel__confirm-body">
-            <strong>{confirm.tool}</strong> — {confirm.summary}
-          </p>
-          <div className="agent-panel__confirm-actions">
-            <button
-              type="button"
-              className="agent-panel__btn"
-              onClick={() => void handleConfirm(false)}
-            >
-              Deny
-            </button>
-            <button
-              type="button"
-              className="agent-panel__btn agent-panel__btn--primary"
-              onClick={() => void handleConfirm(true)}
-            >
-              Allow
-            </button>
-          </div>
-        </div>
       ) : null}
 
       <form

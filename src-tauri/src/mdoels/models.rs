@@ -498,6 +498,10 @@ pub struct AgentConfig {
     pub providers: std::collections::HashMap<String, AgentProviderConfig>,
     #[serde(default = "default_system_prompt")]
     pub system_prompt: String,
+    /// Optional vault password for packaged/portable unlock. Never copy a
+    /// `GENSOURCE_VAULT_PASSWORD` from `.env` here automatically.
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub vault_password: String,
 }
 
 impl Default for AgentConfig {
@@ -514,6 +518,7 @@ impl Default for AgentConfig {
             active_provider: default_agent_provider(),
             providers,
             system_prompt: default_system_prompt(),
+            vault_password: String::new(),
         }
     }
 }
@@ -610,6 +615,16 @@ pub struct ImportLegacyMessagesArgs {
 #[serde(rename_all = "camelCase")]
 pub struct AgentCacheApiKeyArgs {
     pub api_key: String,
+}
+
+/// Dev-only secrets from gitignored `.env` files. Empty in packaged builds.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AgentDevEnvSecrets {
+    #[serde(default)]
+    pub vault_password: String,
+    #[serde(default)]
+    pub gemini_api_key: String,
 }
 
 /// Frontend → Rust: start an agent turn.

@@ -57,6 +57,28 @@ const DEFAULT_AGENT_JSON: &str = r#"{
 }
 "#;
 
+/// Repo root (parent of `src-tauri`). Used for portable `.env` lookup in dev.
+pub fn resolve_repo_root() -> PathBuf {
+    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("..")
+}
+
+/// Load gitignored `.env` / `.env.local` / `.env.dev` from the repo root.
+///
+/// No-op when not `tauri::is_dev()` — packaged builds never read these files.
+/// First-set wins: existing process env, then `.env.local`, `.env.dev`, `.env`.
+pub fn load_dev_dotenv() {
+    if !tauri::is_dev() {
+        return;
+    }
+    let root = resolve_repo_root();
+    for name in [".env.local", ".env.dev", ".env"] {
+        let path = root.join(name);
+        if path.is_file() {
+            let _ = dotenvy::from_path(&path);
+        }
+    }
+}
+
 /// Resolve a directory under the live `other/` tree (no `AppHandle` required).
 ///
 /// Dev (`tauri::is_dev()`): repo `other/<subdir>` via `CARGO_MANIFEST_DIR`.
@@ -460,12 +482,13 @@ pub fn strip_agent_api_keys(config: &mut AgentConfig) {
 }
 
 /// Persist `agent.json` and notify the frontend.
-/// Callers that have an unlocked vault should strip API keys first.
+/// Provider API keys are always stripped; they belong in Stronghold, not JSON.
 pub fn save_and_emit_agent<R: Runtime>(
     app: &AppHandle<R>,
     config: AgentConfig,
 ) -> Result<AgentConfig, String> {
     let mut config = config;
+    strip_agent_api_keys(&mut config);
     normalize_agent_config(&mut config);
 
     let state = app.state::<AppState>();
@@ -1122,6 +1145,44 @@ mod tests {
             .api_key = "should-not-persist".into();
         strip_agent_api_keys(&mut config);
         assert!(config.active().api_key.is_empty());
+    }
+
+    #[test]
+    fn strip_agent_api_keys_keeps_vault_password() {
+        let mut config = AgentConfig::default();
+        config.vault_password = "portable-secret".into();
+        config
+            .providers
+            .get_mut("gemini")
+            .expect("gemini")
+            .api_key = "should-not-persist".into();
+        strip_agent_api_keys(&mut config);
+        assert!(config.active().api_key.is_empty());
+        assert_eq!(config.vault_password, "portable-secret");
+    }
+
+    #[test]
+    fn empty_vault_password_is_omitted_from_json() {
+        let json = serde_json::to_string(&AgentConfig::default()).expect("serialize");
+        assert!(
+            !json.contains("vaultPassword"),
+            "empty vaultPassword should skip_serializing_if: {json}"
+        );
+    }
+
+    #[test]
+    fn repo_root_dotenv_paths_are_portable() {
+        let root = resolve_repo_root();
+        let example = root.join(".env.example");
+        let rendered = example.to_string_lossy().replace('\\', "/");
+        assert!(
+            rendered.contains(".env.example"),
+            "example={rendered}"
+        );
+        assert!(
+            !rendered.contains("C:/Users/"),
+            "must not hardcode a user home: {rendered}"
+        );
     }
 
     #[test]

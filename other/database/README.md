@@ -23,6 +23,10 @@ The Agents panel talks to SQLite through typed Rust `invoke()` commands (sqlx). 
 
 ## Stronghold password
 
-The Gemini API key is **not** stored in `other/configs/agent.json`. Set a vault password once in **Config → Agents** (first run: password + confirm + key). Later sessions unlock with that password; the key is cached in Rust for the Gemini loop and never sent to Google from the webview.
+The Gemini API key is **not** stored in `other/configs/agent.json`. Unlock or create the vault on the **Agents** side-panel tab (third rail icon: Agent settings).
 
-If an older `agent.json` still has a plaintext `apiKey`, unlocking or creating the vault copies it into Stronghold and clears the JSON field.
+**Dev:** put `GENSOURCE_VAULT_PASSWORD` (and optionally `GEMINI_API_KEY` for first-time create) in a gitignored repo-root `.env` / `.env.local` / `.env.dev`. Names only live in [`.env.example`](../../.env.example). Rust loads those files only when `tauri::is_dev()`; packaged builds ignore `.env`.
+
+**Packaged:** set optional `vaultPassword` in `agent.json` (Agents settings: “Save password in agent.json”), or type the password on that page each session.
+
+If an older `agent.json` still has a plaintext `apiKey`, unlocking or creating the vault copies it into Stronghold and clears the JSON field. Saves always strip `providers.*.apiKey`.

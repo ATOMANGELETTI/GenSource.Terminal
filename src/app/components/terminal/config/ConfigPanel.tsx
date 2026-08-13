@@ -4,7 +4,6 @@ import { invoke } from "@tauri-apps/api/core";
 import {
   AboutIcon,
   AppearanceIcon,
-  BotIcon,
   FolderIcon,
   KeyboardIcon,
   LoggingIcon,
@@ -12,11 +11,6 @@ import {
   WindowIcon,
 } from "../../icons/MenuIcons";
 import { fetchKeybindings, saveKeybindings } from "../../../lib/keybindings";
-import {
-  fetchAgentConfig,
-  saveAgentConfig,
-  subscribeAgentConfigChanges,
-} from "../../../lib/agent";
 import {
   fetchAppInfo,
   fetchLogging,
@@ -26,14 +20,12 @@ import {
   subscribeSettingsChanges,
 } from "../../../lib/settings";
 import type {
-  AgentConfig,
   AppInfo,
   AppSettings,
   Keybinding,
   LoggingSettings,
 } from "../../../types";
 import AboutPage from "./AboutPage";
-import AgentsPage from "./AgentsPage";
 import AppearancePage from "./AppearancePage";
 import KeyboardPage from "./KeyboardPage";
 import LoggingPage from "./LoggingPage";
@@ -49,7 +41,6 @@ type ConfigCategory =
   | "terminal"
   | "logging"
   | "keyboard"
-  | "agents"
   | "about";
 
 const CATEGORIES: {
@@ -62,7 +53,6 @@ const CATEGORIES: {
   { id: "terminal", label: "Terminal", Icon: TerminalIcon },
   { id: "logging", label: "Logging", Icon: LoggingIcon },
   { id: "keyboard", label: "Keyboard", Icon: KeyboardIcon },
-  { id: "agents", label: "Agents", Icon: BotIcon },
   { id: "about", label: "About", Icon: AboutIcon },
 ];
 
@@ -104,10 +94,6 @@ const CATEGORY_META: Record<
     title: "Keyboard",
     subtitle: "Shortcuts from keybindings.json",
   },
-  agents: {
-    title: "Agents",
-    subtitle: "Gemini provider and Stronghold vault",
-  },
   about: {
     title: "About",
     subtitle: "App identity from appinfo.json",
@@ -123,7 +109,6 @@ export default function ConfigPanel() {
   const [settings, setSettings] = useState<AppSettings | null>(null);
   const [logging, setLogging] = useState<LoggingSettings | null>(null);
   const [bindings, setBindings] = useState<Keybinding[]>([]);
-  const [agentConfig, setAgentConfig] = useState<AgentConfig | null>(null);
   const [appInfo, setAppInfo] = useState<AppInfo | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -131,9 +116,7 @@ export default function ConfigPanel() {
   const settingsTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const loggingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const bindingsTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const agentTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const skipExternalSettings = useRef(false);
-  const skipExternalAgent = useRef(false);
 
   useEffect(() => {
     try {
@@ -145,19 +128,17 @@ export default function ConfigPanel() {
 
   const loadAll = useCallback(async () => {
     try {
-      const [nextSettings, nextLogging, nextBindings, nextInfo, nextAgent] =
+      const [nextSettings, nextLogging, nextBindings, nextInfo] =
         await Promise.all([
           fetchSettings(),
           fetchLogging().catch(() => null),
           fetchKeybindings().catch(() => [] as Keybinding[]),
           fetchAppInfo().catch(() => null),
-          fetchAgentConfig().catch(() => null),
         ]);
       setSettings(nextSettings);
       if (nextLogging) setLogging(nextLogging);
       setBindings(nextBindings);
       if (nextInfo) setAppInfo(nextInfo);
-      if (nextAgent) setAgentConfig(nextAgent);
       setLoadError(null);
     } catch (error: unknown) {
       const message =
@@ -167,7 +148,7 @@ export default function ConfigPanel() {
   }, []);
 
   useEffect(() => {
-    // Mount-time config hydrate (settings / logging / bindings / agent / appinfo).
+    // Mount-time config hydrate (settings / logging / bindings / appinfo).
     // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional async bootstrap
     void loadAll();
   }, [loadAll]);
@@ -209,26 +190,9 @@ export default function ConfigPanel() {
       if (settingsTimer.current) clearTimeout(settingsTimer.current);
       if (loggingTimer.current) clearTimeout(loggingTimer.current);
       if (bindingsTimer.current) clearTimeout(bindingsTimer.current);
-      if (agentTimer.current) clearTimeout(agentTimer.current);
     };
   }, []);
 
-  useEffect(() => {
-    let unlisten: (() => void) | undefined;
-    let cancelled = false;
-    void subscribeAgentConfigChanges((next) => {
-      if (!cancelled && !skipExternalAgent.current) setAgentConfig(next);
-    }).then((fn) => {
-      if (cancelled) {
-        fn();
-        return;
-      }
-      unlisten = fn;
-    });
-    return () => {
-      cancelled = true;
-      unlisten?.();
-    };
   }, []);
 
   const persistSettings = useCallback(async (next: AppSettings) => {
@@ -272,22 +236,6 @@ export default function ConfigPanel() {
     }
   }, []);
 
-  const persistAgent = useCallback(async (next: AgentConfig) => {
-    skipExternalAgent.current = true;
-    try {
-      const saved = await saveAgentConfig(next);
-      setAgentConfig(saved);
-      setSaveError(null);
-    } catch (error: unknown) {
-      const message =
-        error instanceof Error ? error.message : "Failed to save agent config";
-      setSaveError(message);
-      console.warn("save_agent_config failed", error);
-    } finally {
-      window.setTimeout(() => {
-        skipExternalAgent.current = false;
-      }, 400);
-    }
   }, []);
 
   const scheduleSettingsSave = useCallback(
@@ -318,16 +266,6 @@ export default function ConfigPanel() {
       }, SAVE_DEBOUNCE_MS);
     },
     [persistBindings],
-  );
-
-  const scheduleAgentSave = useCallback(
-    (next: AgentConfig) => {
-      if (agentTimer.current) clearTimeout(agentTimer.current);
-      agentTimer.current = setTimeout(() => {
-        void persistAgent(next);
-      }, SAVE_DEBOUNCE_MS);
-    },
-    [persistAgent],
   );
 
   const patchSettings = useCallback(
@@ -388,17 +326,6 @@ export default function ConfigPanel() {
       });
     },
     [persistBindings],
-  );
-
-  const updateAgentConfig = useCallback(
-    (next: AgentConfig) => {
-      setAgentConfig((prev) => {
-        if (prev && deepEqual(prev, next)) return prev;
-        scheduleAgentSave(next);
-        return next;
-      });
-    },
-    [scheduleAgentSave],
   );
 
   const openConfigFolder = useCallback(() => {
@@ -489,12 +416,6 @@ export default function ConfigPanel() {
               onCommitShortcut={commitBindingShortcut}
             />
           ) : null}
-          {category === "agents" && agentConfig ? (
-            <AgentsPage config={agentConfig} onChange={updateAgentConfig} />
-          ) : null}
-          {category === "agents" && !agentConfig && settings ? (
-            <p className="config-form__note">Agent settings unavailable.</p>
-          ) : null}
           {category === "about" ? <AboutPage appInfo={appInfo} /> : null}
 
           {!loadError &&
@@ -502,8 +423,7 @@ export default function ConfigPanel() {
             category === "window" ||
             category === "terminal") &&
             !settings) ||
-            (category === "logging" && !logging && !settings) ||
-            (category === "agents" && !agentConfig && !settings)) ? (
+            (category === "logging" && !logging && !settings)) ? (
             <p className="config-panel__status">Loading…</p>
           ) : null}
         </div>

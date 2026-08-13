@@ -6,7 +6,9 @@ import type {
   AgentChatSendArgs,
   AgentChunkEvent,
   AgentConfig,
+  AgentConfirmDecision,
   AgentConfirmEvent,
+  AgentDevEnvSecrets,
   AgentConversation,
   AgentDoneEvent,
   AgentErrorEvent,
@@ -48,19 +50,35 @@ export function formatRelativeTime(epochMs: number, now = Date.now()): string {
   return new Date(epochMs).toLocaleDateString();
 }
 
+function isConfirmDecision(
+  value: string | undefined,
+): value is AgentConfirmDecision {
+  return value === "allowed" || value === "denied" || value === "expired";
+}
+
 export function storedMessageToChat(
   row: AgentStoredMessage,
 ): AgentChatMessage {
   const role: AgentMessageRole =
-    row.role === "user" || row.role === "assistant" || row.role === "tool"
+    row.role === "user" ||
+    row.role === "assistant" ||
+    row.role === "tool" ||
+    row.role === "confirm"
       ? row.role
       : "assistant";
+  const confirmDecision = isConfirmDecision(row.confirmDecision)
+    ? row.confirmDecision
+    : role === "confirm" && isConfirmDecision(row.toolStatus)
+      ? row.toolStatus
+      : undefined;
   return {
     id: row.id,
     role,
     content: row.content,
     toolName: row.toolName,
     toolStatus: row.toolStatus,
+    confirmRequestId: row.confirmRequestId,
+    confirmDecision,
   };
 }
 
@@ -75,7 +93,17 @@ export function defaultAgentConfig(): AgentConfig {
     },
     systemPrompt:
       "You are GenSource Terminal's agent. Prefer tools for shell, files, git, and settings.",
+    vaultPassword: "",
   };
+}
+
+/** Keys belong in Stronghold — never persist `providers.*.apiKey` to agent.json. */
+export function stripAgentApiKeys(config: AgentConfig): AgentConfig {
+  const providers: Record<string, AgentProviderConfig> = {};
+  for (const [name, provider] of Object.entries(config.providers)) {
+    providers[name] = { ...provider, apiKey: "" };
+  }
+  return { ...config, providers };
 }
 
 export function activeProvider(
@@ -97,7 +125,13 @@ export async function fetchAgentConfig(): Promise<AgentConfig> {
 export async function saveAgentConfig(
   config: AgentConfig,
 ): Promise<AgentConfig> {
-  return invoke<AgentConfig>("save_agent_config", { config });
+  return invoke<AgentConfig>("save_agent_config", {
+    config: stripAgentApiKeys(config),
+  });
+}
+
+export async function fetchDevEnvSecrets(): Promise<AgentDevEnvSecrets> {
+  return invoke<AgentDevEnvSecrets>("agent_dev_env_secrets");
 }
 
 export async function agentHasApiKey(): Promise<boolean> {
@@ -178,6 +212,57 @@ export function applyAgentChunk(
     ],
     streamingId: nextId,
   };
+}
+
+export function appendConfirmMessage(
+  messages: AgentChatMessage[],
+  event: AgentConfirmEvent,
+  createId: () => string,
+): AgentChatMessage[] {
+  if (messages.some((message) => message.confirmRequestId === event.requestId)) {
+    return messages;
+  }
+  return [
+    ...messages,
+    {
+      id: createId(),
+      role: "confirm",
+      content: event.summary,
+      toolName: event.tool,
+      confirmRequestId: event.requestId,
+    },
+  ];
+}
+
+export function resolveConfirmMessage(
+  messages: AgentChatMessage[],
+  requestId: string,
+  decision: AgentConfirmDecision,
+): AgentChatMessage[] {
+  let found = false;
+  const next = messages.map((message) => {
+    if (message.confirmRequestId !== requestId || message.role !== "confirm") {
+      return message;
+    }
+    found = true;
+    if (message.confirmDecision === decision) return message;
+    return { ...message, confirmDecision: decision };
+  });
+  return found ? next : messages;
+}
+
+export function expirePendingConfirmMessages(
+  messages: AgentChatMessage[],
+): AgentChatMessage[] {
+  let changed = false;
+  const next = messages.map((message) => {
+    if (message.role !== "confirm" || message.confirmDecision) {
+      return message;
+    }
+    changed = true;
+    return { ...message, confirmDecision: "expired" as const };
+  });
+  return changed ? next : messages;
 }
 
 export async function agentChatSend(

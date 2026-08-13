@@ -3729,6 +3729,7 @@ name = "gensource-terminal"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "dotenvy",
  "futures",
  "gix",
  "json_comments",

@@ -293,7 +293,8 @@
 }
 
 .agent-panel__confirm {
-  margin: 0 0.65rem 0.5rem;
+  align-self: stretch;
+  margin: 0;
   padding: 0.55rem;
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -307,7 +308,7 @@
 }
 
 .agent-panel__confirm-body {
-  margin: 0 0 0.45rem;
+  margin: 0;
   font-size: 0.7rem;
   color: var(--text-muted);
   line-height: 1.4;
@@ -317,6 +318,16 @@
   display: flex;
   justify-content: flex-end;
   gap: 0.35rem;
+  margin-top: 0.45rem;
+}
+
+.agent-panel__confirm--allowed .agent-panel__confirm-title {
+  color: var(--accent);
+}
+
+.agent-panel__confirm--denied .agent-panel__confirm-title,
+.agent-panel__confirm--expired .agent-panel__confirm-title {
+  color: var(--error, #bf616a);
 }
 
 .agent-history {
@@ -401,4 +412,20 @@
   color: var(--text);
   font-family: inherit;
   font-size: 0.72rem;
+}
+
+.agent-settings {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.agent-settings .config-panel__header {
+  border-bottom: 1px solid var(--border);
+}
+
+.agent-settings .config-panel__body {
+  flex: 1;
+  min-height: 0;
 }
