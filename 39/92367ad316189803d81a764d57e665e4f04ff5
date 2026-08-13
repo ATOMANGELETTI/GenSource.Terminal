@@ -1,0 +1,16 @@
+src/configs/.tsbuildinfo-app
+  h_90ad036e211778 1
+src/configs/.tsbuildinfo-test
+  h_90ad036e211778 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "3992367ad316189803d81a764d57e665e4f04ff5",
+  "prompts": {},
+  "humans": {
+    "h_90ad036e211778": {
+      "author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
