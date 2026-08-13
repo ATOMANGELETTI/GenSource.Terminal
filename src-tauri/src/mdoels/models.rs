@@ -532,10 +532,6 @@ impl AgentConfig {
             .or_else(|| self.providers.get("gemini").cloned())
             .unwrap_or_default()
     }
-
-    pub fn has_api_key(&self) -> bool {
-        !self.active().api_key.trim().is_empty()
-    }
 }
 
 /// Runtime-resolved portable data paths (no machine-specific literals in source).
