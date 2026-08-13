@@ -1,0 +1,24 @@
+src-tauri/Cargo.toml
+  s_2a9a96be4ee489::t_aa8840ee8f36d6 62
+src-tauri/src/config/mod.rs
+  s_2a9a96be4ee489::t_05ab1433e660e9 164,455-463,470
+  s_2a9a96be4ee489::t_02a8c900d5064a 46-58
+  s_2a9a96be4ee489::t_4d82846aea93fc 131-163
+  s_2a9a96be4ee489::t_68e95a52f9f650 165
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "0af85b7f038946f909d02d1b0e6113906af2b7ca",
+  "prompts": {},
+  "sessions": {
+    "s_2a9a96be4ee489": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "33af420c-0c6c-445c-bd92-4e7335ab9d79",
+        "model": "cursor-grok-4.6-high-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
