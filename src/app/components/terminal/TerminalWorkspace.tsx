@@ -38,6 +38,7 @@ import SidePanel from "./SidePanel";
 import StatusBar from "./StatusBar";
 import TabBar from "./TabBar";
 import TerminalPane from "./TerminalPane";
+import type { OpenInTerminalApi } from "./explorer/FilesExplorer";
 import TerminalParticleField from "./TerminalParticleField";
 import type { XtermViewHandle } from "./XtermView";
 
@@ -52,7 +53,8 @@ interface TabMenuState extends ContextMenuPosition {
 
 /** Imperative API for App.tsx local shortcuts (Track D). */
 export interface TerminalWorkspaceHandle {
-  newTab: () => void;
+  /** Optional cwd spawns the new shell in that directory (no typed `cd`). */
+  newTab: (cwd?: string) => void;
   closeActiveTab: () => void;
   togglePinActive: () => void;
   openFind: () => void;
@@ -62,6 +64,17 @@ export interface TerminalWorkspaceHandle {
   isFocused: () => boolean;
   sendKeys: (data: string) => void;
   pasteClipboard: () => Promise<void>;
+  /** Active tab exists (hydrated) and can host a shell. */
+  hasReadyTab: () => boolean;
+  /**
+   * Respawn the active tab's shell with `cwd` as the process working directory.
+   * Returns false if there is no active tab.
+   */
+  cdActive: (path: string) => boolean;
+}
+
+export interface TerminalWorkspaceProps {
+  openInTerminal?: OpenInTerminalApi;
 }
 
 interface TerminalSettingsSlice {
@@ -122,16 +135,22 @@ function TerminalTabHost({
   const [restoreDone, setRestoreDone] = useState(!tab.initialScrollback);
 
   useEffect(() => {
-    if (restoreDone) return;
+    if (!tab.initialScrollback) {
+      setRestoreDone(true);
+      return;
+    }
+    setRestoreDone(false);
     const timer = setTimeout(() => {
       setRestoreDone(true);
     }, RESTORE_PTY_TIMEOUT_MS);
     return () => clearTimeout(timer);
-  }, [restoreDone]);
+  }, [tab.initialScrollback, tab.spawnKey]);
 
   const pty = usePtySession({
     enabled: restoreDone,
     profileId: tab.profileId,
+    cwd: tab.cwd,
+    spawnKey: tab.spawnKey ?? 0,
     cols: size.cols,
     rows: size.rows,
     onOutput: (_sessionId, data) => {
@@ -261,8 +280,10 @@ function TerminalTabHost({
   );
 }
 
-const TerminalWorkspace = forwardRef<TerminalWorkspaceHandle>(
-  function TerminalWorkspace(_props, ref) {
+const TerminalWorkspace = forwardRef<
+  TerminalWorkspaceHandle,
+  TerminalWorkspaceProps
+>(function TerminalWorkspace({ openInTerminal }, ref) {
     const { loadPinnedTabs, savePinnedTabs } = usePinnedTabs();
     const terminalSettings = useTerminalSettings();
     const settings: TerminalSettingsSlice = useMemo(
@@ -568,11 +589,13 @@ const TerminalWorkspace = forwardRef<TerminalWorkspaceHandle>(
       setFindOpen(false);
     }, []);
 
-    const handleAdd = useCallback(() => {
+    const handleAdd = useCallback((cwd?: string) => {
       const slice = settingsRef.current;
       const tab = createTabState({
         profileId: slice.defaultProfile,
         title: profileTitle(slice.defaultProfile, slice.profiles),
+        cwd: cwd?.trim() || null,
+        spawnKey: cwd?.trim() ? 1 : 0,
       });
       setTabs((prev) => [...prev, tab]);
       setActiveTabId(tab.tabId);
@@ -789,7 +812,7 @@ const TerminalWorkspace = forwardRef<TerminalWorkspaceHandle>(
     useImperativeHandle(
       ref,
       () => ({
-        newTab: () => handleAdd(),
+        newTab: (cwd?: string) => handleAdd(cwd),
         closeActiveTab: () => {
           const id = activeTabIdRef.current;
           if (id) handleClose(id);
@@ -844,6 +867,38 @@ const TerminalWorkspace = forwardRef<TerminalWorkspaceHandle>(
             console.warn("clipboard read failed", error);
           }
         },
+        hasReadyTab: () => {
+          const id = activeTabIdRef.current;
+          if (!id) return false;
+          return tabsRef.current.some((t) => t.tabId === id);
+        },
+        cdActive: (path: string) => {
+          const id = activeTabIdRef.current;
+          if (!id) return false;
+          const trimmed = path.trim();
+          if (!trimmed) return false;
+          if (!tabsRef.current.some((t) => t.tabId === id)) return false;
+
+          xtermHandles.current.get(id)?.clear();
+          setTabs((prev) =>
+            prev.map((t) =>
+              t.tabId === id
+                ? {
+                    ...t,
+                    cwd: trimmed,
+                    spawnKey: (t.spawnKey ?? 0) + 1,
+                    status: "running" as const,
+                    exitCode: null,
+                    errorMessage: undefined,
+                    sessionId: null,
+                    // Do not replay old scrollback into the new cwd shell.
+                    initialScrollback: undefined,
+                  }
+                : t,
+            ),
+          );
+          return true;
+        },
       }),
       [handleAdd, handleClose, handleTogglePin],
     );
@@ -887,12 +942,13 @@ const TerminalWorkspace = forwardRef<TerminalWorkspaceHandle>(
             open={panelOpen}
             width={panelWidth}
             onResize={setPanelWidth}
+            openInTerminal={openInTerminal}
           />
           <div className="terminal-workspace__center">
             <TabBar
               tabs={tabBarTabs}
               onSelect={handleSelect}
-              onAdd={handleAdd}
+              onAdd={() => handleAdd()}
               onContextMenu={handleTabContextMenu}
               onRenameCommit={handleRenameCommit}
               onRenameCancel={handleRenameCancel}

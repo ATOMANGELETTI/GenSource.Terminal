@@ -11,6 +11,10 @@ export interface TabState {
   errorMessage?: string;
   /** History text written once into xterm on restore (not replayed as stdin). */
   initialScrollback?: string;
+  /** One-shot PTY cwd (Open in Terminal); overrides profile startingDirectory. */
+  cwd?: string | null;
+  /** Bumped to force PTY respawn even when `cwd` is unchanged. */
+  spawnKey?: number;
 }
 
 export function createTabId(): string {
@@ -34,6 +38,8 @@ export function createTabState(options: {
   pinned?: boolean;
   tabId?: string;
   initialScrollback?: string;
+  cwd?: string | null;
+  spawnKey?: number;
 }): TabState {
   return {
     tabId: options.tabId ?? createTabId(),
@@ -43,5 +49,7 @@ export function createTabState(options: {
     pinned: options.pinned ?? false,
     status: "running",
     initialScrollback: options.initialScrollback,
+    cwd: options.cwd ?? null,
+    spawnKey: options.spawnKey ?? 0,
   };
 }

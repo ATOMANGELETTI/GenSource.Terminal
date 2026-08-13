@@ -47,6 +47,8 @@ export interface PtyCreateArgs {
   profileId: string;
   cols: number;
   rows: number;
+  /** Optional one-shot working directory (overrides profile startingDirectory). */
+  cwd?: string | null;
 }
 
 export interface PtyCreateResult {
@@ -121,3 +123,15 @@ export interface SystemMetrics {
   gpuTempCelsius?: number;
   ramTempCelsius?: number;
 }
+
+/** Source Control / git command types — see `./git-scm`. */
+export type {
+  GitBranchInfo,
+  GitChangeEntry,
+  GitChangeKind,
+  GitChangeStatus,
+  GitCommitResult,
+  GitOpenFolderResult,
+  GitStatusResult,
+  ScmPanelState,
+} from "./git-scm";

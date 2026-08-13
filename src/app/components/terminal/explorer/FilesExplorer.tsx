@@ -1,12 +1,27 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { useFileIconSet } from '../../../hooks/useFileIconSet';
+import { targetDirForEntry } from '../../../lib/terminal/explorer-fs';
 import type { ContextMenuPosition, FsEntry } from '../../../types';
 import ExplorerHeader from './ExplorerHeader';
 import FileAboutModal from './FileAboutModal';
 import FileTree from './FileTree';
 import FileTreeContextMenu from './FileTreeContextMenu';
+import OpenInTerminalModal from './OpenInTerminalModal';
 import { useFileTree } from './useFileTree';
+
+export interface OpenInTerminalApi {
+  hasReadyTab: () => boolean;
+  /** Respawn active tab shell at path (no typed `cd`). */
+  cdActive: (path: string) => boolean;
+  /** Optional cwd starts the new shell in that directory. */
+  newTab: (cwd?: string) => void;
+}
+
+interface FilesExplorerProps {
+  openInTerminal?: OpenInTerminalApi;
+  onOpenInSourceControl?: (path: string) => void;
+}
 
 interface MenuState extends ContextMenuPosition {
   entry: FsEntry;
@@ -17,12 +32,17 @@ function pathsEqual(a: string | null | undefined, b: string | null | undefined) 
   return a.replace(/\\+$/, '').toLowerCase() === b.replace(/\\+$/, '').toLowerCase();
 }
 
-export default function FilesExplorer() {
+export default function FilesExplorer({
+  openInTerminal,
+  onOpenInSourceControl,
+}: FilesExplorerProps) {
   const tree = useFileTree();
   const iconSet = useFileIconSet();
   const [menu, setMenu] = useState<MenuState | null>(null);
+  const [pendingCdPath, setPendingCdPath] = useState<string | null>(null);
 
   const closeMenu = useCallback(() => setMenu(null), []);
+  const closeOpenInTerminalModal = useCallback(() => setPendingCdPath(null), []);
 
   useEffect(() => {
     if (!menu) return;
@@ -47,6 +67,40 @@ export default function FilesExplorer() {
       window.removeEventListener('pointerdown', onPointerDown, true);
     };
   }, [menu, closeMenu]);
+
+  useEffect(() => {
+    if (!pendingCdPath) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeOpenInTerminalModal();
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [pendingCdPath, closeOpenInTerminalModal]);
+
+  const handleOpenInTerminal = useCallback(
+    (entry: FsEntry) => {
+      if (!openInTerminal) return;
+      const path = targetDirForEntry(entry);
+      if (openInTerminal.cdActive(path)) return;
+      setPendingCdPath(path);
+    },
+    [openInTerminal],
+  );
+
+  const handleOpenTerminalTab = useCallback(() => {
+    if (!openInTerminal || !pendingCdPath) {
+      closeOpenInTerminalModal();
+      return;
+    }
+    const path = pendingCdPath;
+    closeOpenInTerminalModal();
+    openInTerminal.newTab(path);
+  }, [closeOpenInTerminalModal, openInTerminal, pendingCdPath]);
 
   const moveSelection = useCallback(
     (delta: number) => {
@@ -164,6 +218,10 @@ export default function FilesExplorer() {
           entry={menu.entry}
           onClose={closeMenu}
           onOpen={() => void tree.openEntry(menu.entry)}
+          onOpenInTerminal={() => handleOpenInTerminal(menu.entry)}
+          onOpenInSourceControl={() =>
+            onOpenInSourceControl?.(menu.entry.path)
+          }
           onReveal={() => void tree.revealEntry(menu.entry)}
           onCopyPath={() => void tree.copyPath(menu.entry)}
           onNewFile={() => tree.startCreate('create-file', menu.entry)}
@@ -179,6 +237,12 @@ export default function FilesExplorer() {
           loading={tree.aboutLoading}
           error={tree.aboutError}
           onClose={tree.closeAbout}
+        />
+      ) : null}
+      {pendingCdPath ? (
+        <OpenInTerminalModal
+          onClose={closeOpenInTerminalModal}
+          onOpenTerminalTab={handleOpenTerminalTab}
         />
       ) : null}
     </div>

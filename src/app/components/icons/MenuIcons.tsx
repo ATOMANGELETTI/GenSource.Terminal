@@ -256,6 +256,19 @@ export function FolderIcon(props: IconProps) {
   );
 }
 
+/** Flat SCM / git-branch glyph for the Source Control side-panel tab. */
+export function SourceControlIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <circle cx="4.5" cy="12.5" r="1.55" />
+      <circle cx="4.5" cy="3.5" r="1.55" />
+      <circle cx="11.5" cy="8" r="1.55" />
+      <path d="M4.5 5.05v5.9" />
+      <path d="M4.5 7.2c0 1.7 2.1 2.9 4.2 2.9h1.2" />
+    </svg>
+  );
+}
+
 export function NewFileIcon(props: IconProps) {
   return (
     <svg {...base} {...props}>
@@ -299,6 +312,16 @@ export function OpenExternalIcon(props: IconProps) {
     <svg {...base} {...props}>
       <path d="M6.5 3.5H3.7A1.2 1.2 0 0 0 2.5 4.7v7.6A1.2 1.2 0 0 0 3.7 13.5h7.6a1.2 1.2 0 0 0 1.2-1.2V9.5" />
       <path d="M9.5 2.5h4v4M13.5 2.5 7.5 8.5" />
+    </svg>
+  );
+}
+
+export function OpenInTerminalIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <rect x="2.5" y="3.5" width="11" height="9" rx="1.2" />
+      <path d="M5 7l1.8 1.5L5 10" />
+      <path d="M8.2 10h2.8" />
     </svg>
   );
 }

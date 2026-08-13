@@ -78,3 +78,22 @@ export function formatFsError(error: unknown, fallback: string): string {
   }
   return raw;
 }
+
+/**
+ * Directory to `cd` into for an explorer entry.
+ * Files use their parent; dirs/drives use `entry.path`.
+ */
+export function targetDirForEntry(entry: FsEntry): string {
+  if (entry.kind !== "file") {
+    return entry.path;
+  }
+  const trimmed = entry.path.replace(/[\\/]+$/, "");
+  const slash = Math.max(trimmed.lastIndexOf("\\"), trimmed.lastIndexOf("/"));
+  if (slash <= 0) {
+    return trimmed;
+  }
+  if (slash === 2 && trimmed[1] === ":") {
+    return trimmed.slice(0, 3);
+  }
+  return trimmed.slice(0, slash);
+}

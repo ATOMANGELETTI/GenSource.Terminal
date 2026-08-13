@@ -1,19 +1,25 @@
 import {
   useCallback,
+  useEffect,
   useRef,
   useState,
   type PointerEvent as ReactPointerEvent,
 } from "react";
 
-import { FolderIcon } from "../icons/MenuIcons";
-import FilesExplorer from "./explorer/FilesExplorer";
+import { FolderIcon, SourceControlIcon } from "../icons/MenuIcons";
+import {
+  loadScmFolderPath,
+  saveScmFolderPath,
+} from "../../lib/terminal/git-scm";
+import FilesExplorer, { type OpenInTerminalApi } from "./explorer/FilesExplorer";
+import SourceControlPanel from "./source-control/SourceControlPanel";
 
 const MIN_WIDTH = 120;
 const MAX_WIDTH = 480;
 
 const SIDE_PANEL_TABS = [
   { id: "files", label: "Files", iconOnly: true },
-  { id: "tab-2", label: "Tab 2", iconOnly: false },
+  { id: "source", label: "Source Control", iconOnly: true },
   { id: "tab-3", label: "Tab 3", iconOnly: false },
   { id: "tab-4", label: "Tab 4", iconOnly: false },
 ] as const;
@@ -24,11 +30,40 @@ interface SidePanelProps {
   open: boolean;
   width: number;
   onResize: (width: number) => void;
+  openInTerminal?: OpenInTerminalApi;
 }
 
-export default function SidePanel({ open, width, onResize }: SidePanelProps) {
+export default function SidePanel({
+  open,
+  width,
+  onResize,
+  openInTerminal,
+}: SidePanelProps) {
   const dragRef = useRef<{ startX: number; startWidth: number } | null>(null);
   const [activeTab, setActiveTab] = useState<SidePanelTabId>("files");
+  const [scmFolderPath, setScmFolderPath] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void loadScmFolderPath().then((path) => {
+      if (cancelled) return;
+      if (path) setScmFolderPath(path);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const handleScmFolderPathChange = useCallback((path: string | null) => {
+    setScmFolderPath(path);
+    void saveScmFolderPath(path);
+  }, []);
+
+  const handleOpenInSourceControl = useCallback((path: string) => {
+    setScmFolderPath(path);
+    void saveScmFolderPath(path);
+    setActiveTab("source");
+  }, []);
 
   const handlePointerDown = useCallback(
     (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -72,6 +107,7 @@ export default function SidePanel({ open, width, onResize }: SidePanelProps) {
   );
 
   const activeMeta = SIDE_PANEL_TABS.find((tab) => tab.id === activeTab);
+  const flushContent = activeTab === "files" || activeTab === "source";
 
   return (
     <aside
@@ -85,14 +121,22 @@ export default function SidePanel({ open, width, onResize }: SidePanelProps) {
       <div className="side-panel__body">
         <div
           className={
-            activeTab === "files"
+            flushContent
               ? "side-panel__content side-panel__content--flush"
               : "side-panel__content"
           }
           role="tabpanel"
         >
           {activeTab === "files" ? (
-            <FilesExplorer />
+            <FilesExplorer
+              openInTerminal={openInTerminal}
+              onOpenInSourceControl={handleOpenInSourceControl}
+            />
+          ) : activeTab === "source" ? (
+            <SourceControlPanel
+              folderPath={scmFolderPath}
+              onFolderPathChange={handleScmFolderPathChange}
+            />
           ) : (
             <p className="side-panel__placeholder">
               {activeMeta?.label ?? "Tab"} content
@@ -117,8 +161,10 @@ export default function SidePanel({ open, width, onResize }: SidePanelProps) {
                 }
                 onClick={() => setActiveTab(tab.id)}
               >
-                {tab.iconOnly ? (
+                {tab.id === "files" ? (
                   <FolderIcon className="side-panel__tab-icon" />
+                ) : tab.id === "source" ? (
+                  <SourceControlIcon className="side-panel__tab-icon" />
                 ) : (
                   <span className="side-panel__tab-label">{tab.label}</span>
                 )}

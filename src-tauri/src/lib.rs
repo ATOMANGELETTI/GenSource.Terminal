@@ -7,6 +7,7 @@
 
 mod commands;
 mod config;
+mod git;
 mod logging;
 #[path = "mdoels/models.rs"]
 mod mdoels;
@@ -160,6 +161,16 @@ pub fn run() {
             commands::fs_reveal_path,
             commands::fs_username,
             commands::get_system_metrics,
+            commands::git_open_folder,
+            commands::git_init,
+            commands::git_status,
+            commands::git_stage,
+            commands::git_unstage,
+            commands::git_discard,
+            commands::git_commit,
+            commands::git_branches,
+            commands::git_checkout,
+            commands::git_create_branch,
         ])
         .setup(|app| {
             // Stronghold needs a filesystem path for its key-derivation

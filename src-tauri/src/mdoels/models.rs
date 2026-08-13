@@ -212,6 +212,9 @@ pub struct PtyCreateArgs {
     pub profile_id: String,
     pub cols: u16,
     pub rows: u16,
+    /// Optional one-shot working directory (overrides profile `startingDirectory`).
+    #[serde(default)]
+    pub cwd: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -379,4 +382,74 @@ pub struct SystemMetrics {
     /// DIMM / memory sensor (°C) when exposed; frequently `None` without vendor drivers.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub ram_temp_celsius: Option<f32>,
+}
+
+/// Result of discovering / opening a folder for Source Control.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GitOpenResult {
+    /// SCM folder the user opened (may be inside a repo).
+    pub folder_path: String,
+    /// Git worktree root when `is_repo`, otherwise the opened folder.
+    pub root: String,
+    pub is_repo: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub branch: Option<String>,
+    /// Short HEAD object id when born.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub head: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ahead: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub behind: Option<u32>,
+}
+
+/// Kind of change for a path in status lists.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum GitChangeStatus {
+    Added,
+    Modified,
+    Deleted,
+    Renamed,
+    Copied,
+    TypeChange,
+    Untracked,
+    Conflict,
+    IntentToAdd,
+}
+
+/// One path in staged / unstaged / untracked / conflict lists.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GitStatusEntry {
+    /// Repository-relative path using `/` separators.
+    pub path: String,
+    pub absolute_path: String,
+    pub status: GitChangeStatus,
+}
+
+/// Aggregated `git status`-style lists for the SCM panel.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct GitStatusResult {
+    pub staged: Vec<GitStatusEntry>,
+    pub unstaged: Vec<GitStatusEntry>,
+    pub untracked: Vec<GitStatusEntry>,
+    pub conflicted: Vec<GitStatusEntry>,
+}
+
+/// Local branch row for the branch menu.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GitBranchInfo {
+    pub name: String,
+    pub is_current: bool,
+}
+
+/// Result of creating a commit.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GitCommitResult {
+    pub id: String,
 }

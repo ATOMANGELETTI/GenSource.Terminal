@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 
 import Titlebar from "./components/layout/Titlebar";
 import AboutDialog from "./components/dialogs/AboutDialog";
@@ -7,6 +7,7 @@ import TitlebarMenu from "./pages/content-menus/titlebar-menu";
 import TerminalWorkspace, {
   type TerminalWorkspaceHandle,
 } from "./components/terminal/TerminalWorkspace";
+import type { OpenInTerminalApi } from "./components/terminal/explorer/FilesExplorer";
 import { copySelection, pasteAtFocus } from "./lib/clipboard";
 import { useLocalShortcuts } from "./lib/keybindings";
 import {
@@ -32,6 +33,17 @@ export default function App() {
   const [appInfo, setAppInfo] = useState<AppInfo | null>(null);
   const [aboutOpen, setAboutOpen] = useState(false);
   const terminalRef = useRef<TerminalWorkspaceHandle>(null);
+
+  const openInTerminalApi = useMemo<OpenInTerminalApi>(
+    () => ({
+      hasReadyTab: () => terminalRef.current?.hasReadyTab() ?? false,
+      cdActive: (path: string) => terminalRef.current?.cdActive(path) ?? false,
+      newTab: (cwd?: string) => {
+        terminalRef.current?.newTab(cwd);
+      },
+    }),
+    [],
+  );
 
   const title = appInfo?.productName ?? appInfo?.name ?? "GenSource Terminal";
 
@@ -154,7 +166,7 @@ export default function App() {
         className="app-shell__main app-shell__main--terminal"
         onContextMenu={(event) => openMenu("content", event)}
       >
-        <TerminalWorkspace ref={terminalRef} />
+        <TerminalWorkspace ref={terminalRef} openInTerminal={openInTerminalApi} />
       </main>
 
       {menu.target === "titlebar" && (

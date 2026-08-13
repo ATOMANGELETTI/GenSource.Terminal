@@ -34,6 +34,17 @@ export type {
   FsUsernameResponse,
 } from "./explorer";
 
+export type {
+  GitBranchInfo,
+  GitChangeEntry,
+  GitChangeKind,
+  GitChangeStatus,
+  GitCommitResult,
+  GitOpenFolderResult,
+  GitStatusResult,
+  ScmPanelState,
+} from "./git-scm";
+
 export interface ContextMenuPosition {
   x: number;
   y: number;

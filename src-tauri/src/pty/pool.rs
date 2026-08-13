@@ -39,6 +39,7 @@ impl PtySessionPool {
         profile_id: &str,
         cols: u16,
         rows: u16,
+        cwd: Option<&str>,
     ) -> Result<String, String> {
         let profile = settings
             .profiles
@@ -65,7 +66,10 @@ impl PtySessionPool {
         if is_powershell_command(&profile.command) {
             inject_powershell_nord_prompt(&mut cmd, &profile.args, &settings.theme);
         }
-        if let Some(dir) = profile
+        // Prefer one-shot cwd (e.g. Open in Terminal), then profile start dir, then home.
+        if let Some(dir) = cwd.map(str::trim).filter(|s| !s.is_empty()) {
+            cmd.cwd(dir);
+        } else if let Some(dir) = profile
             .starting_directory
             .as_deref()
             .filter(|s| !s.is_empty())

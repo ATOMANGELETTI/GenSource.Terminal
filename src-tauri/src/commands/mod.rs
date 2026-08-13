@@ -5,6 +5,8 @@
 #[path = "commands.rs"]
 mod handlers;
 mod explorer;
+mod git;
 
 pub use explorer::*;
+pub use git::*;
 pub use handlers::*;

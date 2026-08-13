@@ -147,7 +147,14 @@ pub fn pty_create(
         .lock()
         .unwrap_or_else(|p| p.into_inner())
         .clone();
-    let session_id = pool.create(&app, &settings, &args.profile_id, args.cols, args.rows)?;
+    let session_id = pool.create(
+        &app,
+        &settings,
+        &args.profile_id,
+        args.cols,
+        args.rows,
+        args.cwd.as_deref(),
+    )?;
     Ok(PtyCreateResult { session_id })
 }
 

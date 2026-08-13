@@ -5,8 +5,10 @@ import {
   NewFileIcon,
   NewFolderIcon,
   OpenExternalIcon,
+  OpenInTerminalIcon,
   RenameIcon,
   RevealIcon,
+  SourceControlIcon,
 } from "../../icons/MenuIcons";
 import type { ContextMenuPosition, FsEntry } from "../../../types";
 
@@ -14,6 +16,8 @@ export interface FileTreeContextMenuProps extends ContextMenuPosition {
   entry: FsEntry;
   onClose: () => void;
   onOpen: () => void;
+  onOpenInTerminal: () => void;
+  onOpenInSourceControl: () => void;
   onReveal: () => void;
   onCopyPath: () => void;
   onNewFile: () => void;
@@ -29,6 +33,8 @@ export default function FileTreeContextMenu({
   entry,
   onClose,
   onOpen,
+  onOpenInTerminal,
+  onOpenInSourceControl,
   onReveal,
   onCopyPath,
   onNewFile,
@@ -45,6 +51,7 @@ export default function FileTreeContextMenu({
   const isDrive = entry.kind === "drive";
   const isDir = entry.kind === "dir" || isDrive;
   const isFile = entry.kind === "file";
+  const isFolderOnly = entry.kind === "dir";
 
   return (
     <nav
@@ -67,6 +74,26 @@ export default function FileTreeContextMenu({
         >
           <OpenExternalIcon className="context-menu__icon" />
           <span className="context-menu__label">Open</span>
+        </button>
+      ) : null}
+      <button
+        type="button"
+        className="context-menu__item"
+        role="menuitem"
+        onClick={run(onOpenInTerminal)}
+      >
+        <OpenInTerminalIcon className="context-menu__icon" />
+        <span className="context-menu__label">Open in Terminal</span>
+      </button>
+      {isFolderOnly ? (
+        <button
+          type="button"
+          className="context-menu__item"
+          role="menuitem"
+          onClick={run(onOpenInSourceControl)}
+        >
+          <SourceControlIcon className="context-menu__icon" />
+          <span className="context-menu__label">Open in Source Control</span>
         </button>
       ) : null}
       <button

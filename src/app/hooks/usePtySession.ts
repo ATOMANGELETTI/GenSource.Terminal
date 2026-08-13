@@ -12,6 +12,10 @@ import type {
 export interface UsePtySessionOptions {
   enabled: boolean;
   profileId: string;
+  /** One-shot working directory for spawn; null/undefined → profile/home. */
+  cwd?: string | null;
+  /** Change to force kill+create even if `cwd` is unchanged. */
+  spawnKey?: number;
   cols: number;
   rows: number;
   onOutput: (sessionId: string, data: string) => void;
@@ -52,6 +56,8 @@ export function usePtySession(
   const {
     enabled,
     profileId,
+    cwd,
+    spawnKey = 0,
     cols,
     rows,
     onOutput,
@@ -67,6 +73,7 @@ export function usePtySession(
   const onErrorRef = useRef(onError);
   const colsRef = useRef(cols);
   const rowsRef = useRef(rows);
+  const cwdRef = useRef(cwd);
   const createGenRef = useRef(0);
   /** Early `pty-output` chunks keyed by sessionId (listen-before-create). */
   const earlyOutputRef = useRef<Map<string, string[]>>(new Map());
@@ -88,6 +95,9 @@ export function usePtySession(
   useEffect(() => {
     rowsRef.current = rows;
   }, [rows]);
+  useEffect(() => {
+    cwdRef.current = cwd;
+  }, [cwd]);
 
   const clearResizeTimer = () => {
     if (resizeTimerRef.current !== null) {
@@ -137,11 +147,13 @@ export function usePtySession(
     }
 
     try {
+      const spawnCwd = cwdRef.current?.trim() || undefined;
       const result = await invoke<PtyCreateResult>("pty_create", {
         args: {
           profileId,
           cols: Math.max(1, colsRef.current),
           rows: Math.max(1, rowsRef.current),
+          ...(spawnCwd ? { cwd: spawnCwd } : {}),
         },
       });
       if (gen !== createGenRef.current) {
@@ -236,7 +248,7 @@ export function usePtySession(
       sessionIdRef.current = null;
       void killSession(previous);
     };
-  }, [enabled, profileId, createSession, killSession]);
+  }, [enabled, profileId, cwd, spawnKey, createSession, killSession]);
 
   const write = useCallback((data: string) => {
     const id = sessionIdRef.current;
