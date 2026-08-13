@@ -27,6 +27,13 @@ other/logging/app/*
 other/logging/build/*
 !other/logging/app/.gitkeep
 !other/logging/build/.gitkeep
+
+# Portable databases + Stronghold vault (runtime; keep empty dirs + README)
+other/database/**/*.db
+other/database/**/*.db-wal
+other/database/**/*.db-shm
+other/database/stronghold/vault.hold
+other/database/stronghold/salt.txt
 other/utilities/scripts/archive/*
 !other/utilities/scripts/archive/.gitkeep
 

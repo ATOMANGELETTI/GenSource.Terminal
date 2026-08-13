@@ -93,6 +93,7 @@
     ],
     "resources": {
       "../other/configs/": "other/configs/",
+      "../other/database/": "other/database/",
       "../other/documents/": "other/documents/",
       "../other/prompts/": "other/prompts/",
       "../other/screenshots/": "other/screenshots/",
