@@ -9,8 +9,13 @@ import {
 } from "react";
 import { confirm } from "@tauri-apps/plugin-dialog";
 
+import {
+  listenContextMenuAction,
+  openContextMenuPopup,
+} from "../../../lib/context-menu-popup";
 import { fsOpenPath, fsRevealPath } from "../../../lib/terminal/explorer-fs";
 import {
+  autoStagePaths,
   canCommit,
   changesSectionEntries,
   emptyStatus,
@@ -25,9 +30,12 @@ import {
   gitStage,
   gitStatus,
   gitUnstage,
+  gitWatchStart,
+  gitWatchStop,
   pickScmFolder,
   resolveScmPanelState,
   scmErrorMessage,
+  subscribeScmChanged,
 } from "../../../lib/terminal/git-scm";
 import type {
   GitBranchInfo,
@@ -37,6 +45,7 @@ import type {
 } from "../../../types/git-scm";
 import {
   ChevronRightIcon,
+  CloseIcon,
   FolderIcon,
   ReloadIcon,
   SourceControlIcon,
@@ -51,6 +60,15 @@ interface SourceControlPanelProps {
   folderPath: string | null;
   onFolderPathChange: (path: string | null) => void;
 }
+
+function scmRootsEqual(a: string, b: string): boolean {
+  const norm = (value: string) =>
+    value.replace(/[\\/]+$/, "").replace(/\\/g, "/").toLowerCase();
+  return norm(a) === norm(b);
+}
+
+/** Keep intentional Unstage from fighting auto-stage / watch refresh briefly. */
+const SKIP_AUTO_STAGE_MS = 1500;
 
 export default function SourceControlPanel({
   folderPath,
@@ -69,6 +87,11 @@ export default function SourceControlPanel({
   const [newBranchName, setNewBranchName] = useState("");
   const [rowMenu, setRowMenu] = useState<ChangeRowMenuState | null>(null);
   const branchMenuRef = useRef<HTMLDivElement | null>(null);
+  const skipAutoStageUntilRef = useRef(0);
+  const refreshGenRef = useRef(0);
+  const loadingOwnerRef = useRef(0);
+  const gitRootRef = useRef("");
+  const folderPathRef = useRef(folderPath);
 
   const panelState = resolveScmPanelState(folderPath, openResult);
   const gitRoot = openResult?.isRepo
@@ -79,35 +102,85 @@ export default function SourceControlPanel({
   const changes = changesSectionEntries(status);
   const conflicts = status.conflicted;
 
-  const refresh = useCallback(async (path: string) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const discovered = await gitOpenFolder(path);
-      setOpenResult(discovered);
-      if (!discovered.isRepo) {
+  gitRootRef.current = gitRoot;
+  folderPathRef.current = folderPath;
+
+  const armSkipAutoStage = useCallback(() => {
+    skipAutoStageUntilRef.current = Date.now() + SKIP_AUTO_STAGE_MS;
+  }, []);
+
+  const clearSkipAutoStage = useCallback(() => {
+    skipAutoStageUntilRef.current = 0;
+  }, []);
+
+  const applyAutoStage = useCallback(
+    async (root: string, nextStatus: GitStatusResult): Promise<GitStatusResult> => {
+      if (Date.now() < skipAutoStageUntilRef.current) {
+        return nextStatus;
+      }
+      const paths = autoStagePaths(nextStatus);
+      if (!paths.length) return nextStatus;
+      await gitStage(root, paths);
+      return gitStatus(root);
+    },
+    [],
+  );
+
+  const refresh = useCallback(
+    async (path: string, options?: { quiet?: boolean }) => {
+      const quiet = options?.quiet === true;
+      const gen = ++refreshGenRef.current;
+      const isStale = () => gen !== refreshGenRef.current;
+
+      if (!quiet) {
+        setLoading(true);
+        setError(null);
+        loadingOwnerRef.current = gen;
+      }
+      try {
+        const discovered = await gitOpenFolder(path);
+        if (isStale()) return;
+        setOpenResult(discovered);
+        if (!discovered.isRepo) {
+          setStatus(emptyStatus());
+          setBranches([]);
+          return;
+        }
+        const [initialStatus, nextBranches] = await Promise.all([
+          gitStatus(discovered.root),
+          gitBranches(discovered.root).catch(() => [] as GitBranchInfo[]),
+        ]);
+        if (isStale()) return;
+        let nextStatus = initialStatus;
+        try {
+          nextStatus = await applyAutoStage(discovered.root, initialStatus);
+        } catch (err) {
+          if (!quiet) {
+            setError(scmErrorMessage(err, "Failed to auto-stage changes"));
+          }
+        }
+        if (isStale()) return;
+        setStatus(nextStatus);
+        setBranches(nextBranches);
+      } catch (err) {
+        if (isStale()) return;
+        if (quiet) return;
+        setOpenResult(null);
         setStatus(emptyStatus());
         setBranches([]);
-        return;
+        setError(scmErrorMessage(err, "Failed to open folder"));
+      } finally {
+        if (!quiet && loadingOwnerRef.current === gen) {
+          setLoading(false);
+        }
       }
-      const [nextStatus, nextBranches] = await Promise.all([
-        gitStatus(discovered.root),
-        gitBranches(discovered.root).catch(() => [] as GitBranchInfo[]),
-      ]);
-      setStatus(nextStatus);
-      setBranches(nextBranches);
-    } catch (err) {
-      setOpenResult(null);
-      setStatus(emptyStatus());
-      setBranches([]);
-      setError(scmErrorMessage(err, "Failed to open folder"));
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    },
+    [applyAutoStage],
+  );
 
   useEffect(() => {
     if (!folderPath) {
+      refreshGenRef.current += 1;
       setOpenResult(null);
       setStatus(emptyStatus());
       setBranches([]);
@@ -117,10 +190,46 @@ export default function SourceControlPanel({
       setCreateBranchOpen(false);
       setNewBranchName("");
       setRowMenu(null);
+      clearSkipAutoStage();
       return;
     }
     void refresh(folderPath);
-  }, [folderPath, refresh]);
+  }, [folderPath, refresh, clearSkipAutoStage]);
+
+  useEffect(() => {
+    if (panelState !== "repo" || !gitRoot) {
+      void gitWatchStop().catch(() => undefined);
+      return;
+    }
+    void gitWatchStart(gitRoot).catch(() => undefined);
+    return () => {
+      void gitWatchStop().catch(() => undefined);
+    };
+  }, [panelState, gitRoot]);
+
+  useEffect(() => {
+    let cancelled = false;
+    let unlisten: (() => void) | undefined;
+
+    void subscribeScmChanged((payload) => {
+      const currentRoot = gitRootRef.current;
+      if (!payload?.root || !currentRoot) return;
+      if (!scmRootsEqual(payload.root, currentRoot)) return;
+      const path = folderPathRef.current ?? currentRoot;
+      void refresh(path, { quiet: true });
+    }).then((fn) => {
+      if (cancelled) {
+        fn();
+        return;
+      }
+      unlisten = fn;
+    });
+
+    return () => {
+      cancelled = true;
+      unlisten?.();
+    };
+  }, [refresh]);
 
   useEffect(() => {
     if (!rowMenu) return;
@@ -234,9 +343,15 @@ export default function SourceControlPanel({
   const handleUnstage = useCallback(
     (paths: string[]) => {
       if (!paths.length) return;
-      void runMutation(() => gitUnstage(gitRoot, paths), "Failed to unstage");
+      armSkipAutoStage();
+      void runMutation(() => gitUnstage(gitRoot, paths), "Failed to unstage").then(
+        (ok) => {
+          if (ok) armSkipAutoStage();
+          else clearSkipAutoStage();
+        },
+      );
     },
-    [gitRoot, runMutation],
+    [armSkipAutoStage, clearSkipAutoStage, gitRoot, runMutation],
   );
 
   const handleDiscard = useCallback(
@@ -253,6 +368,51 @@ export default function SourceControlPanel({
     },
     [gitRoot, runMutation],
   );
+
+  useEffect(() => {
+    let cancelled = false;
+    let unlisten: (() => void) | undefined;
+
+    void listenContextMenuAction((event) => {
+      if (event.kind !== "scm-change" || event.payload.kind !== "scm-change") {
+        return;
+      }
+      const { entry } = event.payload;
+      switch (event.action) {
+        case "stage":
+          handleStage([entry.path]);
+          break;
+        case "unstage":
+          handleUnstage([entry.path]);
+          break;
+        case "discard":
+          void handleDiscard([entry.path]);
+          break;
+        case "open":
+          void fsOpenPath(entry.absolutePath);
+          break;
+        case "copyPath":
+          void writeText(entry.absolutePath);
+          break;
+        case "reveal":
+          void fsRevealPath(entry.absolutePath);
+          break;
+        default:
+          break;
+      }
+    }).then((stop) => {
+      if (cancelled) {
+        stop();
+      } else {
+        unlisten = stop;
+      }
+    });
+
+    return () => {
+      cancelled = true;
+      unlisten?.();
+    };
+  }, [handleDiscard, handleStage, handleUnstage]);
 
   const handleCheckout = useCallback(
     (branch: string) => {
@@ -284,7 +444,17 @@ export default function SourceControlPanel({
   ) => {
     event.preventDefault();
     event.stopPropagation();
-    setRowMenu({ entry, section, x: event.clientX, y: event.clientY });
+    const { clientX, clientY } = event;
+    void (async () => {
+      const opened = await openContextMenuPopup(clientX, clientY, {
+        kind: "scm-change",
+        entry,
+        section,
+      });
+      if (!opened) {
+        setRowMenu({ entry, section, x: clientX, y: clientY });
+      }
+    })();
   };
 
   const renderChangeRow = (
@@ -379,12 +549,12 @@ export default function SourceControlPanel({
           <div className="scm-header__actions">
             <button
               type="button"
-              className="scm-header__close"
+              className="scm-icon-btn scm-icon-btn--danger"
               title="Close"
               aria-label="Close repo"
               onClick={() => onFolderPathChange(null)}
             >
-              Close
+              <CloseIcon />
             </button>
             <button
               type="button"
@@ -451,12 +621,12 @@ export default function SourceControlPanel({
         <div className="scm-header__actions">
           <button
             type="button"
-            className="scm-header__close"
+            className="scm-icon-btn scm-icon-btn--danger"
             title="Close"
             aria-label="Close repo"
             onClick={() => onFolderPathChange(null)}
           >
-            Close
+            <CloseIcon />
           </button>
           <button
             type="button"

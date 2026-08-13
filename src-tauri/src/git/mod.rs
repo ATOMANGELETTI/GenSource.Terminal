@@ -1,6 +1,10 @@
 //! Pure-Rust gitoxide (`gix`) helpers for the Source Control panel.
 //! No system `git.exe` — local discover/init/status/index/commit/branch ops.
 
+mod watch;
+
+pub use watch::{resolve_worktree_root, GitWatcher};
+
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -121,6 +125,7 @@ pub fn status(repo_path: impl AsRef<Path>) -> Result<GitStatusResult, String> {
 }
 
 /// Stage paths (repo-relative `/` or absolute under the worktree).
+/// Directory paths expand to nested files (skipping `.git` and empty dirs).
 pub fn stage(repo_path: impl AsRef<Path>, paths: &[String]) -> Result<(), String> {
     let repo = open_repo(repo_path)?;
     let workdir = workdir(&repo)?;
@@ -138,31 +143,100 @@ pub fn stage(repo_path: impl AsRef<Path>, paths: &[String]) -> Result<(), String
             continue;
         }
 
-        let Some((id, kind, _md)) = pipeline
-            .worktree_file_to_object(rela_bstr, &index)
-            .map_err(|err| format!("stage {rela}: {err}"))?
-        else {
-            return Err(format!("cannot stage {rela}: unsupported type"));
-        };
-
-        let fs_meta = gix::index::fs::Metadata::from_path_no_follow(&abs)
+        let meta = fs::symlink_metadata(&abs)
             .map_err(|err| format!("stat {}: {err}", abs.display()))?;
-        let stat = gix::index::entry::Stat::from_fs(&fs_meta)
-            .map_err(|err| format!("index stat {rela}: {err}"))?;
-        let mode = mode_from_kind(kind);
+        if meta.is_dir() {
+            for file_rela in expand_dir_to_files(&workdir, rela)? {
+                stage_one_file(&workdir, &mut pipeline, &mut index, &file_rela)?;
+            }
+            continue;
+        }
 
-        remove_path_from_index(&mut index, rela_bstr);
-        index.dangerously_push_entry(
-            stat,
-            id,
-            gix::index::entry::Flags::empty(),
-            mode,
-            rela_bstr,
-        );
+        stage_one_file(&workdir, &mut pipeline, &mut index, rela)?;
     }
 
     index.sort_entries();
     write_index(&mut index)
+}
+
+/// Stage a single worktree file into `index` via the filter pipeline.
+fn stage_one_file(
+    workdir: &Path,
+    pipeline: &mut gix::filter::Pipeline<'_>,
+    index: &mut gix::index::File,
+    rela: &str,
+) -> Result<(), String> {
+    let rela_bstr: &BStr = rela.as_bytes().as_bstr();
+    let abs = workdir.join(gix::path::from_bstr(rela_bstr));
+
+    let Some((id, kind, _md)) = pipeline
+        .worktree_file_to_object(rela_bstr, index)
+        .map_err(|err| format!("stage {rela}: {err}"))?
+    else {
+        return Err(format!("cannot stage {rela}: unsupported type"));
+    };
+
+    let fs_meta = gix::index::fs::Metadata::from_path_no_follow(&abs)
+        .map_err(|err| format!("stat {}: {err}", abs.display()))?;
+    let stat = gix::index::entry::Stat::from_fs(&fs_meta)
+        .map_err(|err| format!("index stat {rela}: {err}"))?;
+    let mode = mode_from_kind(kind);
+
+    remove_path_from_index(index, rela_bstr);
+    index.dangerously_push_entry(
+        stat,
+        id,
+        gix::index::entry::Flags::empty(),
+        mode,
+        rela_bstr,
+    );
+    Ok(())
+}
+
+/// Recursively collect repo-relative `/` file paths under `rela_dir`.
+/// Skips `.git` directories; empty directories yield an empty list.
+fn expand_dir_to_files(workdir: &Path, rela_dir: &str) -> Result<Vec<String>, String> {
+    let abs = workdir.join(gix::path::from_bstr(rela_dir.as_bytes().as_bstr()));
+    let mut files = Vec::new();
+    collect_dir_files(workdir, &abs, &mut files)?;
+    Ok(files)
+}
+
+fn collect_dir_files(workdir: &Path, dir: &Path, out: &mut Vec<String>) -> Result<(), String> {
+    let entries = fs::read_dir(dir)
+        .map_err(|err| format!("read dir {}: {err}", dir.display()))?;
+    for entry in entries {
+        let entry = entry.map_err(|err| format!("read dir entry in {}: {err}", dir.display()))?;
+        let name = entry.file_name();
+        if name == ".git" {
+            continue;
+        }
+        let path = entry.path();
+        let file_type = entry
+            .file_type()
+            .map_err(|err| format!("file type {}: {err}", path.display()))?;
+        if file_type.is_dir() {
+            collect_dir_files(workdir, &path, out)?;
+            continue;
+        }
+        let rela = path
+            .strip_prefix(workdir)
+            .map_err(|_| {
+                format!(
+                    "{} is outside the repository worktree {}",
+                    path.display(),
+                    workdir.display()
+                )
+            })?
+            .components()
+            .map(|c| c.as_os_str().to_string_lossy())
+            .collect::<Vec<_>>()
+            .join("/");
+        if !rela.is_empty() {
+            out.push(rela);
+        }
+    }
+    Ok(())
 }
 
 /// Unstage paths (restore index entries from HEAD, or drop newly added paths).
@@ -434,7 +508,7 @@ fn count_unique_commits(repo: &Repository, tip: ObjectId, hide: ObjectId) -> Opt
     Some(n)
 }
 
-fn open_repo(path: impl AsRef<Path>) -> Result<Repository, String> {
+pub(crate) fn open_repo(path: impl AsRef<Path>) -> Result<Repository, String> {
     let path = path.as_ref();
     if path.as_os_str().is_empty() {
         return Err("path is required".into());
@@ -442,7 +516,7 @@ fn open_repo(path: impl AsRef<Path>) -> Result<Repository, String> {
     gix::discover(path).map_err(|err| format!("not a git repository: {err}"))
 }
 
-fn workdir(repo: &Repository) -> Result<PathBuf, String> {
+pub(crate) fn workdir(repo: &Repository) -> Result<PathBuf, String> {
     repo.workdir()
         .map(Path::to_path_buf)
         .ok_or_else(|| "repository has no worktree (bare)".to_string())
@@ -894,6 +968,42 @@ mod tests {
         fs::write(dir.join("b.txt"), b"new").unwrap();
         discard(&dir, &["b.txt".into()]).unwrap();
         assert!(!dir.join("b.txt").exists());
+
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn stage_untracked_directory_path() {
+        let dir = temp_dir();
+        init_repo(&dir).unwrap();
+
+        let agent = dir.join("agent");
+        let nested = agent.join("nested");
+        fs::create_dir_all(&nested).unwrap();
+        fs::write(agent.join("mod.rs"), b"mod nested;").unwrap();
+        fs::write(nested.join("tools.rs"), b"pub fn x() {}").unwrap();
+
+        let st = status(&dir).expect("status before stage");
+        assert!(
+            st.untracked.iter().any(|e| e.path == "agent" || e.path.starts_with("agent/")),
+            "expected untracked agent path(s), got {:?}",
+            st.untracked.iter().map(|e| &e.path).collect::<Vec<_>>()
+        );
+
+        stage(&dir, &["agent".into()]).expect("stage directory");
+
+        let st = status(&dir).expect("status after stage");
+        let staged_paths: Vec<&str> = st.staged.iter().map(|e| e.path.as_str()).collect();
+        assert!(
+            staged_paths.iter().any(|p| *p == "agent/mod.rs"),
+            "missing agent/mod.rs in staged: {staged_paths:?}"
+        );
+        assert!(
+            staged_paths.iter().any(|p| *p == "agent/nested/tools.rs"),
+            "missing agent/nested/tools.rs in staged: {staged_paths:?}"
+        );
+        assert!(st.untracked.is_empty(), "untracked should be empty: {:?}", st.untracked);
+        assert!(st.staged.iter().all(|e| e.status == GitChangeStatus::Added));
 
         let _ = fs::remove_dir_all(&dir);
     }

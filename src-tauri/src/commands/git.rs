@@ -1,6 +1,8 @@
 //! Source Control IPC: discover/init, status, stage/unstage/discard, commit, branches.
 
-use crate::git;
+use tauri::{AppHandle, State};
+
+use crate::git::{self, GitWatcher};
 use crate::mdoels::{
     GitBranchInfo, GitCommitResult, GitOpenResult, GitStatusResult,
 };
@@ -63,4 +65,23 @@ pub fn git_checkout(path: String, branch: String) -> Result<(), String> {
 #[tauri::command]
 pub fn git_create_branch(path: String, name: String, checkout: bool) -> Result<(), String> {
     git::create_branch(path.trim(), name.trim(), checkout)
+}
+
+/// Start a recursive worktree watch; emits debounced `scm-changed` events.
+/// Stops any previous watch first. `path` may be any path inside the repo.
+#[tauri::command]
+pub fn git_watch_start(
+    app: AppHandle,
+    watcher: State<'_, GitWatcher>,
+    path: String,
+) -> Result<(), String> {
+    let root = git::resolve_worktree_root(path.trim())?;
+    watcher.start(app, root)
+}
+
+/// Stop the active SCM worktree watch, if any.
+#[tauri::command]
+pub fn git_watch_stop(watcher: State<'_, GitWatcher>) -> Result<(), String> {
+    watcher.stop();
+    Ok(())
 }

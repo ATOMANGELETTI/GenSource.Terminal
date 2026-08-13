@@ -2,7 +2,7 @@
   "error": true,
   "warn": true,
   "info": true,
-  "debug": false,
-  "trace": false,
+  "debug": true,
+  "trace": true,
   "fatal": true
 }

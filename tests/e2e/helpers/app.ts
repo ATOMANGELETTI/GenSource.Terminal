@@ -1,6 +1,6 @@
 import { expect, type Page } from '@playwright/test';
 
-export type VisualWindow = 'main' | 'splash' | 'tray-menu';
+export type VisualWindow = 'main' | 'splash' | 'tray-menu' | 'context-menu';
 
 /** Mirrors `FONT_FAMILY_MAP` in src/app/lib/settings.ts for DOM fixtures. */
 const FONT_STACKS: Record<string, string> = {
@@ -51,6 +51,12 @@ export async function openApp(
     });
     // Version appears once e2e stub (or backend) loads app info.
     await expect(page.locator('.context-menu__header-version')).toBeVisible({
+      timeout: 10_000,
+    });
+  } else if (windowLabel === 'context-menu') {
+    // Popup host mounts empty until a `context-menu-open` event; in Vite e2e
+    // the shell is still present for screenshot/theme fixtures.
+    await expect(page.locator('.context-menu-window')).toBeVisible({
       timeout: 10_000,
     });
   }

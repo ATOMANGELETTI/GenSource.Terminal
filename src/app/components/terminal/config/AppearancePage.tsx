@@ -1,6 +1,6 @@
 import type { AppSettings } from "../../../types";
 import { ALLOWED_FONT_FAMILIES } from "../../../lib/settings";
-import ConfigField from "./ConfigField";
+import { ConfigCard, ConfigRow } from "./ConfigField";
 
 const THEME_OPTIONS = [
   { value: "nord-polar-night", label: "Polar Night" },
@@ -39,90 +39,114 @@ export default function AppearancePage({
   onPatch,
 }: AppearancePageProps) {
   return (
-    <div className="config-form">
-      <ConfigField label="Theme" htmlFor="config-theme">
-        <select
-          id="config-theme"
-          className="config-form__control"
-          value={settings.theme}
-          onChange={(event) => onPatch({ theme: event.target.value })}
+    <>
+      <ConfigCard label="Look">
+        <ConfigRow
+          label="Theme"
+          hint="Nord palette for the whole app"
+          htmlFor="config-theme"
         >
-          {THEME_OPTIONS.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </ConfigField>
+          <select
+            id="config-theme"
+            className="config-form__control"
+            value={settings.theme}
+            onChange={(event) => onPatch({ theme: event.target.value })}
+          >
+            {THEME_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </ConfigRow>
+      </ConfigCard>
 
-      <ConfigField label="UI font" htmlFor="config-font-family">
-        <select
-          id="config-font-family"
-          className="config-form__control"
-          value={settings.fontFamily}
-          onChange={(event) => onPatch({ fontFamily: event.target.value })}
+      <ConfigCard label="Typography">
+        <ConfigRow
+          label="UI font"
+          hint="Chrome, menus, and this panel"
+          htmlFor="config-font-family"
         >
-          {ALLOWED_FONT_FAMILIES.map((family) => (
-            <option key={family} value={family}>
-              {family}
-            </option>
-          ))}
-        </select>
-      </ConfigField>
-
-      <ConfigField label="UI font size" htmlFor="config-font-size">
-        <input
-          id="config-font-size"
-          className="config-form__control config-form__control--narrow"
-          type="number"
-          min={8}
-          max={32}
-          step={1}
-          value={settings.fontSize}
-          onChange={(event) => {
-            const value = Number(event.target.value);
-            if (!Number.isFinite(value)) return;
-            onPatch({ fontSize: value });
-          }}
-          onBlur={(event) => {
-            const value = Number(event.target.value);
-            if (!Number.isFinite(value) || value <= 0) return;
-            onPatch({ fontSize: value }, { immediate: true });
-          }}
-        />
-      </ConfigField>
-
-      <ConfigField label="Particle effect" htmlFor="config-particle">
-        <select
-          id="config-particle"
-          className="config-form__control"
-          value={settings.particleEffect}
-          onChange={(event) =>
-            onPatch({ particleEffect: event.target.value })
-          }
+          <select
+            id="config-font-family"
+            className="config-form__control"
+            value={settings.fontFamily}
+            onChange={(event) => onPatch({ fontFamily: event.target.value })}
+          >
+            {ALLOWED_FONT_FAMILIES.map((family) => (
+              <option key={family} value={family}>
+                {family}
+              </option>
+            ))}
+          </select>
+        </ConfigRow>
+        <ConfigRow
+          label="UI font size"
+          hint="8–32 px"
+          htmlFor="config-font-size"
         >
-          {PARTICLE_OPTIONS.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </ConfigField>
+          <input
+            id="config-font-size"
+            className="config-form__control config-form__control--narrow"
+            type="number"
+            min={8}
+            max={32}
+            step={1}
+            value={settings.fontSize}
+            onChange={(event) => {
+              const value = Number(event.target.value);
+              if (!Number.isFinite(value)) return;
+              onPatch({ fontSize: value });
+            }}
+            onBlur={(event) => {
+              const value = Number(event.target.value);
+              if (!Number.isFinite(value) || value <= 0) return;
+              onPatch({ fontSize: value }, { immediate: true });
+            }}
+          />
+        </ConfigRow>
+      </ConfigCard>
 
-      <ConfigField label="File icon set" htmlFor="config-file-icons">
-        <select
-          id="config-file-icons"
-          className="config-form__control"
-          value={settings.fileIconSet}
-          onChange={(event) => onPatch({ fileIconSet: event.target.value })}
+      <ConfigCard label="Explorer and backdrop">
+        <ConfigRow
+          label="File icon set"
+          hint="Icons in the Files tree"
+          htmlFor="config-file-icons"
         >
-          {ICON_SET_OPTIONS.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </ConfigField>
-    </div>
+          <select
+            id="config-file-icons"
+            className="config-form__control"
+            value={settings.fileIconSet}
+            onChange={(event) => onPatch({ fileIconSet: event.target.value })}
+          >
+            {ICON_SET_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </ConfigRow>
+        <ConfigRow
+          label="Particle effect"
+          hint="Terminal backdrop"
+          htmlFor="config-particle"
+        >
+          <select
+            id="config-particle"
+            className="config-form__control"
+            value={settings.particleEffect}
+            onChange={(event) =>
+              onPatch({ particleEffect: event.target.value })
+            }
+          >
+            {PARTICLE_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </ConfigRow>
+      </ConfigCard>
+    </>
   );
 }

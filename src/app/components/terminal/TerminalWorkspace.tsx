@@ -26,8 +26,13 @@ import {
   toPinnedRecords,
 } from "../../lib/terminal/pinned-tabs";
 import { listenForQuitRequest } from "../../lib/quit-flush";
+import {
+  listenContextMenuAction,
+  openContextMenuPopup,
+} from "../../lib/context-menu-popup";
 import { getWindow } from "../../lib/window";
 import type {
+  AgentTerminalContext,
   ContextMenuPosition,
   CursorStyle,
   ParticleEffect,
@@ -42,7 +47,7 @@ import type { OpenInTerminalApi } from "./explorer/FilesExplorer";
 import TerminalParticleField from "./TerminalParticleField";
 import type { XtermViewHandle } from "./XtermView";
 
-const DEFAULT_PANEL_WIDTH = 260;
+const DEFAULT_PANEL_WIDTH = 300;
 const PIN_SNAPSHOT_INTERVAL_MS = 5000;
 /** Safety net so a tab never stays shell-less if restore never reports ready. */
 const RESTORE_PTY_TIMEOUT_MS = 1500;
@@ -691,9 +696,22 @@ const TerminalWorkspace = forwardRef<
 
     const handleTabContextMenu = useCallback(
       (tabId: string, x: number, y: number) => {
-        setTabMenu({ tabId, x, y });
+        const tab = tabs.find((t) => t.tabId === tabId);
+        if (!tab) return;
+        const canCloseAll = tabs.some((t) => !t.pinned);
+        void (async () => {
+          const opened = await openContextMenuPopup(x, y, {
+            kind: "tab",
+            tabId,
+            pinned: tab.pinned,
+            canCloseAll,
+          });
+          if (!opened) {
+            setTabMenu({ tabId, x, y });
+          }
+        })();
       },
-      [],
+      [tabs],
     );
 
     const handleStartRename = useCallback((tabId: string) => {
@@ -701,6 +719,43 @@ const TerminalWorkspace = forwardRef<
       setFindOpen(false);
       setRenamingTabId(tabId);
     }, []);
+
+    useEffect(() => {
+      let cancelled = false;
+      let unlisten: (() => void) | undefined;
+
+      void listenContextMenuAction((event) => {
+        if (event.kind !== "tab" || event.payload.kind !== "tab") return;
+        const { tabId } = event.payload;
+        switch (event.action) {
+          case "rename":
+            handleStartRename(tabId);
+            break;
+          case "togglePin":
+            handleTogglePin(tabId);
+            break;
+          case "closeTab":
+            handleClose(tabId);
+            break;
+          case "closeAllTabs":
+            handleCloseAllUnpinned();
+            break;
+          default:
+            break;
+        }
+      }).then((stop) => {
+        if (cancelled) {
+          stop();
+        } else {
+          unlisten = stop;
+        }
+      });
+
+      return () => {
+        cancelled = true;
+        unlisten?.();
+      };
+    }, [handleClose, handleCloseAllUnpinned, handleStartRename, handleTogglePin]);
 
     const handleRenameCancel = useCallback(() => {
       setRenamingTabId(null);
@@ -925,6 +980,26 @@ const TerminalWorkspace = forwardRef<
       ? profileTitle(activeTab.profileId, settings.profiles)
       : settings.defaultProfile;
 
+    const agentTerminal = useMemo<AgentTerminalContext | null>(() => {
+      if (!activeTab) return null;
+      return {
+        sessionId: activeTab.sessionId,
+        cwd: activeTab.cwd ?? null,
+        getRecentOutput: (maxChars = 8000) => {
+          const text =
+            xtermHandles.current.get(activeTab.tabId)?.getScrollbackText() ??
+            "";
+          if (text.length <= maxChars) return text;
+          return text.slice(text.length - maxChars);
+        },
+        writeCommand: (command: string) => {
+          let data = command;
+          if (!data.endsWith("\n")) data += "\n";
+          writeFns.current.get(activeTab.tabId)?.(data);
+        },
+      };
+    }, [activeTab]);
+
     if (!ready) {
       return (
         <div
@@ -943,6 +1018,7 @@ const TerminalWorkspace = forwardRef<
             width={panelWidth}
             onResize={setPanelWidth}
             openInTerminal={openInTerminal}
+            agentTerminal={agentTerminal}
           />
           <div className="terminal-workspace__center">
             <TabBar

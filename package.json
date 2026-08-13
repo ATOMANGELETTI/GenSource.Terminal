@@ -58,6 +58,7 @@
     "@xterm/xterm": "^6.0.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "react-markdown": "^10.1.0",
     "vscode-icon-resolver": "^1.1.1"
   },
   "devDependencies": {

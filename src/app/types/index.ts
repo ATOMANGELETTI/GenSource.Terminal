@@ -44,17 +44,32 @@ export type {
   GitCommitResult,
   GitOpenFolderResult,
   GitStatusResult,
+  ScmChangedPayload,
   ScmPanelState,
 } from "./git-scm";
+
+export type {
+  AgentChatMessage,
+  AgentChatSendArgs,
+  AgentChunkEvent,
+  AgentConfig,
+  AgentConfirmEvent,
+  AgentDoneEvent,
+  AgentErrorEvent,
+  AgentMessageRole,
+  AgentProviderConfig,
+  AgentTerminalContext,
+  AgentToolEvent,
+} from "./agent";
 
 export interface ContextMenuPosition {
   x: number;
   y: number;
 }
 
-// The tray's right-click menu is its own Tauri window (see
-// pages/tray-menu/TrayMenuWindow.tsx), not an overlay inside the main
-// window, so it isn't a member of this union.
+// In-app context menus (titlebar, content, tabs, file tree, SCM) render in a
+// dedicated `context-menu` Tauri window (see pages/context-menu/). The tray
+// flyout stays on its own `tray-menu` window and is not part of this union.
 export type ContextMenuTarget = "titlebar" | "content";
 
 export interface ContextMenuState extends ContextMenuPosition {

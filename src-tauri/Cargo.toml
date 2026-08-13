@@ -54,6 +54,11 @@ portable-pty = "0.9"
 uuid = { version = "1", features = ["v4"] }
 sysinfo = "0.39"
 gix = { version = "0.86", default-features = false, features = ["max-performance-safe", "comfort", "basic", "status", "dirwalk", "excludes", "attributes", "worktree-mutation", "interrupt", "tree-editor", "sha1"] }
+rig = "0.41"
+futures = "0.3"
+anyhow = "1"
+thiserror = "2"
+tokio = { version = "1.53.1", features = ["sync", "time", "macros", "rt-multi-thread"] }
 
 [target.'cfg(windows)'.dependencies]
 windows = { version = "0.61", features = ["Win32_System_Performance"] }

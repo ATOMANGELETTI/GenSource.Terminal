@@ -1,0 +1,10 @@
+{
+  "activeProvider": "gemini",
+  "providers": {
+    "gemini": {
+      "apiKey": "",
+      "model": "gemini-3.5-flash-lite"
+    }
+  },
+  "systemPrompt": "You are GenSource Terminal's agent. Reply in the Agents chat panel. Use tools for files, git, and settings when helpful. Only use the terminal tool when the user asks you to run a shell command."
+}

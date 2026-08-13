@@ -5,6 +5,7 @@
 // on Windows debug links; allow until upstream ships matching PDBs/CRT.
 #![cfg_attr(all(windows, target_env = "msvc"), allow(linker_messages))]
 
+mod agent;
 mod commands;
 mod config;
 mod git;
@@ -96,7 +97,7 @@ pub fn run() {
         // should only appear on right-click; splash is a one-shot boot screen.
         .plugin(
             tauri_plugin_window_state::Builder::default()
-                .with_denylist(&["tray-menu", "splash"])
+                .with_denylist(&["tray-menu", "context-menu", "splash"])
                 .build(),
         )
         .plugin(tauri_plugin_fs::init())
@@ -136,6 +137,8 @@ pub fn run() {
             Some(early_configs.clone()),
         ))
         .manage(Arc::new(pty::PtySessionPool::default()))
+        .manage(Arc::new(agent::AgentSessionStore::new()))
+        .manage(git::GitWatcher::default())
         .invoke_handler(tauri::generate_handler![
             commands::greet,
             commands::get_app_info,
@@ -175,6 +178,15 @@ pub fn run() {
             commands::git_branches,
             commands::git_checkout,
             commands::git_create_branch,
+            commands::git_watch_start,
+            commands::git_watch_stop,
+            agent::get_agent_config,
+            agent::save_agent_config,
+            agent::agent_has_api_key,
+            agent::agent_chat_send,
+            agent::agent_chat_cancel,
+            agent::agent_chat_clear,
+            agent::agent_confirm_response,
         ])
         .setup(|app| {
             // Stronghold needs a filesystem path for its key-derivation
@@ -243,9 +255,12 @@ pub fn run() {
                 config::apply_always_on_top(&window, &settings);
                 let _ = window.hide();
             }
-            // Tray flyout must stay hidden until an explicit right-click
-            // (denylist above prevents restore; this covers any edge case).
+            // Tray / context-menu flyouts must stay hidden until an explicit
+            // right-click (denylist above prevents restore; this covers edges).
             if let Some(menu) = app.get_webview_window("tray-menu") {
+                let _ = menu.hide();
+            }
+            if let Some(menu) = app.get_webview_window("context-menu") {
                 let _ = menu.hide();
             }
 
@@ -300,10 +315,18 @@ pub fn run() {
                 })
                 .build(app)?;
 
-            // Dismiss the tray flyout as soon as it loses focus (clicking
-            // elsewhere, or an item invoking a command) instead of closing
-            // it, so the next right-click reopens instantly.
+            // Dismiss tray / context-menu flyouts as soon as they lose focus
+            // (clicking elsewhere, or an item invoking a command) instead of
+            // closing them, so the next right-click reopens instantly.
             if let Some(menu) = app.get_webview_window("tray-menu") {
+                let hideable = menu.clone();
+                menu.on_window_event(move |event| {
+                    if let WindowEvent::Focused(false) = event {
+                        let _ = hideable.hide();
+                    }
+                });
+            }
+            if let Some(menu) = app.get_webview_window("context-menu") {
                 let hideable = menu.clone();
                 menu.on_window_event(move |event| {
                     if let WindowEvent::Focused(false) = event {

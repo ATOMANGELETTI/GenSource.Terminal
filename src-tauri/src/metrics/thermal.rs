@@ -66,6 +66,18 @@ mod windows_thermal {
         ready: bool,
         nvml: Option<Nvml>,
         lhm: Option<LhmSampler>,
+        /// WMI classes that failed once (e.g. WBEM_E_INVALID_CLASS) — do not retry every tick.
+        probes: ProbeAvailability,
+    }
+
+    /// Sticky skip flags for WMI probes that are missing on this machine.
+    #[derive(Default)]
+    struct ProbeAvailability {
+        skip_thermal_zone_perf: bool,
+        skip_acpi: bool,
+        skip_nvidia_thermal: bool,
+        skip_numeric_sensor: bool,
+        skip_temp_probe: bool,
     }
 
     impl Sampler {
@@ -74,6 +86,7 @@ mod windows_thermal {
                 ready: false,
                 nvml: None,
                 lhm: None,
+                probes: ProbeAvailability::default(),
             }
         }
 
@@ -112,20 +125,21 @@ mod windows_thermal {
                 .map(|s| s.sample())
                 .unwrap_or_default();
             let com = init_com();
+            let probes = &mut self.probes;
 
             let cpu = lhm
                 .cpu_temp_celsius
-                .or_else(|| com.and_then(sample_cpu_thermal_zone_perf))
-                .or_else(|| com.and_then(sample_cpu_acpi));
+                .or_else(|| com.and_then(|c| sample_cpu_thermal_zone_perf(c, probes)))
+                .or_else(|| com.and_then(|c| sample_cpu_acpi(c, probes)));
 
             let gpu = lhm
                 .gpu_temp_celsius
                 .or_else(|| sample_gpu_nvml(self.nvml.as_ref()))
-                .or_else(|| com.and_then(sample_gpu_wmi));
+                .or_else(|| com.and_then(|c| sample_gpu_wmi(c, probes)));
 
             let ram = lhm
                 .ram_temp_celsius
-                .or_else(|| com.and_then(sample_ram));
+                .or_else(|| com.and_then(|c| sample_ram(c, probes)));
 
             if !LOGGED_LAYER.swap(true, Ordering::Relaxed) {
                 log::info!(
@@ -206,7 +220,11 @@ mod windows_thermal {
     }
 
     /// Prefer `Win32_PerfFormattedData_Counters_ThermalZoneInformation` (often CPUZ zones).
-    fn sample_cpu_thermal_zone_perf(com: COMLibrary) -> Option<f32> {
+    fn sample_cpu_thermal_zone_perf(com: COMLibrary, probes: &mut ProbeAvailability) -> Option<f32> {
+        if probes.skip_thermal_zone_perf {
+            return None;
+        }
+
         let wmi = match WMIConnection::new(com) {
             Ok(w) => w,
             Err(err) => {
@@ -220,7 +238,8 @@ mod windows_thermal {
         ) {
             Ok(z) => z,
             Err(err) => {
-                log::debug!("ThermalZoneInformation query failed: {err}");
+                probes.skip_thermal_zone_perf = true;
+                log::debug!("ThermalZoneInformation unavailable ({err}); skipping further queries");
                 return None;
             }
         };
@@ -262,12 +281,26 @@ mod windows_thermal {
     }
 
     /// CPU / package proxy: max ACPI thermal-zone reading (exclude obvious GPU names).
-    fn sample_cpu_acpi(com: COMLibrary) -> Option<f32> {
-        let wmi = WMIConnection::with_namespace_path(r"ROOT\WMI", com).ok()?;
+    fn sample_cpu_acpi(com: COMLibrary, probes: &mut ProbeAvailability) -> Option<f32> {
+        if probes.skip_acpi {
+            return None;
+        }
+
+        let wmi = match WMIConnection::with_namespace_path(r"ROOT\WMI", com) {
+            Ok(w) => w,
+            Err(err) => {
+                probes.skip_acpi = true;
+                log::debug!("ROOT\\WMI connect failed ({err}); skipping ACPI thermal queries");
+                return None;
+            }
+        };
         let zones: Vec<MsAcpiThermalZone> = match wmi.query() {
             Ok(z) => z,
             Err(err) => {
-                log::debug!("MSAcpi_ThermalZoneTemperature query failed: {err}");
+                probes.skip_acpi = true;
+                log::debug!(
+                    "MSAcpi_ThermalZoneTemperature unavailable ({err}); skipping further queries"
+                );
                 return None;
             }
         };
@@ -330,10 +363,10 @@ mod windows_thermal {
     }
 
     /// Vendor WMI GPU temps when present; otherwise thermal zones named like GPU.
-    fn sample_gpu_wmi(com: COMLibrary) -> Option<f32> {
-        sample_nvidia_gpu(com)
-            .or_else(|| sample_gpu_from_thermal_zones(com))
-            .or_else(|| sample_gpu_from_numeric_sensors(com))
+    fn sample_gpu_wmi(com: COMLibrary, probes: &mut ProbeAvailability) -> Option<f32> {
+        sample_nvidia_gpu(com, probes)
+            .or_else(|| sample_gpu_from_thermal_zones(com, probes))
+            .or_else(|| sample_gpu_from_numeric_sensors(com, probes))
     }
 
     #[derive(Deserialize, Debug)]
@@ -347,11 +380,21 @@ mod windows_thermal {
         temperature: Option<i32>,
     }
 
-    fn sample_nvidia_gpu(com: COMLibrary) -> Option<f32> {
+    fn sample_nvidia_gpu(com: COMLibrary, probes: &mut ProbeAvailability) -> Option<f32> {
+        if probes.skip_nvidia_thermal {
+            return None;
+        }
+
         let wmi = WMIConnection::with_namespace_path(r"ROOT\WMI", com).ok()?;
-        let rows: Vec<NvidiaThermalSensor> = wmi
-            .raw_query("SELECT * FROM NVIDIA_ThermalSensor")
-            .ok()?;
+        let rows: Vec<NvidiaThermalSensor> = match wmi.raw_query("SELECT * FROM NVIDIA_ThermalSensor")
+        {
+            Ok(rows) => rows,
+            Err(err) => {
+                probes.skip_nvidia_thermal = true;
+                log::debug!("NVIDIA_ThermalSensor unavailable ({err}); skipping further queries");
+                return None;
+            }
+        };
 
         max_celsius(rows.into_iter().filter_map(|row| {
             let raw = row
@@ -367,9 +410,22 @@ mod windows_thermal {
         }))
     }
 
-    fn sample_gpu_from_thermal_zones(com: COMLibrary) -> Option<f32> {
+    fn sample_gpu_from_thermal_zones(com: COMLibrary, probes: &mut ProbeAvailability) -> Option<f32> {
+        if probes.skip_acpi {
+            return None;
+        }
+
         let wmi = WMIConnection::with_namespace_path(r"ROOT\WMI", com).ok()?;
-        let zones: Vec<MsAcpiThermalZone> = wmi.query().ok()?;
+        let zones: Vec<MsAcpiThermalZone> = match wmi.query() {
+            Ok(z) => z,
+            Err(err) => {
+                probes.skip_acpi = true;
+                log::debug!(
+                    "MSAcpi_ThermalZoneTemperature unavailable ({err}); skipping further queries"
+                );
+                return None;
+            }
+        };
         max_celsius(zones.into_iter().filter_map(|zone| {
             if !zone_name_suggests_gpu(zone.instance_name.as_deref()) {
                 return None;
@@ -391,9 +447,23 @@ mod windows_thermal {
         sensor_type: Option<u16>,
     }
 
-    fn sample_gpu_from_numeric_sensors(com: COMLibrary) -> Option<f32> {
+    fn sample_gpu_from_numeric_sensors(
+        com: COMLibrary,
+        probes: &mut ProbeAvailability,
+    ) -> Option<f32> {
+        if probes.skip_numeric_sensor {
+            return None;
+        }
+
         let wmi = WMIConnection::new(com).ok()?;
-        let sensors: Vec<NumericSensor> = wmi.query().ok()?;
+        let sensors: Vec<NumericSensor> = match wmi.query() {
+            Ok(s) => s,
+            Err(err) => {
+                probes.skip_numeric_sensor = true;
+                log::debug!("CIM_NumericSensor unavailable ({err}); skipping further queries");
+                return None;
+            }
+        };
         max_celsius(sensors.into_iter().filter_map(|sensor| {
             if sensor.sensor_type.is_some_and(|t| t != 2) {
                 return None;
@@ -407,16 +477,25 @@ mod windows_thermal {
     }
 
     /// DIMM / memory sensors when firmware exposes them (often missing).
-    fn sample_ram(com: COMLibrary) -> Option<f32> {
-        sample_ram_from_numeric_sensors(com).or_else(|| sample_ram_from_temperature_probe(com))
+    fn sample_ram(com: COMLibrary, probes: &mut ProbeAvailability) -> Option<f32> {
+        sample_ram_from_numeric_sensors(com, probes)
+            .or_else(|| sample_ram_from_temperature_probe(com, probes))
     }
 
-    fn sample_ram_from_numeric_sensors(com: COMLibrary) -> Option<f32> {
+    fn sample_ram_from_numeric_sensors(
+        com: COMLibrary,
+        probes: &mut ProbeAvailability,
+    ) -> Option<f32> {
+        if probes.skip_numeric_sensor {
+            return None;
+        }
+
         let wmi = WMIConnection::new(com).ok()?;
         let sensors: Vec<NumericSensor> = match wmi.query() {
             Ok(s) => s,
             Err(err) => {
-                log::debug!("CIM_NumericSensor query failed: {err}");
+                probes.skip_numeric_sensor = true;
+                log::debug!("CIM_NumericSensor unavailable ({err}); skipping further queries");
                 return None;
             }
         };
@@ -445,10 +524,24 @@ mod windows_thermal {
         current_reading: Option<i32>,
     }
 
-    fn sample_ram_from_temperature_probe(com: COMLibrary) -> Option<f32> {
+    fn sample_ram_from_temperature_probe(
+        com: COMLibrary,
+        probes: &mut ProbeAvailability,
+    ) -> Option<f32> {
+        if probes.skip_temp_probe {
+            return None;
+        }
+
         let wmi = WMIConnection::new(com).ok()?;
-        let probes: Vec<TemperatureProbe> = wmi.query().ok()?;
-        max_celsius(probes.into_iter().filter_map(|probe| {
+        let rows: Vec<TemperatureProbe> = match wmi.query() {
+            Ok(rows) => rows,
+            Err(err) => {
+                probes.skip_temp_probe = true;
+                log::debug!("Win32_TemperatureProbe unavailable ({err}); skipping further queries");
+                return None;
+            }
+        };
+        max_celsius(rows.into_iter().filter_map(|probe| {
             let label = probe.name.as_deref().or(probe.description.as_deref());
             if !zone_name_suggests_ram(label) {
                 return None;

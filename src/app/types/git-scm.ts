@@ -51,3 +51,8 @@ export interface GitCommitResult {
 }
 
 export type ScmPanelState = "empty" | "init" | "repo";
+
+/** Payload for the `scm-changed` watch event. */
+export interface ScmChangedPayload {
+  root: string;
+}

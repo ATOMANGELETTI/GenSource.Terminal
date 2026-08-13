@@ -1,13 +1,17 @@
 import type { LoggingSettings } from "../../../types";
-import ConfigField from "./ConfigField";
+import { ConfigCard, ConfigRow, ConfigSwitch } from "./ConfigField";
 
-const LEVELS: { key: keyof LoggingSettings; label: string }[] = [
-  { key: "error", label: "Error" },
-  { key: "warn", label: "Warn" },
-  { key: "info", label: "Info" },
-  { key: "debug", label: "Debug" },
-  { key: "trace", label: "Trace" },
-  { key: "fatal", label: "Fatal" },
+const LEVELS: {
+  key: keyof LoggingSettings;
+  label: string;
+  hint: string;
+}[] = [
+  { key: "error", label: "Error", hint: "Failures that stop work" },
+  { key: "warn", label: "Warn", hint: "Recoverable problems" },
+  { key: "info", label: "Info", hint: "Normal operation" },
+  { key: "debug", label: "Debug", hint: "Extra diagnostic detail" },
+  { key: "trace", label: "Trace", hint: "Very verbose internals" },
+  { key: "fatal", label: "Fatal", hint: "Process-ending failures" },
 ];
 
 interface LoggingPageProps {
@@ -17,22 +21,21 @@ interface LoggingPageProps {
 
 export default function LoggingPage({ logging, onPatch }: LoggingPageProps) {
   return (
-    <div className="config-form">
-      {LEVELS.map(({ key, label }) => (
-        <ConfigField
+    <ConfigCard label="Levels">
+      {LEVELS.map(({ key, label, hint }) => (
+        <ConfigRow
           key={key}
           label={label}
+          hint={hint}
           htmlFor={`config-log-${key}`}
         >
-          <input
+          <ConfigSwitch
             id={`config-log-${key}`}
-            className="config-form__checkbox"
-            type="checkbox"
             checked={logging[key]}
-            onChange={(event) => onPatch({ [key]: event.target.checked })}
+            onChange={(checked) => onPatch({ [key]: checked })}
           />
-        </ConfigField>
+        </ConfigRow>
       ))}
-    </div>
+    </ConfigCard>
   );
 }

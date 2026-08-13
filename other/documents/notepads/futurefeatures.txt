@@ -1,0 +1,66 @@
+# ------------------------------------------------------------------------------------------------------------------
+# GIT ENHANCMENT
+# NOTE: I WANT TO KEEP THE TERMINAL SOURCE VIEW / GIT VIEWER A "VIEWER" AND MAKE A STANDALINE CLIENT LATER WITH GIT2
+# UPDATE: IDK BUT GIX CAN COMMIT, PUSH, PULL, ECT. ITS JUST NOT SETUP. SO I MIGHT IMPLIMENT THAT TO THE TERMINAL GIT
+# ------------------------------------------------------------------------------------------------------------------
+
+1. notify (already in tree) — highest priority
+Wire a watcher on the SCM root (debounce ~200–500ms) → emit a Tauri event → frontend calls git_status again.
+
+That is the VS Code-like “files changed → panel updates” behavior. No new crate required.
+
+Optional polish: ignore .git/ noise, debounce bursts from builds, pause while a commit/checkout is in flight.
+
+2. Stay on gix and turn on more features
+Don’t add a second git stack unless you hit a hard wall. For closer VS Code parity, extend gix rather than replacing it:
+
+Diff preview (click a change → see hunks)
+gix blob/tree APIs + a diff crate (below)
+Stash list / stash / pop / apply
+Build on gix refs + tree ops (more work; no magic crate)
+Push / pull / fetch
+Enable gix network features (e.g. blocking-network-client / related) — omitted on purpose in v1
+Credentials
+gix-credentials / credential helpers (Windows Credential Manager, etc.)
+Merge / conflict content
+Read conflicted blobs via gix; UI for 2/3-way still app-side
+Ignore / .gitignore
+You already enable excludes / attributes
+
+3. Diff UI helpers (small, useful)
+similar or imara-diff — turn “old blob vs new blob” into line hunks for a side-by-side or unified diff view (VS Code’s diff editor lite).
+gix can supply the before/after bytes; these crates format the presentation.
+4. git2 (libgit2) — only if needed
+Mature porcelain for stage/diff/merge/remotes, but it’s a C dependency, larger binary, and overlaps gix. Prefer it only if a specific operation is painful in gix (e.g. some merge/rebase edge cases). Mixing both long-term is usually worse than deepening gix.
+
+5. Not needed for “basic VS Code SCM”
+Bundled Git Portable / spawning git.exe
+isomorphic-git / Node git libs (wrong side of Tauri)
+Full history graph libs — nice later, not required for the Source tab’s main job
+VS Code Source tab checklist vs your app
+Already in a good place
+
+Open folder / init repo
+Changes + staged sections
+Stage / unstage / discard / commit
+Branch switch / create
+Necessity for “feels like VS Code” next
+
+Live refresh — notify + debounced git_status (and refresh after every mutation you already do)
+Diff on click — gix blobs + similar/imara-diff
+Commit UX — Amend (optional), empty-message guard (you have), clearer “no identity” → open settings hint
+HEAD / upstream — you already surface ahead/behind when tracking exists
+Useful soon after 5. Stash (Save / Apply / Drop)
+6. Fetch / Pull / Push + credentials (gix network + credential crates)
+7. Sync button state (ahead/behind → enable Pull/Push)
+8. Open file / reveal (you largely have this)
+
+Later / not core Source tab
+
+Rebase interactive, cherry-pick UI, submodule manager, blame gutter, full commit graph
+Practical recommendation
+No new git engine — keep gix.
+Use notify now for auto-updating the change list (not auto-staging).
+Add similar or imara-diff when you want click-to-diff.
+Add gix network + credentials only when you implement Fetch/Pull/Push.
+Reach for git2 only if a concrete gix gap blocks you.

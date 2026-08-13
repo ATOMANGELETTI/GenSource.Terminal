@@ -1,5 +1,5 @@
 import type { AppSettings } from "../../../types";
-import ConfigField from "./ConfigField";
+import { ConfigCard, ConfigRow, ConfigSwitch } from "./ConfigField";
 
 interface WindowPageProps {
   settings: AppSettings;
@@ -8,40 +8,40 @@ interface WindowPageProps {
 
 export default function WindowPage({ settings, onPatch }: WindowPageProps) {
   return (
-    <div className="config-form">
-      <ConfigField label="Start minimized" htmlFor="config-start-minimized">
-        <input
+    <ConfigCard label="Launch">
+      <ConfigRow
+        label="Start minimized"
+        hint="Open in the tray instead of a window"
+        htmlFor="config-start-minimized"
+      >
+        <ConfigSwitch
           id="config-start-minimized"
-          className="config-form__checkbox"
-          type="checkbox"
           checked={settings.startMinimized}
-          onChange={(event) =>
-            onPatch({ startMinimized: event.target.checked })
-          }
+          onChange={(checked) => onPatch({ startMinimized: checked })}
         />
-      </ConfigField>
-
-      <ConfigField label="Autostart on login" htmlFor="config-autostart">
-        <input
+      </ConfigRow>
+      <ConfigRow
+        label="Autostart on login"
+        hint="Launch with Windows"
+        htmlFor="config-autostart"
+      >
+        <ConfigSwitch
           id="config-autostart"
-          className="config-form__checkbox"
-          type="checkbox"
           checked={settings.autostart}
-          onChange={(event) => onPatch({ autostart: event.target.checked })}
+          onChange={(checked) => onPatch({ autostart: checked })}
         />
-      </ConfigField>
-
-      <ConfigField label="Always on top" htmlFor="config-always-on-top">
-        <input
+      </ConfigRow>
+      <ConfigRow
+        label="Always on top"
+        hint="Keep the window above other apps"
+        htmlFor="config-always-on-top"
+      >
+        <ConfigSwitch
           id="config-always-on-top"
-          className="config-form__checkbox"
-          type="checkbox"
           checked={settings.alwaysOnTop}
-          onChange={(event) =>
-            onPatch({ alwaysOnTop: event.target.checked })
-          }
+          onChange={(checked) => onPatch({ alwaysOnTop: checked })}
         />
-      </ConfigField>
-    </div>
+      </ConfigRow>
+    </ConfigCard>
   );
 }

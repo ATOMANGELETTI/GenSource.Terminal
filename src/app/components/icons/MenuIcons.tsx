@@ -306,6 +306,20 @@ export function FolderIcon(props: IconProps) {
   );
 }
 
+/** Flat bot / agent glyph for the Agents side-panel tab. */
+export function BotIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <rect x="3.5" y="5.5" width="9" height="7" rx="1.5" />
+      <path d="M8 2.5v3" />
+      <circle cx="8" cy="2.2" r="0.9" fill="currentColor" stroke="none" />
+      <path d="M5.8 8.2h.1M10.2 8.2h.1" />
+      <path d="M6.2 10.2h3.6" />
+      <path d="M3.5 8.2H2.2M12.5 8.2h1.3" />
+    </svg>
+  );
+}
+
 /** Flat SCM / git-branch glyph for the Source Control side-panel tab. */
 export function SourceControlIcon(props: IconProps) {
   return (

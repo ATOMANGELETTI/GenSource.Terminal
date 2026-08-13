@@ -1,4 +1,4 @@
-/* Config side-panel — left icon rail + compact Nord form fields. */
+/* Config side-panel — left icon rail + grouped Nord setting cards. */
 
 .config-panel {
   display: flex;
@@ -66,137 +66,241 @@
 
 .config-panel__header {
   flex-shrink: 0;
-  padding: 0.5rem 0.65rem 0.45rem;
+  padding: 0.55rem 0.7rem 0.5rem;
   border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.config-panel__header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem;
+  min-width: 0;
 }
 
 .config-panel__title {
   margin: 0;
-  font-size: 0.75rem;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.8125rem;
   font-weight: 600;
   letter-spacing: 0.02em;
   color: var(--text);
 }
 
 .config-panel__subtitle {
-  margin: 0.15rem 0 0;
+  margin: 0.2rem 0 0;
   font-size: 0.6875rem;
   line-height: 1.35;
   color: var(--text-muted);
 }
 
-.config-panel__body {
-  flex: 1;
-  min-height: 0;
-  overflow: auto;
-  padding: 0.45rem 0.65rem 0.65rem;
-}
-
-.config-panel__footer {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  padding: 0.35rem 0.5rem;
-  border-top: 1px solid var(--border);
-}
-
-.config-panel__footer-btn {
+.config-panel__header-btn {
   display: inline-flex;
   align-items: center;
-  padding: 0.25rem 0.45rem;
-  border: 1px solid var(--border);
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: none;
   border-radius: 4px;
   background: transparent;
   color: var(--text-muted);
-  font: inherit;
-  font-size: 0.6875rem;
   cursor: pointer;
 }
 
-.config-panel__footer-btn:hover {
+.config-panel__header-btn:hover {
   background: var(--hover);
   color: var(--text);
 }
 
-.config-panel__footer-btn:focus-visible {
+.config-panel__header-btn:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 1px;
 }
 
+.config-panel__header-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.config-panel__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 0.7rem;
+  min-height: 0;
+  overflow: auto;
+  padding: 0.65rem;
+}
+
 .config-panel__status {
-  margin: 0 0 0.5rem;
+  margin: 0;
   font-size: 0.75rem;
   color: var(--text-muted);
 }
 
 .config-panel__status--error {
-  color: var(--error, #bf616a);
+  color: var(--danger, #bf616a);
 }
 
-.config-form {
+.config-card-group {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.3rem;
 }
 
-.config-form__row {
+.config-card__label {
+  margin: 0 0.2rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.config-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+}
+
+.config-card__footer {
+  padding: 0.45rem 0.65rem 0.55rem;
+  font-size: 0.6875rem;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
+.config-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
-  min-height: 1.65rem;
+  gap: 0.65rem;
+  padding: 0.55rem 0.65rem;
 }
 
-.config-form__label {
-  flex: 1;
+.config-row:not(:last-child) {
+  border-bottom: 1px solid var(--border);
+}
+
+.config-row--stack {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.4rem;
+}
+
+.config-row__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
   min-width: 0;
-  font-size: 0.75rem;
-  color: var(--text);
-  line-height: 1.3;
+  flex: 1;
 }
 
-.config-form__field {
+.config-row__label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.config-row__hint {
+  margin: 0;
+  font-size: 0.625rem;
+  line-height: 1.35;
+  color: var(--text-muted);
+}
+
+.config-row__control {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  flex-shrink: 0;
-  max-width: 55%;
+  gap: 0.4rem;
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.config-row--stack .config-row__control {
+  width: 100%;
+  align-items: stretch;
 }
 
 .config-form__control {
   width: 100%;
-  min-width: 0;
-  max-width: 9.5rem;
-  height: 1.5rem;
-  padding: 0 0.35rem;
+  min-width: 6.5rem;
+  max-width: 11rem;
+  height: 1.7rem;
+  padding: 0 0.45rem;
   border: 1px solid var(--border);
   border-radius: 4px;
-  background: var(--bg);
+  background-color: var(--surface);
   color: var(--text);
   font: inherit;
   font-size: 0.75rem;
+  transition:
+    border-color 120ms ease,
+    background-color 120ms ease;
+}
+
+.config-row--stack .config-form__control {
+  max-width: none;
+  min-width: 0;
 }
 
 .config-form__control--narrow {
-  max-width: 5.5rem;
+  max-width: 4.5rem;
+  min-width: 3.5rem;
   text-align: right;
+}
+
+.config-form__control:hover {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
 }
 
 .config-form__control:focus-visible {
   outline: 2px solid var(--accent);
-  outline-offset: 1px;
+  outline-offset: 0;
+  border-color: transparent;
 }
 
-.config-form__checkbox {
-  width: 0.875rem;
-  height: 0.875rem;
+select.config-form__control {
+  -webkit-appearance: none;
+  appearance: none;
+  padding-right: 1.35rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%2381a1c1' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.35rem center;
+  background-size: 0.65rem;
+}
+
+[data-theme="nord-snow-storm"] select.config-form__control,
+[data-theme="nord-frost-light"] select.config-form__control,
+[data-theme="nord-aurora-light"] select.config-form__control {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%234c566a' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.config-form__control[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.config-form__control[type="number"]::-webkit-inner-spin-button,
+.config-form__control[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
   margin: 0;
-  accent-color: var(--accent);
-  cursor: pointer;
 }
 
 .config-form__note {
-  margin: 0.35rem 0 0;
+  margin: 0;
   font-size: 0.6875rem;
   line-height: 1.4;
   color: var(--text-muted);
@@ -217,85 +321,153 @@
   color: var(--text);
 }
 
-.config-keys {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
+.config-form__link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
-.config-keys__row {
-  display: grid;
-  grid-template-columns: 1fr minmax(4.5rem, 5.5rem) auto;
-  gap: 0.35rem;
-  align-items: center;
-  padding: 0.25rem 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.config-keys__row:last-child {
-  border-bottom: none;
-}
-
-.config-keys__meta {
-  display: flex;
-  flex-direction: column;
-  gap: 0.05rem;
-  min-width: 0;
-}
-
-.config-keys__id {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 0.6875rem;
-  color: var(--text);
-}
-
-.config-keys__scope {
-  font-size: 0.625rem;
-  color: var(--text-muted);
-  text-transform: lowercase;
-}
-
-.config-keys__shortcut {
-  max-width: none;
-  width: 100%;
-  font-size: 0.6875rem;
-}
-
-.config-keys__enabled {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-size: 0.625rem;
-  color: var(--text-muted);
+.config-switch {
+  position: relative;
+  flex-shrink: 0;
+  width: 1.85rem;
+  height: 1.05rem;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
   cursor: pointer;
 }
 
-.config-about {
-  gap: 0.4rem;
+.config-switch:hover {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
 }
 
-.config-about__row {
+.config-switch--on {
+  background: color-mix(in srgb, var(--accent) 42%, var(--bg));
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+}
+
+.config-switch:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.config-switch__thumb {
+  position: absolute;
+  top: 50%;
+  left: 1px;
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 999px;
+  background: var(--text-muted);
+  transform: translateY(-50%);
+  transition: transform 120ms ease;
+}
+
+.config-switch--on .config-switch__thumb {
+  transform: translate(0.8rem, -50%);
+  background: var(--text);
+}
+
+.config-segmented {
   display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-  padding-bottom: 0.3rem;
-  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface);
 }
 
-.config-about__row:last-of-type {
-  border-bottom: none;
-}
-
-.config-about__label {
-  font-size: 0.625rem;
+.config-segmented__btn {
+  flex: 1;
+  min-width: 0;
+  padding: 0.28rem 0.2rem;
+  border: none;
+  border-right: 1px solid var(--border);
+  background: transparent;
   color: var(--text-muted);
+  font: inherit;
+  font-size: 0.625rem;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+}
+
+.config-segmented__btn:last-child {
+  border-right: none;
+}
+
+.config-segmented__btn:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.config-segmented__btn--active {
+  background: color-mix(in srgb, var(--accent) 18%, var(--bg));
+  color: var(--text);
+}
+
+.config-segmented__btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.config-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--border));
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg));
+  color: var(--accent);
+  font-size: 0.6875rem;
+  font-weight: 600;
   letter-spacing: 0.02em;
+}
+
+.config-keys__controls {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+}
+
+.config-keys__shortcut {
+  flex: 1;
+  max-width: none;
+  min-width: 0;
+  text-align: left;
+  font-size: 0.6875rem;
+  letter-spacing: 0.03em;
+}
+
+.config-about__identity {
+  padding: 0.8rem 0.75rem 0.75rem;
+}
+
+.config-about__name {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--text);
+}
+
+.config-about__meta {
+  margin: 0.3rem 0 0;
+  font-size: 0.6875rem;
+  line-height: 1.4;
+  color: var(--text-muted);
 }
 
 .config-about__value {
   font-size: 0.75rem;
   color: var(--text);
   word-break: break-word;
+}
+
+.config-row--stack .config-about__value {
+  display: block;
+  width: 100%;
+  text-align: left;
 }

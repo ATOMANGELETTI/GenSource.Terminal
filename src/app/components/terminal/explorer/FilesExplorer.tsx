@@ -1,6 +1,10 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useFileIconSet } from '../../../hooks/useFileIconSet';
+import {
+  listenContextMenuAction,
+  openContextMenuPopup,
+} from '../../../lib/context-menu-popup';
 import { targetDirForEntry } from '../../../lib/terminal/explorer-fs';
 import type { ContextMenuPosition, FsEntry } from '../../../types';
 import ExplorerHeader from './ExplorerHeader';
@@ -43,6 +47,18 @@ export default function FilesExplorer({
 
   const closeMenu = useCallback(() => setMenu(null), []);
   const closeOpenInTerminalModal = useCallback(() => setPendingCdPath(null), []);
+
+  const openEntryMenu = useCallback((entry: FsEntry, x: number, y: number) => {
+    void (async () => {
+      const opened = await openContextMenuPopup(x, y, {
+        kind: 'file-tree',
+        entry,
+      });
+      if (!opened) {
+        setMenu({ entry, x, y });
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     if (!menu) return;
@@ -91,6 +107,71 @@ export default function FilesExplorer({
     },
     [openInTerminal],
   );
+
+  const treeRef = useRef(tree);
+  treeRef.current = tree;
+  const openInTerminalHandlerRef = useRef(handleOpenInTerminal);
+  openInTerminalHandlerRef.current = handleOpenInTerminal;
+  const openInSourceControlRef = useRef(onOpenInSourceControl);
+  openInSourceControlRef.current = onOpenInSourceControl;
+
+  useEffect(() => {
+    let cancelled = false;
+    let unlisten: (() => void) | undefined;
+
+    void listenContextMenuAction((event) => {
+      if (event.kind !== 'file-tree' || event.payload.kind !== 'file-tree') {
+        return;
+      }
+      const { entry } = event.payload;
+      const currentTree = treeRef.current;
+      switch (event.action) {
+        case 'open':
+          void currentTree.openEntry(entry);
+          break;
+        case 'openInTerminal':
+          openInTerminalHandlerRef.current(entry);
+          break;
+        case 'openInSourceControl':
+          openInSourceControlRef.current?.(entry.path);
+          break;
+        case 'reveal':
+          void currentTree.revealEntry(entry);
+          break;
+        case 'copyPath':
+          void currentTree.copyPath(entry);
+          break;
+        case 'newFile':
+          currentTree.startCreate('create-file', entry);
+          break;
+        case 'newFolder':
+          currentTree.startCreate('create-dir', entry);
+          break;
+        case 'rename':
+          currentTree.startRename(entry);
+          break;
+        case 'delete':
+          void currentTree.deleteEntry(entry);
+          break;
+        case 'about':
+          void currentTree.openAbout(entry);
+          break;
+        default:
+          break;
+      }
+    }).then((stop) => {
+      if (cancelled) {
+        stop();
+      } else {
+        unlisten = stop;
+      }
+    });
+
+    return () => {
+      cancelled = true;
+      unlisten?.();
+    };
+  }, []);
 
   const handleOpenTerminalTab = useCallback(() => {
     if (!openInTerminal || !pendingCdPath) {
@@ -200,7 +281,7 @@ export default function FilesExplorer({
         onSelect={(entry) => tree.selectPath(entry.path)}
         onToggle={tree.toggleExpand}
         onOpenFile={(entry) => void tree.openEntry(entry)}
-        onContextMenu={(entry, x, y) => setMenu({ entry, x, y })}
+        onContextMenu={openEntryMenu}
         onDraftChange={tree.setDraftName}
         onDraftCommit={() => void tree.commitDraft()}
         onDraftCancel={tree.cancelDraft}

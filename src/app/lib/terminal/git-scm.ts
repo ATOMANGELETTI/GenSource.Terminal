@@ -1,4 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
+import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 import { open } from "@tauri-apps/plugin-dialog";
 
 import { getStoreValue, setStoreValue } from "../app-store";
@@ -10,10 +11,14 @@ import type {
   GitCommitResult,
   GitOpenFolderResult,
   GitStatusResult,
+  ScmChangedPayload,
   ScmPanelState,
 } from "../../types/git-scm";
 
+export type { ScmChangedPayload };
+
 export const SCM_FOLDER_KEY = "scm.folderPath";
+export const SCM_CHANGED_EVENT = "scm-changed";
 
 export async function loadScmFolderPath(): Promise<string | null> {
   const raw = await getStoreValue<unknown>(SCM_FOLDER_KEY);
@@ -90,6 +95,22 @@ export async function gitCreateBranch(
   return invoke<void>("git_create_branch", { path, name, checkout });
 }
 
+export async function gitWatchStart(path: string): Promise<void> {
+  return invoke<void>("git_watch_start", { path });
+}
+
+export async function gitWatchStop(): Promise<void> {
+  return invoke<void>("git_watch_stop");
+}
+
+export async function subscribeScmChanged(
+  onChange: (payload: ScmChangedPayload) => void,
+): Promise<UnlistenFn> {
+  return listen<ScmChangedPayload>(SCM_CHANGED_EVENT, (event) => {
+    onChange(event.payload);
+  });
+}
+
 export function scmErrorMessage(error: unknown, fallback: string): string {
   return errorMessage(error, fallback);
 }
@@ -149,6 +170,11 @@ export function changesSectionEntries(
 ): GitChangeEntry[] {
   if (!status) return [];
   return [...status.unstaged, ...status.untracked];
+}
+
+/** Paths eligible for auto-stage (unstaged + untracked; never conflicted). */
+export function autoStagePaths(status: GitStatusResult | null): string[] {
+  return changesSectionEntries(status).map((entry) => entry.path);
 }
 
 export function emptyStatus(): GitStatusResult {

@@ -51,6 +51,11 @@
       "path": "tests/unit/file-tree-filter.test.ts"
     },
     {
+      "id": "agent-chat",
+      "kind": "unit",
+      "path": "tests/unit/agent-chat.test.ts"
+    },
+    {
       "id": "smoke",
       "kind": "unit",
       "path": "tests/unit/smoke.test.ts"

@@ -1,0 +1,13 @@
+---
+alwaysApply: true
+---
+
+# Path Reference Rules
+
+- **Always use relative paths:** Never hardcode absolute system paths (e.g., `/Users/username/...`, `C:\Users\...`, or `/home/user/...`).
+
+- **Workspace-relative imports/references:** Reference files using relative modules (e.g., `./components/Button`, `../utils/helpers`) or aliases relative to the project root (e.g., `@/components/...` or `~/utils/...`).
+
+- **Dynamic path resolution at runtime:** For runtime asset loading or file System access (e.g., Node.js `fs`, Rust `std::path`, Python `pathlib`), always construct paths using relative root utilities (such as `path.join(__dirname, ...)`, `import.meta.url`, or `env::current_dir()`).
+
+- **Portability first:** Ensure every file path generated will function identically regardless of the hosting machine, OS, directory structure, or packaging step.

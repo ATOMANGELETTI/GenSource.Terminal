@@ -40,4 +40,13 @@ commands.allow = [
   "git_branches",
   "git_checkout",
   "git_create_branch",
+  "git_watch_start",
+  "git_watch_stop",
+  "get_agent_config",
+  "save_agent_config",
+  "agent_has_api_key",
+  "agent_chat_send",
+  "agent_chat_cancel",
+  "agent_chat_clear",
+  "agent_confirm_response",
 ]

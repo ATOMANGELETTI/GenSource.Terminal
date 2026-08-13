@@ -18,7 +18,8 @@ use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
 use time::OffsetDateTime;
 
 use crate::mdoels::{
-    AppInfo, AppInfoFile, AppSettings, KeybindingScope, KeybindingsFile, LoggingSettings,
+    AgentConfig, AppInfo, AppInfoFile, AppSettings, KeybindingScope, KeybindingsFile,
+    LoggingSettings,
 };
 use crate::state::AppState;
 
@@ -27,18 +28,22 @@ const SELF_WRITE_IGNORE: Duration = Duration::from_millis(600);
 
 static SETTINGS_SELF_WRITE_UNTIL: Mutex<Option<Instant>> = Mutex::new(None);
 static LOGGING_SELF_WRITE_UNTIL: Mutex<Option<Instant>> = Mutex::new(None);
+static AGENT_SELF_WRITE_UNTIL: Mutex<Option<Instant>> = Mutex::new(None);
 
 pub const SETTINGS_CHANGED_EVENT: &str = "settings-changed";
+pub const AGENT_CHANGED_EVENT: &str = "agent-changed";
 
 const SETTINGS_FILE: &str = "settings.json";
 const KEYBINDINGS_FILE: &str = "keybindings.json";
 const APPINFO_FILE: &str = "appinfo.json";
 const LOGGING_FILE: &str = "logging.json";
+const AGENT_FILE: &str = "agent.json";
 
 const DEFAULT_SETTINGS_JSON: &str = include_str!("../../../other/configs/settings.json");
 const DEFAULT_KEYBINDINGS_JSON: &str = include_str!("../../../other/configs/keybindings.json");
 const DEFAULT_APPINFO_JSON: &str = include_str!("../../../other/configs/appinfo.json");
 const DEFAULT_LOGGING_JSON: &str = include_str!("../../../other/configs/logging.json");
+const DEFAULT_AGENT_JSON: &str = include_str!("../../../other/configs/agent.json");
 
 /// Resolve a directory under the live `other/` tree (no `AppHandle` required).
 ///
@@ -120,6 +125,7 @@ pub fn ensure_config_files(dir: &Path) -> Result<(), String> {
     write_default_if_missing(dir.join(KEYBINDINGS_FILE), DEFAULT_KEYBINDINGS_JSON)?;
     write_default_if_missing(dir.join(APPINFO_FILE), DEFAULT_APPINFO_JSON)?;
     write_default_if_missing(dir.join(LOGGING_FILE), DEFAULT_LOGGING_JSON)?;
+    write_default_if_missing(dir.join(AGENT_FILE), DEFAULT_AGENT_JSON)?;
 
     Ok(())
 }
@@ -305,6 +311,15 @@ fn note_logging_self_write() {
     }
 }
 
+fn note_agent_self_write() {
+    match AGENT_SELF_WRITE_UNTIL.lock() {
+        Ok(mut guard) => *guard = Some(Instant::now() + SELF_WRITE_IGNORE),
+        Err(poisoned) => {
+            *poisoned.into_inner() = Some(Instant::now() + SELF_WRITE_IGNORE);
+        }
+    }
+}
+
 fn is_settings_self_write() -> bool {
     let guard = SETTINGS_SELF_WRITE_UNTIL
         .lock()
@@ -319,6 +334,13 @@ fn is_logging_self_write() -> bool {
     guard.is_some_and(|until| Instant::now() < until)
 }
 
+fn is_agent_self_write() -> bool {
+    let guard = AGENT_SELF_WRITE_UNTIL
+        .lock()
+        .unwrap_or_else(|p| p.into_inner());
+    guard.is_some_and(|until| Instant::now() < until)
+}
+
 /// Write normalized `settings.json` (pretty camelCase JSON).
 pub fn write_settings(dir: &Path, settings: &AppSettings) -> Result<(), String> {
     write_pretty_json(&dir.join(SETTINGS_FILE), settings)
@@ -327,6 +349,82 @@ pub fn write_settings(dir: &Path, settings: &AppSettings) -> Result<(), String> 
 /// Write `logging.json` (pretty camelCase JSON).
 pub fn write_logging(dir: &Path, settings: &LoggingSettings) -> Result<(), String> {
     write_pretty_json(&dir.join(LOGGING_FILE), settings)
+}
+
+/// Write `agent.json` (pretty camelCase JSON).
+pub fn write_agent(dir: &Path, config: &AgentConfig) -> Result<(), String> {
+    write_pretty_json(&dir.join(AGENT_FILE), config)
+}
+
+pub fn load_agent(dir: &Path) -> AgentConfig {
+    let path = dir.join(AGENT_FILE);
+    match fs::read_to_string(&path) {
+        Ok(raw) => match parse_jsonc::<AgentConfig>(&raw) {
+            Ok(mut config) => {
+                normalize_agent_config(&mut config);
+                config
+            }
+            Err(err) => {
+                warn!("corrupt agent.json ({err}); using defaults");
+                AgentConfig::default()
+            }
+        },
+        Err(err) => {
+            warn!("could not read agent.json ({err}); using defaults");
+            AgentConfig::default()
+        }
+    }
+}
+
+fn normalize_agent_config(config: &mut AgentConfig) {
+    if config.active_provider.trim().is_empty() {
+        config.active_provider = default_agent_provider_name();
+    }
+    if config.system_prompt.trim().is_empty() {
+        config.system_prompt = AgentConfig::default().system_prompt;
+    }
+    if !config.providers.contains_key("gemini") {
+        config
+            .providers
+            .insert("gemini".into(), crate::mdoels::AgentProviderConfig::default());
+    }
+    for provider in config.providers.values_mut() {
+        if provider.model.trim().is_empty() {
+            provider.model = "gemini-3.6-flash".into();
+        }
+    }
+}
+
+fn default_agent_provider_name() -> String {
+    "gemini".into()
+}
+
+pub fn emit_agent_changed<R: Runtime>(app: &AppHandle<R>, config: &AgentConfig) {
+    if let Err(err) = app.emit(AGENT_CHANGED_EVENT, config) {
+        warn!("failed to emit {AGENT_CHANGED_EVENT}: {err}");
+    }
+}
+
+/// Persist `agent.json` and notify the frontend (API key stays in this payload for Config UI only).
+pub fn save_and_emit_agent<R: Runtime>(
+    app: &AppHandle<R>,
+    config: AgentConfig,
+) -> Result<AgentConfig, String> {
+    let mut config = config;
+    normalize_agent_config(&mut config);
+
+    let state = app.state::<AppState>();
+    let configs_dir = state
+        .configs_dir
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner())
+        .clone()
+        .ok_or_else(|| "configs dir not initialized".to_string())?;
+
+    note_agent_self_write();
+    write_agent(&configs_dir, &config)?;
+    emit_agent_changed(app, &config);
+    Ok(config)
 }
 
 /// Write `keybindings.json` (pretty camelCase JSON).
@@ -695,6 +793,9 @@ pub fn start_settings_watcher<R: Runtime>(app: AppHandle<R>, configs_dir: PathBu
         let mut last_logging_apply = Instant::now()
             .checked_sub(Duration::from_secs(1))
             .unwrap_or_else(Instant::now);
+        let mut last_agent_apply = Instant::now()
+            .checked_sub(Duration::from_secs(1))
+            .unwrap_or_else(Instant::now);
 
         while let Ok(event) = rx.recv() {
             let Ok(event) = event else {
@@ -715,6 +816,11 @@ pub fn start_settings_watcher<R: Runtime>(app: AppHandle<R>, configs_dir: PathBu
                 path.file_name()
                     .and_then(|name| name.to_str())
                     .is_some_and(|name| name.eq_ignore_ascii_case(LOGGING_FILE))
+            });
+            let touches_agent = event.paths.iter().any(|path| {
+                path.file_name()
+                    .and_then(|name| name.to_str())
+                    .is_some_and(|name| name.eq_ignore_ascii_case(AGENT_FILE))
             });
 
             if touches_settings
@@ -741,6 +847,17 @@ pub fn start_settings_watcher<R: Runtime>(app: AppHandle<R>, configs_dir: PathBu
                     "reloaded logging.json (error={}, warn={}, info={}, debug={}, trace={}, fatal={})",
                     next.error, next.warn, next.info, next.debug, next.trace, next.fatal
                 );
+            }
+
+            if touches_agent
+                && !is_agent_self_write()
+                && last_agent_apply.elapsed() >= Duration::from_millis(250)
+            {
+                last_agent_apply = Instant::now();
+                thread::sleep(Duration::from_millis(80));
+                let next = load_agent(&configs_dir);
+                emit_agent_changed(&app, &next);
+                info!("reloaded agent.json from disk");
             }
         }
     });

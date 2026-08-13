@@ -98,6 +98,47 @@ describe("git-scm helpers", () => {
     expect(changesSectionEntries(null)).toEqual([]);
   });
 
+  it("autoStagePaths returns unstaged and untracked only", async () => {
+    const { autoStagePaths, emptyStatus, SCM_CHANGED_EVENT } =
+      await importHelpers();
+    const status: GitStatusResult = {
+      ...emptyStatus(),
+      unstaged: [
+        {
+          path: "dirty.ts",
+          absolutePath: "C:\\work\\dirty.ts",
+          status: "modified",
+        },
+      ],
+      untracked: [
+        {
+          path: "new.ts",
+          absolutePath: "C:\\work\\new.ts",
+          status: "untracked",
+        },
+      ],
+      staged: [
+        {
+          path: "ready.ts",
+          absolutePath: "C:\\work\\ready.ts",
+          status: "added",
+        },
+      ],
+      conflicted: [
+        {
+          path: "conflict.ts",
+          absolutePath: "C:\\work\\conflict.ts",
+          status: "conflict",
+        },
+      ],
+    };
+
+    expect(autoStagePaths(status)).toEqual(["dirty.ts", "new.ts"]);
+    expect(autoStagePaths(null)).toEqual([]);
+    expect(autoStagePaths(emptyStatus())).toEqual([]);
+    expect(SCM_CHANGED_EVENT).toBe("scm-changed");
+  });
+
   it("changeStatusLabel maps statuses", async () => {
     const { changeStatusLabel } = await importHelpers();
     expect(changeStatusLabel("modified")).toBe("M");

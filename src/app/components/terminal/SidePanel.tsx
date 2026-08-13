@@ -8,6 +8,7 @@ import {
 } from "react";
 
 import {
+  BotIcon,
   FolderIcon,
   PreferencesIcon,
   SourceControlIcon,
@@ -17,7 +18,12 @@ import {
   pickScmFolder,
   saveScmFolderPath,
 } from "../../lib/terminal/git-scm";
-import type { ContextMenuPosition } from "../../types";
+import {
+  listenContextMenuAction,
+  openContextMenuPopup,
+} from "../../lib/context-menu-popup";
+import type { AgentTerminalContext, ContextMenuPosition } from "../../types";
+import AgentPanel from "./agent/AgentPanel";
 import ConfigPanel from "./config/ConfigPanel";
 import FilesExplorer, { type OpenInTerminalApi } from "./explorer/FilesExplorer";
 import SourceControlPanel from "./source-control/SourceControlPanel";
@@ -30,7 +36,7 @@ const SIDE_PANEL_TAB_STORAGE_KEY = "gensource.sidePanel.tab";
 const SIDE_PANEL_TABS = [
   { id: "files", label: "Files", iconOnly: true },
   { id: "source", label: "Source Control", iconOnly: true },
-  { id: "tab-3", label: "Tab 3", iconOnly: false },
+  { id: "agent", label: "Agents", iconOnly: true },
   { id: "config", label: "Config", iconOnly: true },
 ] as const;
 
@@ -55,6 +61,7 @@ interface SidePanelProps {
   width: number;
   onResize: (width: number) => void;
   openInTerminal?: OpenInTerminalApi;
+  agentTerminal?: AgentTerminalContext | null;
 }
 
 export default function SidePanel({
@@ -62,6 +69,7 @@ export default function SidePanel({
   width,
   onResize,
   openInTerminal,
+  agentTerminal,
 }: SidePanelProps) {
   const dragRef = useRef<{ startX: number; startWidth: number } | null>(null);
   const [activeTab, setActiveTab] = useState<SidePanelTabId>(readStoredSidePanelTab);
@@ -150,10 +158,50 @@ export default function SidePanel({
     (event: ReactMouseEvent<HTMLButtonElement>) => {
       event.preventDefault();
       event.stopPropagation();
-      setSourceTabMenu({ x: event.clientX, y: event.clientY });
+      const { clientX, clientY } = event;
+      const hasRepoOpen = scmFolderPath != null;
+      void (async () => {
+        const opened = await openContextMenuPopup(clientX, clientY, {
+          kind: "scm-tab",
+          hasRepoOpen,
+        });
+        if (!opened) {
+          setSourceTabMenu({ x: clientX, y: clientY });
+        }
+      })();
     },
-    [],
+    [scmFolderPath],
   );
+
+  useEffect(() => {
+    let cancelled = false;
+    let unlisten: (() => void) | undefined;
+
+    void listenContextMenuAction((event) => {
+      if (event.kind !== "scm-tab") return;
+      switch (event.action) {
+        case "openRepo":
+          handleOpenRepo();
+          break;
+        case "closeRepo":
+          handleCloseRepo();
+          break;
+        default:
+          break;
+      }
+    }).then((stop) => {
+      if (cancelled) {
+        stop();
+      } else {
+        unlisten = stop;
+      }
+    });
+
+    return () => {
+      cancelled = true;
+      unlisten?.();
+    };
+  }, [handleCloseRepo, handleOpenRepo]);
 
   const handlePointerDown = useCallback(
     (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -196,11 +244,20 @@ export default function SidePanel({
     [onResize, width],
   );
 
-  const activeMeta = SIDE_PANEL_TABS.find((tab) => tab.id === activeTab);
   const flushContent =
     activeTab === "files" ||
     activeTab === "source" ||
+    activeTab === "agent" ||
     activeTab === "config";
+
+  const openAgentsConfig = useCallback(() => {
+    try {
+      sessionStorage.setItem("gensource.config.category", "agents");
+    } catch {
+      // sessionStorage unavailable
+    }
+    setActiveTab("config");
+  }, []);
 
   return (
     <aside
@@ -228,13 +285,14 @@ export default function SidePanel({
               folderPath={scmFolderPath}
               onFolderPathChange={handleScmFolderPathChange}
             />
+          ) : activeTab === "agent" ? (
+            <AgentPanel
+              terminal={agentTerminal}
+              onOpenAgentsConfig={openAgentsConfig}
+            />
           ) : activeTab === "config" ? (
             <ConfigPanel />
-          ) : (
-            <p className="side-panel__placeholder">
-              {activeMeta?.label ?? "Tab"} content
-            </p>
-          )}
+          ) : null}
         </div>
         <div className="side-panel__tabs" role="tablist" aria-label="Side panel">
           {SIDE_PANEL_TABS.map((tab) => {
@@ -261,10 +319,10 @@ export default function SidePanel({
                   <FolderIcon className="side-panel__tab-icon" />
                 ) : tab.id === "source" ? (
                   <SourceControlIcon className="side-panel__tab-icon" />
-                ) : tab.id === "config" ? (
-                  <PreferencesIcon className="side-panel__tab-icon" />
+                ) : tab.id === "agent" ? (
+                  <BotIcon className="side-panel__tab-icon" />
                 ) : (
-                  <span className="side-panel__tab-label">{tab.label}</span>
+                  <PreferencesIcon className="side-panel__tab-icon" />
                 )}
               </button>
             );

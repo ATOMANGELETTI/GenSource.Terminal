@@ -57,6 +57,24 @@
         "skipTaskbar": true,
         "alwaysOnTop": true,
         "focus": false
+      },
+      {
+        "label": "context-menu",
+        "url": "index.html?window=context-menu",
+        "title": "GenSource Terminal",
+        "width": 240,
+        "height": 48,
+        "visible": false,
+        "decorations": false,
+        "transparent": true,
+        "shadow": false,
+        "resizable": false,
+        "maximizable": false,
+        "minimizable": false,
+        "closable": false,
+        "skipTaskbar": true,
+        "alwaysOnTop": true,
+        "focus": false
       }
     ],
     "security": {

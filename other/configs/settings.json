@@ -9,7 +9,7 @@
   "defaultProfile": "powershell",
   "terminalFontFamily": "Terminus",
   "scrollbackLines": 5000.0,
-  "cursorStyle": "bar",
+  "cursorStyle": "block",
   "cursorBlink": true,
   "fileIconSet": "catppuccin",
   "profiles": [

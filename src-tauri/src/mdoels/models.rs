@@ -453,3 +453,145 @@ pub struct GitBranchInfo {
 pub struct GitCommitResult {
     pub id: String,
 }
+
+fn default_agent_provider() -> String {
+    "gemini".into()
+}
+
+fn default_gemini_model() -> String {
+    "gemini-3.6-flash".into()
+}
+
+fn default_system_prompt() -> String {
+    "You are GenSource Terminal's agent. Reply in the Agents chat panel. \
+Use tools for files, git, and settings when helpful. \
+Only use the terminal tool when the user asks you to run a shell command."
+        .into()
+}
+
+/// Gemini (or future) provider credentials under `providers` in `agent.json`.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct AgentProviderConfig {
+    #[serde(default)]
+    pub api_key: String,
+    #[serde(default = "default_gemini_model")]
+    pub model: String,
+}
+
+impl Default for AgentProviderConfig {
+    fn default() -> Self {
+        Self {
+            api_key: String::new(),
+            model: default_gemini_model(),
+        }
+    }
+}
+
+/// On-disk `other/configs/agent.json` — multi-provider-ready, Gemini-first.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct AgentConfig {
+    #[serde(default = "default_agent_provider")]
+    pub active_provider: String,
+    #[serde(default)]
+    pub providers: std::collections::HashMap<String, AgentProviderConfig>,
+    #[serde(default = "default_system_prompt")]
+    pub system_prompt: String,
+}
+
+impl Default for AgentConfig {
+    fn default() -> Self {
+        let mut providers = std::collections::HashMap::new();
+        providers.insert(
+            "gemini".into(),
+            AgentProviderConfig {
+                api_key: String::new(),
+                model: default_gemini_model(),
+            },
+        );
+        Self {
+            active_provider: default_agent_provider(),
+            providers,
+            system_prompt: default_system_prompt(),
+        }
+    }
+}
+
+impl AgentConfig {
+    /// Active provider entry (creates a default gemini slot when missing).
+    pub fn active(&self) -> AgentProviderConfig {
+        self.providers
+            .get(&self.active_provider)
+            .cloned()
+            .or_else(|| self.providers.get("gemini").cloned())
+            .unwrap_or_default()
+    }
+
+    pub fn has_api_key(&self) -> bool {
+        !self.active().api_key.trim().is_empty()
+    }
+}
+
+/// Frontend → Rust: start an agent turn.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AgentChatSendArgs {
+    pub conversation_id: String,
+    pub message: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub session_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cwd: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub recent_output: Option<String>,
+}
+
+/// Streamed assistant text chunk.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AgentChunkEvent {
+    pub conversation_id: String,
+    pub text: String,
+}
+
+/// Tool call lifecycle event for the Agents panel.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AgentToolEvent {
+    pub conversation_id: String,
+    pub name: String,
+    pub status: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub detail: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AgentDoneEvent {
+    pub conversation_id: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AgentErrorEvent {
+    pub conversation_id: String,
+    pub message: String,
+}
+
+/// Destructive tool needs UI confirmation before continuing.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AgentConfirmEvent {
+    pub conversation_id: String,
+    pub request_id: String,
+    pub tool: String,
+    pub summary: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AgentConfirmResponseArgs {
+    pub request_id: String,
+    pub approved: bool,
+}

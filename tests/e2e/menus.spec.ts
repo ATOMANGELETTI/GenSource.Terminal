@@ -8,6 +8,8 @@ import {
 } from './helpers/app';
 
 test.describe('menus', () => {
+  // Vite e2e has no Tauri popup window, so titlebar/content menus fall back
+  // to in-webview overlays (see openContextMenuPopup / canUseContextMenuPopup).
   test('titlebar context menu', async ({ page }) => {
     await openApp(page);
     await openTitlebarMenu(page);

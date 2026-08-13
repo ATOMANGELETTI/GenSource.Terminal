@@ -9,10 +9,16 @@ import TerminalWorkspace, {
 } from "./components/terminal/TerminalWorkspace";
 import type { OpenInTerminalApi } from "./components/terminal/explorer/FilesExplorer";
 import { copySelection, pasteAtFocus } from "./lib/clipboard";
+import {
+  listenContextMenuAction,
+  openContextMenuPopup,
+} from "./lib/context-menu-popup";
 import { useLocalShortcuts } from "./lib/keybindings";
 import {
   closeWindow,
+  isWindowMaximized,
   minimizeWindow,
+  moveWindow,
   toggleMaximize,
 } from "./lib/window";
 import { zoomIn, zoomOut, zoomReset } from "./lib/zoom";
@@ -54,9 +60,37 @@ export default function App() {
   const openMenu = useCallback(
     (target: ContextMenuTarget, event: MouseEvent<HTMLElement>) => {
       event.preventDefault();
-      setMenu({ target, x: event.clientX, y: event.clientY });
+      const { clientX, clientY } = event;
+
+      void (async () => {
+        if (target === "titlebar") {
+          let maximized = false;
+          try {
+            maximized = await isWindowMaximized();
+          } catch {
+            maximized = false;
+          }
+          const opened = await openContextMenuPopup(clientX, clientY, {
+            kind: "titlebar",
+            maximized,
+          });
+          if (!opened) {
+            setMenu({ target, x: clientX, y: clientY });
+          }
+          return;
+        }
+
+        const opened = await openContextMenuPopup(clientX, clientY, {
+          kind: "content",
+          productName: title,
+          hasTerminal: true,
+        });
+        if (!opened) {
+          setMenu({ target, x: clientX, y: clientY });
+        }
+      })();
     },
-    [],
+    [title],
   );
 
   useEffect(() => {
@@ -133,6 +167,92 @@ export default function App() {
     }
     void pasteAtFocus();
   }, []);
+
+  // Popup menu actions that need main-window state/APIs.
+  useEffect(() => {
+    let cancelled = false;
+    let unlisten: (() => void) | undefined;
+
+    void listenContextMenuAction((event) => {
+      if (event.kind === "titlebar") {
+        switch (event.action) {
+          case "restore":
+          case "toggleMaximize":
+            void toggleMaximize();
+            break;
+          case "move":
+            void moveWindow();
+            break;
+          case "minimize":
+            void minimizeWindow();
+            break;
+          case "close":
+            void closeWindow();
+            break;
+          default:
+            break;
+        }
+        return;
+      }
+
+      if (event.kind === "content") {
+        switch (event.action) {
+          case "reload":
+            window.location.reload();
+            break;
+          case "zoomIn":
+            void zoomIn();
+            break;
+          case "zoomOut":
+            void zoomOut();
+            break;
+          case "zoomReset":
+            void zoomReset();
+            break;
+          case "preferences":
+            void invoke("open_configs_folder");
+            break;
+          case "about":
+            setAboutOpen(true);
+            break;
+          case "copy":
+            handleTerminalCopy();
+            break;
+          case "paste":
+            handleTerminalPaste();
+            break;
+          case "newTab":
+            terminalRef.current?.newTab();
+            break;
+          case "closeTab":
+            terminalRef.current?.closeActiveTab();
+            break;
+          case "togglePin":
+            terminalRef.current?.togglePinActive();
+            break;
+          case "search":
+            terminalRef.current?.openFind();
+            break;
+          case "clear":
+            terminalRef.current?.clearActive();
+            break;
+          default:
+            break;
+        }
+      }
+    }).then((stop) => {
+      if (cancelled) {
+        stop();
+      } else {
+        unlisten = stop;
+      }
+    });
+
+    return () => {
+      cancelled = true;
+      unlisten?.();
+    };
+  }, [handleTerminalCopy, handleTerminalPaste]);
 
   // Every `local`-scope id in other/configs/keybindings.json is mapped here
   // so pressing the shortcut does exactly what clicking the matching menu

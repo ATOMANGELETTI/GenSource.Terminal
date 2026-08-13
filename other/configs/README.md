@@ -1,6 +1,6 @@
 # Runtime app config (`other/configs/`)
 
-User-editable preferences shipped beside the installed `.exe` under `other/configs/`.
+User-editable preferences shipped beside the installed `.exe` under `other/configs/` (`appinfo.json`, `settings.json`, `keybindings.json`, `logging.json`, `agent.json`).
 
 ## Hardware temperatures (status bar)
 
@@ -116,6 +116,38 @@ Set each level to `true` (include) or `false` (exclude):
 | `fatal` | Separate channel (error-level messages tagged with target `gensource::fatal`) |
 
 Build logs under `other/logging/build/` are full transcripts and ignore this file.
+
+---
+
+## `agent.json`
+
+AI agent provider settings for the **Agents** side-panel tab. Multi-provider-ready schema; **Gemini** is the only wired provider in v1. API keys are loaded by Rust for the chat/tool loop (Config → Agents can edit the key; the webview never calls Google HTTP APIs directly).
+
+| Key | Description |
+| --- | --- |
+| `activeProvider` | Provider id under `providers` (default `gemini`). |
+| `providers.gemini.apiKey` | Gemini API key (empty until you set it). Prefer not committing real keys. |
+| `providers.gemini.model` | Model id (default `gemini-3.6-flash`). |
+| `systemPrompt` | Optional system preamble for the agent. A fixed chat-vs-terminal routing policy is always appended in Rust and cannot be removed via this field. |
+
+Later providers (`openai`, `anthropic`, …) add sibling objects under `providers` without reshaping the file.
+
+Shipped default:
+
+```json
+{
+  "activeProvider": "gemini",
+  "providers": {
+    "gemini": {
+      "apiKey": "",
+      "model": "gemini-3.6-flash"
+    }
+  },
+  "systemPrompt": "You are GenSource Terminal's agent. Reply in the Agents chat panel. Use tools for files, git, and settings when helpful. Only use the terminal tool when the user asks you to run a shell command."
+}
+```
+
+Edit via **Config → Agents**, or by hand. The configs watcher reloads when the file changes on disk.
 
 ---
 

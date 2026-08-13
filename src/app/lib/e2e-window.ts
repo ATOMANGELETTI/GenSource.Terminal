@@ -2,9 +2,14 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 
 import type { AppInfo, AppSettings } from "../types";
 
-export type AppWindowLabel = "main" | "splash" | "tray-menu";
+export type AppWindowLabel = "main" | "splash" | "tray-menu" | "context-menu";
 
-const KNOWN_LABELS = new Set<string>(["main", "splash", "tray-menu"]);
+const KNOWN_LABELS = new Set<string>([
+  "main",
+  "splash",
+  "tray-menu",
+  "context-menu",
+]);
 
 /** Fixture identity when Vite e2e has no Tauri backend. */
 export const E2E_APP_INFO: AppInfo = {
@@ -49,8 +54,8 @@ export const E2E_DEFAULT_SETTINGS: AppSettings = {
 };
 
 /**
- * Playwright / Vite harness: `?window=splash|tray-menu|main` selects the
- * secondary-window tree without requiring a live Tauri WebView.
+ * Playwright / Vite harness: `?window=splash|tray-menu|context-menu|main`
+ * selects the secondary-window tree without requiring a live Tauri WebView.
  */
 export function readWindowQueryParam(
   search = typeof window !== "undefined" ? window.location.search : "",

@@ -148,5 +148,6 @@ export type {
   GitCommitResult,
   GitOpenFolderResult,
   GitStatusResult,
+  ScmChangedPayload,
   ScmPanelState,
 } from "./git-scm";

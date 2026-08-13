@@ -1,0 +1,256 @@
+/* Agents side-panel — flat Nord chat chrome (no glow/glass). */
+
+.agent-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.agent-panel__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.55rem 0.65rem 0.4rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.agent-panel__title {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.agent-panel__subtitle {
+  margin: 0.15rem 0 0;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 11rem;
+}
+
+.agent-panel__header-actions {
+  display: flex;
+  gap: 0.3rem;
+  flex-shrink: 0;
+}
+
+.agent-panel__messages {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 0.55rem 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.agent-panel__hint {
+  margin: 0;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.agent-panel__msg {
+  max-width: 100%;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+}
+
+.agent-panel__msg--user {
+  align-self: flex-end;
+  background: var(--hover);
+}
+
+.agent-panel__msg--assistant {
+  align-self: stretch;
+}
+
+.agent-panel__msg-text {
+  margin: 0;
+  font-size: 0.74rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.agent-panel__markdown {
+  font-size: 0.74rem;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.agent-panel__markdown p {
+  margin: 0 0 0.4rem;
+}
+
+.agent-panel__markdown p:last-child {
+  margin-bottom: 0;
+}
+
+.agent-panel__markdown code {
+  font-family: ui-monospace, monospace;
+  font-size: 0.7rem;
+  padding: 0.05rem 0.25rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--hover);
+}
+
+.agent-panel__markdown pre {
+  margin: 0.35rem 0;
+  padding: 0.4rem;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--hover);
+}
+
+.agent-panel__markdown pre code {
+  border: none;
+  padding: 0;
+  background: transparent;
+}
+
+.agent-panel__tool-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  align-self: flex-start;
+  padding: 0.15rem 0.4rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  background: var(--bg);
+}
+
+.agent-panel__tool-name {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.agent-panel__composer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.5rem 0.65rem 0.65rem;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.agent-panel__input {
+  width: 100%;
+  resize: none;
+  padding: 0.4rem 0.45rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.74rem;
+  line-height: 1.4;
+}
+
+.agent-panel__input:focus {
+  outline: 1px solid var(--accent);
+  outline-offset: 0;
+}
+
+.agent-panel__send {
+  align-self: flex-end;
+}
+
+.agent-panel__btn {
+  padding: 0.28rem 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--hover);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.7rem;
+  cursor: default;
+}
+
+.agent-panel__btn:hover:not(:disabled) {
+  background: var(--border);
+}
+
+.agent-panel__btn:disabled {
+  opacity: 0.5;
+}
+
+.agent-panel__btn--primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+}
+
+.agent-panel__btn--primary:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.agent-panel__empty {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 1rem 0.75rem;
+}
+
+.agent-panel__empty-title {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.agent-panel__empty-body {
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.agent-panel__error {
+  margin: 0;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.7rem;
+  color: var(--error, #bf616a);
+  border-top: 1px solid var(--border);
+}
+
+.agent-panel__confirm {
+  margin: 0 0.65rem 0.5rem;
+  padding: 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+}
+
+.agent-panel__confirm-title {
+  margin: 0 0 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.agent-panel__confirm-body {
+  margin: 0 0 0.45rem;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.agent-panel__confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.35rem;
+}

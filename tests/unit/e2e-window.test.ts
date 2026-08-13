@@ -10,6 +10,7 @@ describe("readWindowQueryParam", () => {
   it("parses known window labels", () => {
     expect(readWindowQueryParam("?window=splash")).toBe("splash");
     expect(readWindowQueryParam("?window=tray-menu")).toBe("tray-menu");
+    expect(readWindowQueryParam("?window=context-menu")).toBe("context-menu");
     expect(readWindowQueryParam("?window=main")).toBe("main");
   });
 

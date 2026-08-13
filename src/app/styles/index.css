@@ -12,6 +12,7 @@
 @import "./modules/terminal/explorer.css";
 @import "./modules/terminal/source-control.css";
 @import "./modules/terminal/config-panel.css";
+@import "./modules/terminal/agent.css";
 @import "./modules/terminal/status-bar.css";
 @import "./modules/terminal/metric-tooltip.css";
 @import "./modules/terminal/tabs.css";
@@ -22,5 +23,6 @@
 @import "./modules/context-menus/content-content.css";
 @import "./modules/context-menus/tab-content.css";
 @import "./modules/context-menus/tray-window.css";
+@import "./modules/context-menus/popup-window.css";
 @import "./modules/dialogs/about-dialog.css";
 @import "./app.css";

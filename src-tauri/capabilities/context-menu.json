@@ -1,0 +1,26 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "context-menu",
+  "description": "Minimal ACL for the ephemeral in-app context-menu popup (position/size/show/hide + theme).",
+  "windows": ["context-menu"],
+  "permissions": [
+    "core:default",
+    "core:window:allow-show",
+    "core:window:allow-hide",
+    "core:window:allow-set-focus",
+    "core:window:allow-set-size",
+    "core:window:allow-set-position",
+    "core:window:allow-is-visible",
+    "core:window:allow-outer-position",
+    "core:window:allow-inner-size",
+    "core:window:allow-outer-size",
+    "core:window:allow-scale-factor",
+    "core:window:allow-current-monitor",
+    "core:window:allow-monitor-from-point",
+    "core:window:allow-available-monitors",
+    "core:event:default",
+    "allow-app-commands",
+    "log:default",
+    "os:default"
+  ]
+}

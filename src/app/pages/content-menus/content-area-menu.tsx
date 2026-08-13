@@ -36,6 +36,14 @@ interface ContentAreaMenuProps extends ContextMenuPosition {
   productName: string;
   onClose: () => void;
   onAbout: () => void;
+  /** Popup host overrides — run on main via events instead of locally. */
+  onReload?: () => void;
+  onZoomIn?: () => void;
+  onZoomOut?: () => void;
+  onZoomReset?: () => void;
+  onPreferences?: () => void;
+  onCopy?: () => void;
+  onPaste?: () => void;
   terminal?: ContentAreaTerminalActions;
 }
 
@@ -45,6 +53,13 @@ export default function ContentAreaMenu({
   productName,
   onClose,
   onAbout,
+  onReload,
+  onZoomIn,
+  onZoomOut,
+  onZoomReset,
+  onPreferences,
+  onCopy,
+  onPaste,
   terminal,
 }: ContentAreaMenuProps) {
   const { label } = useKeybindingLabels();
@@ -54,8 +69,8 @@ export default function ContentAreaMenu({
     onClose();
   };
 
-  const copy = terminal?.onCopy ?? copySelection;
-  const paste = terminal?.onPaste ?? pasteAtFocus;
+  const copy = onCopy ?? terminal?.onCopy ?? copySelection;
+  const paste = onPaste ?? terminal?.onPaste ?? pasteAtFocus;
 
   return (
     <nav
@@ -68,7 +83,7 @@ export default function ContentAreaMenu({
         type="button"
         className="context-menu__item"
         role="menuitem"
-        onClick={run(() => window.location.reload())}
+        onClick={run(onReload ?? (() => window.location.reload()))}
       >
         <ReloadIcon className="context-menu__icon" />
         <span className="context-menu__label">Reload</span>
@@ -78,7 +93,7 @@ export default function ContentAreaMenu({
         type="button"
         className="context-menu__item"
         role="menuitem"
-        onClick={run(zoomIn)}
+        onClick={run(onZoomIn ?? zoomIn)}
       >
         <ZoomInIcon className="context-menu__icon" />
         <span className="context-menu__label">Zoom In</span>
@@ -88,7 +103,7 @@ export default function ContentAreaMenu({
         type="button"
         className="context-menu__item"
         role="menuitem"
-        onClick={run(zoomOut)}
+        onClick={run(onZoomOut ?? zoomOut)}
       >
         <ZoomOutIcon className="context-menu__icon" />
         <span className="context-menu__label">Zoom Out</span>
@@ -98,7 +113,7 @@ export default function ContentAreaMenu({
         type="button"
         className="context-menu__item"
         role="menuitem"
-        onClick={run(zoomReset)}
+        onClick={run(onZoomReset ?? zoomReset)}
       >
         <ZoomResetIcon className="context-menu__icon" />
         <span className="context-menu__label">Reset Zoom</span>
@@ -202,7 +217,9 @@ export default function ContentAreaMenu({
         type="button"
         className="context-menu__item"
         role="menuitem"
-        onClick={run(() => invoke("open_configs_folder"))}
+        onClick={run(
+          onPreferences ?? (() => invoke("open_configs_folder")),
+        )}
       >
         <PreferencesIcon className="context-menu__icon" />
         <span className="context-menu__label">Preferences</span>
