@@ -1,0 +1,64 @@
+src/configs/.tsbuildinfo-test
+  s_b2fd917b8f2c7b::t_a0d08c59d36956 1
+src/app/components/terminal/config/ConfigPanel.tsx
+  s_7f89939e55b7e7::t_19de7125b9be40 187-207
+  s_7f89939e55b7e7::t_61b55bca861ad0 311,314-318
+  s_7f89939e55b7e7::t_6ce589f010dfe6 234,243-246
+  s_7f89939e55b7e7::t_bcda0322e6aa4f 20,28,186
+  s_7f89939e55b7e7::t_d3f248cdc90cf0 122
+src/app/components/terminal/config/LoggingPage.tsx
+  s_7f89939e55b7e7::t_4225adcfccde31 38
+  s_7f89939e55b7e7::t_83719a5e0eabb6 5
+  s_7f89939e55b7e7::t_fbe6f87cd3ab64 79,85,88,91,99,102,104
+  s_7f89939e55b7e7::t_4de38ee9e5dba2 31-32
+src/app/types/index.ts
+  s_7f89939e55b7e7::t_103d619f7c735c 14
+src-tauri/src/commands/commands.rs
+  s_7f89939e55b7e7::t_68545d28ca1387 86,97
+src-tauri/src/logging.rs
+  s_7f89939e55b7e7::t_5c643fb3ba1633 203-204,207-209
+src-tauri/src/agent/mod.rs
+  s_7f89939e55b7e7::t_88d6dd965b6046 387
+  s_7f89939e55b7e7::t_0cc340bd912fd5 144-151,153
+  s_7f89939e55b7e7::t_4d1ef426bb839d 202-212
+  s_7f89939e55b7e7::t_5aec789043e2e4 272
+  s_7f89939e55b7e7::t_c5fa5ff6291966 393-401,404
+src-tauri/src/config/mod.rs
+  s_7f89939e55b7e7::t_c63e5d322db40f 34
+  s_7f89939e55b7e7::t_32bf642c1b7703 657-662
+  s_7f89939e55b7e7::t_fc268445601388 967
+  s_7f89939e55b7e7::t_e1b737ae88ac08 595-596,604
+.cursor/hooks/state/continual-learning.json
+  s_b2fd917b8f2c7b::t_961fd1c591912e 4,6
+src/app/types/tauri.ts
+  s_7f89939e55b7e7::t_e6269a04ebebb9 135-141
+src/app/lib/settings.ts
+  s_7f89939e55b7e7::t_648b9c771d954b 115-122
+  s_7f89939e55b7e7::t_1f3fed2fdca7bd 13
+src/configs/.tsbuildinfo-app
+  s_b2fd917b8f2c7b::t_a0d08c59d36956 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "f8a4d06404a300d0d01f3a6a082e2f747cb56c44",
+  "prompts": {},
+  "sessions": {
+    "s_7f89939e55b7e7": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "faa8fdac-1c7d-4e6e-98e3-2c0df0673ca0",
+        "model": "grok-4.6"
+      },
+      "human_author": null
+    },
+    "s_b2fd917b8f2c7b": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "57ab9cbf-b5cb-4c7d-b976-e0c1cbe7b653",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
