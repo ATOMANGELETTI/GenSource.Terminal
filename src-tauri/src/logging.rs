@@ -185,6 +185,86 @@ fn local_stamp() -> String {
 }
 
 fn truncate_msg(msg: &str) -> String {
+    let trimmed = redact_secrets(msg.trim());
+    if trimmed.len() <= MAX_AGENT_LINE_BYTES {
+        return trimmed;
+    }
+    let mut end = MAX_AGENT_LINE_BYTES;
+    while end > 0 && !trimmed.is_char_boundary(end) {
+        end -= 1;
+    }
+    format!("{}…", &trimmed[..end])
+}
+
+/// Strip API keys, vault passwords, and similar secrets from log / error text.
+pub fn redact_secrets(input: &str) -> String {
+    let mut out = input.to_string();
+    for needle in [
+        "key=",
+        "api_key=",
+        "apikey=",
+        "x-goog-api-key=",
+        "x-goog-api-key:",
+        "gemini_api_key=",
+        "gensource_vault_password=",
+    ] {
+        out = redact_assignment(&out, needle);
+    }
+    redact_aiza_tokens(&out)
+}
+
+fn redact_assignment(input: &str, needle: &str) -> String {
+    let lower = input.to_ascii_lowercase();
+    let needle_l = needle.to_ascii_lowercase();
+    let mut out = String::with_capacity(input.len());
+    let mut rest = 0;
+    while let Some(rel) = lower[rest..].find(&needle_l) {
+        let start = rest + rel;
+        out.push_str(&input[rest..start + needle.len()]);
+        let value_at = start + needle.len();
+        let end = value_end(input, value_at);
+        out.push_str("***");
+        rest = end;
+    }
+    out.push_str(&input[rest..]);
+    out
+}
+
+fn value_end(input: &str, start: usize) -> usize {
+    input[start..]
+        .find(|c: char| {
+            matches!(c, '&' | '"' | '\'' | ',' | ';' | ']' | '}') || c.is_whitespace()
+        })
+        .map(|i| start + i)
+        .unwrap_or(input.len())
+}
+
+fn redact_aiza_tokens(input: &str) -> String {
+    let bytes = input.as_bytes();
+    let mut out = String::with_capacity(input.len());
+    let mut i = 0;
+    while i < bytes.len() {
+        if bytes.len() - i >= 4 && &bytes[i..i + 4] == b"AIza" {
+            out.push_str("AIza***");
+            i += 4;
+            while i < bytes.len() {
+                let c = bytes[i];
+                if c.is_ascii_alphanumeric() || c == b'_' || c == b'-' {
+                    i += 1;
+                } else {
+                    break;
+                }
+            }
+            continue;
+        }
+        let ch = input[i..].chars().next().unwrap_or('\0');
+        out.push(ch);
+        i += ch.len_utf8();
+    }
+    out
+}
+
+fn append_agent_line(line: &str) {
     let trimmed = msg.trim();
     if trimmed.len() <= MAX_AGENT_LINE_BYTES {
         return trimmed.to_string();
@@ -231,7 +311,10 @@ fn rotate_if_needed(slot: &mut Option<AgentFile>, path: &Path) {
         return;
     }
     *slot = None;
-    let old = PathBuf::from(format!("{}.old", path.display()));
+    let old = match path.file_stem().and_then(|s| s.to_str()) {
+        Some(stem) => path.with_file_name(format!("{stem}.old.log")),
+        None => PathBuf::from(format!("{}.old.log", path.display())),
+    };
     let _ = fs::remove_file(&old);
     let _ = fs::rename(path, &old);
 }
@@ -324,5 +407,22 @@ mod tests {
         settings.agent.levels.error = false;
         assert!(!agent_allows(&settings.agent, Level::Error, false, None));
         assert!(agent_allows(&settings.agent, Level::Warn, false, None));
+    }
+
+    #[test]
+    fn redacts_query_key_and_aiza_tokens() {
+        let raw = "HttpError: https://generativelanguage.googleapis.com/v1?alt=sse&key=AIzaSyCsecretvalue123";
+        let scrubbed = redact_secrets(raw);
+        assert!(!scrubbed.contains("AIzaSyCsecretvalue123"), "{scrubbed}");
+        assert!(!scrubbed.contains("key=AIza"), "{scrubbed}");
+        assert!(scrubbed.contains("key=***"), "{scrubbed}");
+    }
+
+    #[test]
+    fn redacts_env_style_secrets() {
+        let raw = "GEMINI_API_KEY=abc123 GENSOURCE_VAULT_PASSWORD=hunter2";
+        let scrubbed = redact_secrets(raw);
+        assert!(!scrubbed.contains("abc123"), "{scrubbed}");
+        assert!(!scrubbed.contains("hunter2"), "{scrubbed}");
     }
 }
