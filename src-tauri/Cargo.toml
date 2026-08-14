@@ -18,7 +18,7 @@ tauri = { version = "2", features = ["tray-icon", "image-png"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 log = "0.4.33"
-notify = "7"
+notify = "8"
 time = { version = "0.3", features = ["local-offset", "formatting"] }
 
 # Desktop plugins (kitchen sink; mobile-only plugins intentionally omitted:
