@@ -1,10 +1,11 @@
-//! Source Control IPC: discover/init, status, stage/unstage/discard, commit, branches.
+//! Source Control IPC: discover/init, status, list-dir, stage/unstage/discard, commit, branches.
 
 use tauri::{AppHandle, State};
 
 use crate::git::{self, GitWatcher};
 use crate::mdoels::{
-    GitBranchInfo, GitCommitResult, GitOpenResult, GitStatusResult,
+    GitBranchInfo, GitCommitResult, GitDiffSide, GitFileDiff, GitOpenResult, GitStatusResult,
+    GitTreeEntry,
 };
 
 /// Discover whether `path` (or an ancestor) is a git repository.
@@ -23,6 +24,12 @@ pub fn git_init(path: String) -> Result<GitOpenResult, String> {
 #[tauri::command]
 pub fn git_status(path: String) -> Result<GitStatusResult, String> {
     git::status(path.trim())
+}
+
+/// List one worktree directory with git decorations. `dir` defaults to the root.
+#[tauri::command]
+pub fn git_list_dir(path: String, dir: Option<String>) -> Result<Vec<GitTreeEntry>, String> {
+    git::list_dir(path.trim(), dir.as_deref().unwrap_or(""))
 }
 
 /// Stage the given paths into the index (`path` = any path inside the repo).
@@ -84,4 +91,14 @@ pub fn git_watch_start(
 pub fn git_watch_stop(watcher: State<'_, GitWatcher>) -> Result<(), String> {
     watcher.stop();
     Ok(())
+}
+
+/// Unified per-file diff (`filePath` + `side` from the webview).
+#[tauri::command(rename_all = "camelCase")]
+pub fn git_file_diff(
+    path: String,
+    file_path: String,
+    side: GitDiffSide,
+) -> Result<GitFileDiff, String> {
+    git::file_diff(path.trim(), file_path.trim(), side)
 }

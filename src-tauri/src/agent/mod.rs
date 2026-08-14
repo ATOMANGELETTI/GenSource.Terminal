@@ -162,6 +162,13 @@ pub async fn agent_chat_send(
         provider.model.trim().to_string()
     };
 
+    crate::log_agent!(
+        log::Level::Info,
+        Some(crate::logging::AgentLogKind::Prompt),
+        &conversation_id,
+        "{message}"
+    );
+
     db.ensure_conversation(&conversation_id).await?;
     db.insert_message(&conversation_id, "user", &message, None, None, None)
         .await?;
@@ -231,6 +238,13 @@ pub async fn agent_chat_send(
         Ok(reply) => {
             sessions.set_history(&conversation_id, history.clone());
             if !reply.trim().is_empty() {
+                crate::log_agent!(
+                    log::Level::Info,
+                    Some(crate::logging::AgentLogKind::Reply),
+                    &conversation_id,
+                    "{}",
+                    reply.trim()
+                );
                 let _ = db
                     .insert_message(&conversation_id, "assistant", reply.trim(), None, None, None)
                     .await;
@@ -246,6 +260,12 @@ pub async fn agent_chat_send(
         }
         Err(err) => {
             let message = err;
+            let level = if message == "cancelled" {
+                log::Level::Warn
+            } else {
+                log::Level::Error
+            };
+            crate::log_agent!(level, None, &conversation_id, "{message}");
             let _ = app.emit(
                 AGENT_ERROR_EVENT,
                 AgentErrorEvent {
@@ -360,6 +380,15 @@ where
     }
 
     let visible = visible_agent_reply(&acc, &final_output, &reasoning);
+    if !reasoning.trim().is_empty() {
+        crate::log_agent!(
+            log::Level::Debug,
+            Some(crate::logging::AgentLogKind::Reasoning),
+            conversation_id,
+            "{}",
+            reasoning.trim()
+        );
+    }
     if acc.trim().is_empty() && !visible.is_empty() {
         log::info!(
             "agent reply had no text deltas; returning {} chars from final/reasoning",

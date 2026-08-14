@@ -15,10 +15,15 @@ import {
 } from "../../../lib/context-menu-popup";
 import { fsOpenPath, fsRevealPath } from "../../../lib/terminal/explorer-fs";
 import {
+  diffSideFromSection,
+  type OpenDiffRequest,
+} from "../../../lib/terminal/git-diff";
+import {
   autoStagePaths,
   canCommit,
   changesSectionEntries,
   emptyStatus,
+  unstagedSectionEntries,
   folderDisplayName,
   gitBranches,
   gitCheckout,
@@ -35,6 +40,7 @@ import {
   pickScmFolder,
   resolveScmPanelState,
   scmErrorMessage,
+  scmRootsEqual,
   subscribeScmChanged,
 } from "../../../lib/terminal/git-scm";
 import type {
@@ -42,6 +48,7 @@ import type {
   GitChangeEntry,
   GitOpenFolderResult,
   GitStatusResult,
+  ScmPanelState,
 } from "../../../types/git-scm";
 import {
   ChevronRightIcon,
@@ -59,12 +66,8 @@ import ChangeRowContextMenu, {
 interface SourceControlPanelProps {
   folderPath: string | null;
   onFolderPathChange: (path: string | null) => void;
-}
-
-function scmRootsEqual(a: string, b: string): boolean {
-  const norm = (value: string) =>
-    value.replace(/[\\/]+$/, "").replace(/\\/g, "/").toLowerCase();
-  return norm(a) === norm(b);
+  onPanelStateChange?: (state: ScmPanelState) => void;
+  onOpenDiff?: (request: OpenDiffRequest) => void;
 }
 
 /** Keep intentional Unstage from fighting auto-stage / watch refresh briefly. */
@@ -73,6 +76,8 @@ const SKIP_AUTO_STAGE_MS = 1500;
 export default function SourceControlPanel({
   folderPath,
   onFolderPathChange,
+  onPanelStateChange,
+  onOpenDiff,
 }: SourceControlPanelProps) {
   const messageId = useId();
   const [openResult, setOpenResult] = useState<GitOpenFolderResult | null>(null);
@@ -99,11 +104,16 @@ export default function SourceControlPanel({
     : (folderPath ?? "");
   const displayRoot = openResult?.root ?? folderPath ?? "";
   const staged = status.staged;
+  const unstaged = unstagedSectionEntries(status);
   const changes = changesSectionEntries(status);
   const conflicts = status.conflicted;
 
   gitRootRef.current = gitRoot;
   folderPathRef.current = folderPath;
+
+  useEffect(() => {
+    onPanelStateChange?.(panelState);
+  }, [onPanelStateChange, panelState]);
 
   const armSkipAutoStage = useCallback(() => {
     skipAutoStageUntilRef.current = Date.now() + SKIP_AUTO_STAGE_MS;
@@ -369,6 +379,20 @@ export default function SourceControlPanel({
     [gitRoot, runMutation],
   );
 
+  const openDiff = useCallback(
+    (entry: GitChangeEntry, section: ChangeListSection) => {
+      if (!gitRoot || !onOpenDiff || section === "clean") return;
+      onOpenDiff({
+        repoRoot: gitRoot,
+        path: entry.path,
+        absolutePath: entry.absolutePath,
+        side: diffSideFromSection(section),
+        status: entry.status,
+      });
+    },
+    [gitRoot, onOpenDiff],
+  );
+
   useEffect(() => {
     let cancelled = false;
     let unlisten: (() => void) | undefined;
@@ -387,6 +411,9 @@ export default function SourceControlPanel({
           break;
         case "discard":
           void handleDiscard([entry.path]);
+          break;
+        case "openDiff":
+          openDiff(entry, event.payload.section);
           break;
         case "open":
           void fsOpenPath(entry.absolutePath);
@@ -412,7 +439,7 @@ export default function SourceControlPanel({
       cancelled = true;
       unlisten?.();
     };
-  }, [handleDiscard, handleStage, handleUnstage]);
+  }, [handleDiscard, handleStage, handleUnstage, openDiff]);
 
   const handleCheckout = useCallback(
     (branch: string) => {
@@ -468,6 +495,7 @@ export default function SourceControlPanel({
           type="button"
           className="scm-change__row"
           title={entry.absolutePath}
+          onClick={() => openDiff(entry, section)}
           onContextMenu={(event) => openChangeContext(entry, section, event)}
         >
           <ChangeStatusBadge status={entry.status} />
@@ -822,6 +850,32 @@ export default function SourceControlPanel({
         <section className="scm-section">
           <div className="scm-section__header">
             <h3 className="scm-section__title">
+              Unstaged
+              <span className="scm-section__count">{unstaged.length}</span>
+            </h3>
+            {unstaged.length > 0 ? (
+              <button
+                type="button"
+                className="scm-section__action"
+                disabled={busy}
+                onClick={() => handleStage(unstaged.map((e) => e.path))}
+              >
+                Stage All
+              </button>
+            ) : null}
+          </div>
+          {unstaged.length === 0 ? (
+            <p className="scm-section__empty">No unstaged changes</p>
+          ) : (
+            <ul className="scm-section__list">
+              {unstaged.map((entry) => renderChangeRow(entry, "unstaged"))}
+            </ul>
+          )}
+        </section>
+
+        <section className="scm-section">
+          <div className="scm-section__header">
+            <h3 className="scm-section__title">
               Changes
               <span className="scm-section__count">{changes.length}</span>
             </h3>
@@ -850,6 +904,7 @@ export default function SourceControlPanel({
         <ChangeRowContextMenu
           {...rowMenu}
           onClose={() => setRowMenu(null)}
+          onOpenDiff={() => openDiff(rowMenu.entry, rowMenu.section)}
           onStage={() => handleStage([rowMenu.entry.path])}
           onUnstage={() => handleUnstage([rowMenu.entry.path])}
           onDiscard={() => void handleDiscard([rowMenu.entry.path])}

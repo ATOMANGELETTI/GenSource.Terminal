@@ -45,7 +45,7 @@ npm run dev
 
 | Script | Purpose |
 | --- | --- |
-| `npm run tauri:dev` | Vite + Tauri desktop (logs to `other/logging/app/`) |
+| `npm run tauri:dev` | Vite + Tauri desktop (logs to `other/logging/app/` and `other/logging/agent/`) |
 | `npm run dev` | Frontend-only Vite dev server |
 | `npm run build` | Typecheck + Vite production build |
 | `npm run tauri:build` | Windows NSIS bundle (logs to `other/logging/build/`) |

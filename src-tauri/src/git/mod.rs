@@ -1,12 +1,16 @@
 //! Pure-Rust gitoxide (`gix`) helpers for the Source Control panel.
 //! No system `git.exe` — local discover/init/status/index/commit/branch ops.
 
+mod diff;
 mod watch;
 
+pub use diff::file_diff;
 pub use watch::{resolve_worktree_root, GitWatcher};
 
+use std::cmp::Ordering;
+use std::collections::{HashMap, HashSet};
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::{Component, Path, PathBuf};
 
 use gix::bstr::{BStr, BString, ByteSlice};
 use gix::diff::index::Change as TreeIndexChange;
@@ -18,6 +22,7 @@ use gix::{ObjectId, Repository};
 
 use crate::mdoels::{
     GitBranchInfo, GitChangeStatus, GitCommitResult, GitOpenResult, GitStatusEntry, GitStatusResult,
+    GitTreeDecoration, GitTreeEntry, GitTreeEntryKind,
 };
 
 /// Discover whether `path` (or an ancestor) is a git worktree and return SCM metadata.
@@ -122,6 +127,84 @@ pub fn status(repo_path: impl AsRef<Path>) -> Result<GitStatusResult, String> {
     sort_entries(&mut result.untracked);
     sort_entries(&mut result.conflicted);
     Ok(result)
+}
+
+/// List one worktree directory with git decorations (not a full-repo walk).
+/// `dir` is a worktree-relative `/` path or absolute path under the worktree;
+/// empty/`None` lists the worktree root. `.git` is hidden. Ignored paths are
+/// included so expanding a parent can show grayed `target/`-style dirs.
+pub fn list_dir(repo_path: impl AsRef<Path>, dir: &str) -> Result<Vec<GitTreeEntry>, String> {
+    let repo = open_repo(repo_path)?;
+    let workdir = workdir(&repo)?;
+    let (abs_dir, rela_dir) = resolve_list_dir(&workdir, dir)?;
+
+    let maps = StatusMaps::from_status(status(&workdir)?);
+    let index = mutable_index(&repo)?;
+    let mut excludes = repo
+        .excludes(
+            &index,
+            None,
+            gix::worktree::stack::state::ignore::Source::WorktreeThenIdMappingIfNotSkipped,
+        )
+        .map_err(|err| format!("excludes stack: {err}"))?;
+
+    let mut seen: HashSet<String> = HashSet::new();
+    let mut entries: Vec<GitTreeEntry> = Vec::new();
+
+    match fs::read_dir(&abs_dir) {
+        Ok(read_dir) => {
+            for entry in read_dir {
+                let entry = match entry {
+                    Ok(e) => e,
+                    Err(_) => continue,
+                };
+                let name = entry.file_name().to_string_lossy().into_owned();
+                if name.is_empty() || name == ".git" {
+                    continue;
+                }
+                let meta = match entry.metadata() {
+                    Ok(m) => m,
+                    Err(_) => continue,
+                };
+                let is_dir = meta.is_dir();
+                if !is_dir && !(meta.is_file() || meta.is_symlink()) {
+                    continue;
+                }
+                let child_rela = join_rela(&rela_dir, &name);
+                let classified = classify_tree_entry(
+                    &workdir,
+                    &name,
+                    &child_rela,
+                    is_dir,
+                    &maps,
+                    &index,
+                    &mut excludes,
+                );
+                seen.insert(name.to_ascii_lowercase());
+                entries.push(classified);
+            }
+        }
+        Err(err) => {
+            if !abs_dir.exists() && has_status_under(&maps, &rela_dir) {
+                // Deleted-only directory: still list injected status children.
+            } else {
+                return Err(format!("failed to list {}: {err}", abs_dir.display()));
+            }
+        }
+    }
+
+    inject_missing_status_children(
+        &workdir,
+        &rela_dir,
+        &maps,
+        &index,
+        &mut excludes,
+        &mut seen,
+        &mut entries,
+    );
+
+    sort_tree_entries(&mut entries);
+    Ok(entries)
 }
 
 /// Stage paths (repo-relative `/` or absolute under the worktree).
@@ -541,7 +624,7 @@ fn current_branch_name(repo: &Repository) -> Option<String> {
     Some(bstr_to_string(name.shorten()))
 }
 
-fn mutable_index(repo: &Repository) -> Result<gix::index::File, String> {
+pub(crate) fn mutable_index(repo: &Repository) -> Result<gix::index::File, String> {
     match repo.open_index() {
         Ok(index) => Ok(index),
         Err(_) => Ok(gix::index::File::from_state(
@@ -551,7 +634,7 @@ fn mutable_index(repo: &Repository) -> Result<gix::index::File, String> {
     }
 }
 
-fn head_tree_index(repo: &Repository) -> Result<Option<gix::index::File>, String> {
+pub(crate) fn head_tree_index(repo: &Repository) -> Result<Option<gix::index::File>, String> {
     match repo.head_commit() {
         Ok(commit) => {
             let tree = commit
@@ -755,7 +838,7 @@ fn make_entry(workdir: &Path, rela: String, status: GitChangeStatus) -> GitStatu
     }
 }
 
-fn normalize_paths(workdir: &Path, paths: &[String]) -> Result<Vec<String>, String> {
+pub(crate) fn normalize_paths(workdir: &Path, paths: &[String]) -> Result<Vec<String>, String> {
     if paths.is_empty() {
         return Err("at least one path is required".into());
     }
@@ -836,8 +919,377 @@ fn bstr_to_string(s: &BStr) -> String {
         .unwrap_or_else(|_| s.to_string())
 }
 
-fn path_to_string(path: &Path) -> String {
+pub(crate) fn path_to_string(path: &Path) -> String {
     path.to_string_lossy().into_owned()
+}
+
+struct StatusMaps {
+    staged: HashMap<String, GitChangeStatus>,
+    unstaged: HashMap<String, GitChangeStatus>,
+    untracked: HashSet<String>,
+    conflicted: HashSet<String>,
+}
+
+impl StatusMaps {
+    fn from_status(status: GitStatusResult) -> Self {
+        let mut staged = HashMap::new();
+        for entry in status.staged {
+            staged.insert(entry.path, entry.status);
+        }
+        let mut unstaged = HashMap::new();
+        for entry in status.unstaged {
+            unstaged.insert(entry.path, entry.status);
+        }
+        Self {
+            staged,
+            unstaged,
+            untracked: status.untracked.into_iter().map(|e| e.path).collect(),
+            conflicted: status.conflicted.into_iter().map(|e| e.path).collect(),
+        }
+    }
+}
+
+fn resolve_list_dir(workdir: &Path, dir: &str) -> Result<(PathBuf, String), String> {
+    let trimmed = dir.trim();
+    if trimmed.is_empty() || trimmed == "." {
+        return Ok((workdir.to_path_buf(), String::new()));
+    }
+
+    let (abs, rela) = if Path::new(trimmed).is_absolute() {
+        let abs = PathBuf::from(trimmed);
+        let rela = abs_to_rela(workdir, &abs)?;
+        (abs, rela)
+    } else {
+        let rela = normalize_rela_input(trimmed);
+        let abs = workdir.join(gix::path::from_bstr(rela.as_bytes().as_bstr()));
+        (abs, rela)
+    };
+
+    if is_git_dir(&rela) {
+        return Err("refusing to list .git".into());
+    }
+    Ok((abs, rela))
+}
+
+fn normalize_rela_input(dir: &str) -> String {
+    dir.replace('\\', "/")
+        .split('/')
+        .filter(|s| !s.is_empty() && *s != ".")
+        .collect::<Vec<_>>()
+        .join("/")
+}
+
+fn is_git_dir(rela: &str) -> bool {
+    rela == ".git" || rela.starts_with(".git/")
+}
+
+fn abs_to_rela(workdir: &Path, abs: &Path) -> Result<String, String> {
+    if let Ok(rela) = abs.strip_prefix(workdir) {
+        return Ok(path_components_rela(rela));
+    }
+    let wd = normalize_path_key(workdir);
+    let ap = normalize_path_key(abs);
+    if ap == wd {
+        return Ok(String::new());
+    }
+    let prefix = format!("{wd}/");
+    if ap.starts_with(&prefix) {
+        let abs_s = path_to_string(abs).replace('\\', "/");
+        let wd_s = path_to_string(workdir).replace('\\', "/");
+        let wd_trim = wd_s.trim_end_matches('/');
+        if abs_s.len() > wd_trim.len() {
+            return Ok(abs_s[wd_trim.len()..]
+                .trim_start_matches('/')
+                .to_string());
+        }
+        return Ok(String::new());
+    }
+    Err(format!(
+        "{} is outside the repository worktree {}",
+        abs.display(),
+        workdir.display()
+    ))
+}
+
+fn normalize_path_key(path: &Path) -> String {
+    path_to_string(path)
+        .replace('\\', "/")
+        .trim_end_matches('/')
+        .to_ascii_lowercase()
+}
+
+fn path_components_rela(path: &Path) -> String {
+    path.components()
+        .filter_map(|c| match c {
+            Component::Normal(s) => Some(s.to_string_lossy().into_owned()),
+            _ => None,
+        })
+        .collect::<Vec<_>>()
+        .join("/")
+}
+
+fn join_rela(parent: &str, name: &str) -> String {
+    if parent.is_empty() {
+        name.to_string()
+    } else {
+        format!("{parent}/{name}")
+    }
+}
+
+fn path_under(dir: &str, path: &str) -> bool {
+    if dir.is_empty() {
+        return !path.is_empty();
+    }
+    path == dir || path.starts_with(&format!("{dir}/"))
+}
+
+fn has_status_under(maps: &StatusMaps, dir: &str) -> bool {
+    maps.staged.keys().any(|p| path_under(dir, p))
+        || maps.unstaged.keys().any(|p| path_under(dir, p))
+        || maps.untracked.iter().any(|p| path_under(dir, p))
+        || maps.conflicted.iter().any(|p| path_under(dir, p))
+}
+
+fn first_child_segment<'a>(dir: &str, path: &'a str) -> Option<(&'a str, bool)> {
+    let rest = if dir.is_empty() {
+        path
+    } else if path == dir {
+        return None;
+    } else {
+        path.strip_prefix(&format!("{dir}/"))?
+    };
+    match rest.find('/') {
+        Some(i) => Some((&rest[..i], false)),
+        None => Some((rest, true)),
+    }
+}
+
+fn index_contains(index: &gix::index::File, rela: &str) -> bool {
+    let rela_bstr: &BStr = rela.as_bytes().as_bstr();
+    index
+        .entry_by_path_and_stage(rela_bstr, gix::index::entry::Stage::Unconflicted)
+        .is_some()
+}
+
+fn index_has_prefix(index: &gix::index::File, dir: &str) -> bool {
+    if dir.is_empty() {
+        return !index.entries().is_empty();
+    }
+    if index_contains(index, dir) {
+        return true;
+    }
+    let prefix = format!("{dir}/");
+    let backing = index.path_backing();
+    index.entries().iter().any(|entry| {
+        let path = bstr_to_string(entry.path_in(backing));
+        path == dir || path.starts_with(&prefix)
+    })
+}
+
+fn path_is_ignored(
+    excludes: &mut gix::AttributeStack<'_>,
+    rela: &str,
+    is_dir: bool,
+) -> bool {
+    if rela.is_empty() {
+        return false;
+    }
+    let mode = if is_dir {
+        Some(gix::index::entry::Mode::DIR)
+    } else {
+        Some(gix::index::entry::Mode::FILE)
+    };
+    match excludes.at_entry(rela.as_bytes().as_bstr(), mode) {
+        Ok(platform) => platform.is_excluded(),
+        Err(_) => false,
+    }
+}
+
+fn first_status_under(
+    map: &HashMap<String, GitChangeStatus>,
+    dir: &str,
+) -> Option<GitChangeStatus> {
+    if let Some(&status) = map.get(dir) {
+        return Some(status);
+    }
+    map.iter()
+        .find(|(path, _)| path_under(dir, path))
+        .map(|(_, status)| *status)
+}
+
+fn classify_tree_entry(
+    workdir: &Path,
+    name: &str,
+    rela: &str,
+    is_dir: bool,
+    maps: &StatusMaps,
+    index: &gix::index::File,
+    excludes: &mut gix::AttributeStack<'_>,
+) -> GitTreeEntry {
+    let ignored = path_is_ignored(excludes, rela, is_dir);
+    let in_index = if is_dir {
+        index_has_prefix(index, rela)
+    } else {
+        index_contains(index, rela)
+    };
+
+    let (decoration, status) = if is_dir {
+        classify_dir(rela, maps, in_index, ignored)
+    } else {
+        classify_file(rela, maps, in_index, ignored)
+    };
+
+    GitTreeEntry {
+        name: name.to_string(),
+        path: rela.to_string(),
+        absolute_path: path_to_string(&workdir.join(gix::path::from_bstr(rela.as_bytes().as_bstr()))),
+        kind: if is_dir {
+            GitTreeEntryKind::Dir
+        } else {
+            GitTreeEntryKind::File
+        },
+        decoration,
+        status,
+        ignored,
+    }
+}
+
+fn classify_file(
+    rela: &str,
+    maps: &StatusMaps,
+    in_index: bool,
+    ignored: bool,
+) -> (GitTreeDecoration, Option<GitChangeStatus>) {
+    if maps.conflicted.contains(rela) {
+        return (GitTreeDecoration::Conflict, Some(GitChangeStatus::Conflict));
+    }
+    if let Some(&status) = maps.staged.get(rela) {
+        return (GitTreeDecoration::Staged, Some(status));
+    }
+    if let Some(&status) = maps.unstaged.get(rela) {
+        return (GitTreeDecoration::Unstaged, Some(status));
+    }
+    if maps.untracked.contains(rela) {
+        return (
+            GitTreeDecoration::Untracked,
+            Some(GitChangeStatus::Untracked),
+        );
+    }
+    if in_index {
+        return (GitTreeDecoration::Unchanged, None);
+    }
+    if ignored {
+        return (GitTreeDecoration::Ignored, None);
+    }
+    (
+        GitTreeDecoration::Untracked,
+        Some(GitChangeStatus::Untracked),
+    )
+}
+
+fn classify_dir(
+    rela: &str,
+    maps: &StatusMaps,
+    in_index: bool,
+    ignored: bool,
+) -> (GitTreeDecoration, Option<GitChangeStatus>) {
+    if maps.conflicted.iter().any(|p| path_under(rela, p)) {
+        return (GitTreeDecoration::Conflict, Some(GitChangeStatus::Conflict));
+    }
+    if let Some(status) = first_status_under(&maps.staged, rela) {
+        return (GitTreeDecoration::Staged, Some(status));
+    }
+    if let Some(status) = first_status_under(&maps.unstaged, rela) {
+        return (GitTreeDecoration::Unstaged, Some(status));
+    }
+    if maps.untracked.iter().any(|p| path_under(rela, p)) {
+        return (
+            GitTreeDecoration::Untracked,
+            Some(GitChangeStatus::Untracked),
+        );
+    }
+    if in_index {
+        return (GitTreeDecoration::Unchanged, None);
+    }
+    if ignored {
+        return (GitTreeDecoration::Ignored, None);
+    }
+    (
+        GitTreeDecoration::Untracked,
+        Some(GitChangeStatus::Untracked),
+    )
+}
+
+fn inject_missing_status_children(
+    workdir: &Path,
+    rela_dir: &str,
+    maps: &StatusMaps,
+    index: &gix::index::File,
+    excludes: &mut gix::AttributeStack<'_>,
+    seen: &mut HashSet<String>,
+    entries: &mut Vec<GitTreeEntry>,
+) {
+    let mut names: Vec<(String, bool)> = Vec::new();
+    let push_child = |path: &str, names: &mut Vec<(String, bool)>| {
+        if let Some((name, is_file)) = first_child_segment(rela_dir, path) {
+            if !name.is_empty() && name != ".git" {
+                names.push((name.to_string(), is_file));
+            }
+        }
+    };
+
+    for path in maps
+        .staged
+        .iter()
+        .filter(|(_, status)| **status == GitChangeStatus::Deleted)
+        .map(|(p, _)| p.as_str())
+        .chain(
+            maps.unstaged
+                .iter()
+                .filter(|(_, status)| **status == GitChangeStatus::Deleted)
+                .map(|(p, _)| p.as_str()),
+        )
+        .chain(maps.conflicted.iter().map(String::as_str))
+    {
+        push_child(path, &mut names);
+    }
+
+    for (name, is_file) in names {
+        let key = name.to_ascii_lowercase();
+        if seen.contains(&key) {
+            continue;
+        }
+        let child_rela = join_rela(rela_dir, &name);
+        let abs = workdir.join(gix::path::from_bstr(child_rela.as_bytes().as_bstr()));
+        if abs.exists() {
+            continue;
+        }
+        seen.insert(key);
+        entries.push(classify_tree_entry(
+            workdir,
+            &name,
+            &child_rela,
+            !is_file,
+            maps,
+            index,
+            excludes,
+        ));
+    }
+}
+
+fn sort_tree_entries(entries: &mut [GitTreeEntry]) {
+    entries.sort_by(|a, b| {
+        let dir_a = matches!(a.kind, GitTreeEntryKind::Dir);
+        let dir_b = matches!(b.kind, GitTreeEntryKind::Dir);
+        match (dir_a, dir_b) {
+            (true, false) => Ordering::Less,
+            (false, true) => Ordering::Greater,
+            _ => a
+                .name
+                .to_ascii_lowercase()
+                .cmp(&b.name.to_ascii_lowercase()),
+        }
+    });
 }
 
 #[cfg(test)]
@@ -1004,6 +1456,87 @@ mod tests {
         );
         assert!(st.untracked.is_empty(), "untracked should be empty: {:?}", st.untracked);
         assert!(st.staged.iter().all(|e| e.status == GitChangeStatus::Added));
+
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn list_dir_tracked_untracked_ignored_and_deleted() {
+        let dir = temp_dir();
+        let init = init_repo(&dir).unwrap();
+        write_identity(Path::new(&init.root).join(".git").as_path());
+
+        fs::write(dir.join("tracked.txt"), b"keep").unwrap();
+        stage(&dir, &["tracked.txt".into()]).unwrap();
+        commit(&dir, "add tracked").unwrap();
+
+        fs::write(dir.join("gone.txt"), b"bye").unwrap();
+        stage(&dir, &["gone.txt".into()]).unwrap();
+        commit(&dir, "add gone").unwrap();
+        fs::remove_file(dir.join("gone.txt")).unwrap();
+
+        fs::create_dir_all(dir.join("nested")).unwrap();
+        fs::write(dir.join("nested").join("deep.txt"), b"d").unwrap();
+        stage(&dir, &["nested/deep.txt".into()]).unwrap();
+        commit(&dir, "add nested").unwrap();
+        fs::remove_file(dir.join("nested").join("deep.txt")).unwrap();
+        fs::remove_dir(dir.join("nested")).unwrap();
+
+        fs::write(dir.join(".gitignore"), b"ignored.txt\nsecret/\n").unwrap();
+        fs::write(dir.join("new.txt"), b"u").unwrap();
+        fs::write(dir.join("ignored.txt"), b"nope").unwrap();
+        fs::create_dir_all(dir.join("secret")).unwrap();
+        fs::write(dir.join("secret").join("x.txt"), b"x").unwrap();
+
+        let entries = list_dir(&dir, "").expect("list root");
+        assert!(
+            !entries.iter().any(|e| e.name == ".git"),
+            ".git must be hidden"
+        );
+
+        let by_name: HashMap<&str, &GitTreeEntry> =
+            entries.iter().map(|e| (e.name.as_str(), e)).collect();
+
+        let tracked = by_name.get("tracked.txt").expect("tracked.txt");
+        assert_eq!(tracked.decoration, GitTreeDecoration::Unchanged);
+        assert!(!tracked.ignored);
+        assert_eq!(tracked.kind, GitTreeEntryKind::File);
+
+        let untracked = by_name.get("new.txt").expect("new.txt");
+        assert_eq!(untracked.decoration, GitTreeDecoration::Untracked);
+        assert_eq!(untracked.status, Some(GitChangeStatus::Untracked));
+
+        let ignored = by_name.get("ignored.txt").expect("ignored.txt");
+        assert_eq!(ignored.decoration, GitTreeDecoration::Ignored);
+        assert!(ignored.ignored);
+
+        let secret = by_name.get("secret").expect("secret/");
+        assert_eq!(secret.kind, GitTreeEntryKind::Dir);
+        assert_eq!(secret.decoration, GitTreeDecoration::Ignored);
+        assert!(secret.ignored);
+
+        let gone = by_name.get("gone.txt").expect("deleted gone.txt");
+        assert_eq!(gone.decoration, GitTreeDecoration::Unstaged);
+        assert_eq!(gone.status, Some(GitChangeStatus::Deleted));
+        assert!(!dir.join("gone.txt").exists());
+
+        let nested = by_name.get("nested").expect("deleted nested/");
+        assert_eq!(nested.kind, GitTreeEntryKind::Dir);
+        assert_eq!(nested.decoration, GitTreeDecoration::Unstaged);
+
+        let secret_kids = list_dir(&dir, "secret").expect("list ignored dir");
+        assert_eq!(secret_kids.len(), 1);
+        assert_eq!(secret_kids[0].name, "x.txt");
+        assert!(secret_kids[0].ignored);
+        assert_eq!(secret_kids[0].decoration, GitTreeDecoration::Ignored);
+
+        let nested_kids = list_dir(&dir, "nested").expect("list deleted dir");
+        assert_eq!(nested_kids.len(), 1);
+        assert_eq!(nested_kids[0].name, "deep.txt");
+        assert_eq!(nested_kids[0].status, Some(GitChangeStatus::Deleted));
+        assert_eq!(nested_kids[0].decoration, GitTreeDecoration::Unstaged);
+
+        assert!(list_dir(&dir, ".git").is_err());
 
         let _ = fs::remove_dir_all(&dir);
     }

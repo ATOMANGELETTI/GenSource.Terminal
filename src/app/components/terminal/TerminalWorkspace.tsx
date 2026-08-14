@@ -1,5 +1,7 @@
 import {
   forwardRef,
+  lazy,
+  Suspense,
   useCallback,
   useEffect,
   useImperativeHandle,
@@ -14,8 +16,15 @@ import { useTerminalSettings } from "../../hooks/useTerminalSettings";
 import { saveAppStore } from "../../lib/app-store";
 import { isE2eMode } from "../../lib/e2e-window";
 import {
+  createDiffTabState,
+  ensureActiveWorkspaceTab,
+  findDiffTab,
+  languageFromPath,
+  type DiffTabState,
+  type OpenDiffRequest,
+} from "../../lib/terminal/git-diff";
+import {
   createTabState,
-  ensureActiveTab,
   type TabState,
 } from "../../lib/terminal/session-manager";
 import {
@@ -45,7 +54,10 @@ import TabBar from "./TabBar";
 import TerminalPane from "./TerminalPane";
 import type { OpenInTerminalApi } from "./explorer/FilesExplorer";
 import TerminalParticleField from "./TerminalParticleField";
+import type { GitDiffPaneHandle, GitDiffPaneMeta } from "./diff/GitDiffPane";
 import type { XtermViewHandle } from "./XtermView";
+
+const GitDiffPane = lazy(() => import("./diff/GitDiffPane"));
 
 const DEFAULT_PANEL_WIDTH = 300;
 const PIN_SNAPSHOT_INTERVAL_MS = 5000;
@@ -54,6 +66,7 @@ const RESTORE_PTY_TIMEOUT_MS = 1500;
 
 interface TabMenuState extends ContextMenuPosition {
   tabId: string;
+  tabKind: "terminal" | "diff";
 }
 
 /** Imperative API for App.tsx local shortcuts (Track D). */
@@ -306,6 +319,10 @@ const TerminalWorkspace = forwardRef<
     );
     const particlesActive = !isE2eMode();
     const [tabs, setTabs] = useState<TabState[]>([]);
+    const [diffTabs, setDiffTabs] = useState<DiffTabState[]>([]);
+    const [diffMeta, setDiffMeta] = useState<Record<string, GitDiffPaneMeta>>(
+      {},
+    );
     const [activeTabId, setActiveTabId] = useState<string | null>(null);
     const [ready, setReady] = useState(false);
     const [findOpen, setFindOpen] = useState(false);
@@ -317,6 +334,7 @@ const TerminalWorkspace = forwardRef<
     const [terminalSize, setTerminalSize] = useState({ cols: 80, rows: 24 });
 
     const xtermHandles = useRef(new Map<string, XtermViewHandle>());
+    const gitDiffHandles = useRef(new Map<string, GitDiffPaneHandle>());
     const writeFns = useRef(new Map<string, (data: string) => void>());
     const lastScrollbacksRef = useRef(new Map<string, string>());
     const scrollbackReadyRef = useRef(new Set<string>());
@@ -328,6 +346,7 @@ const TerminalWorkspace = forwardRef<
      */
     const hydratedRef = useRef(false);
     const tabsRef = useRef(tabs);
+    const diffTabsRef = useRef(diffTabs);
     const activeTabIdRef = useRef(activeTabId);
     const settingsRef = useRef(settings);
     const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -337,13 +356,20 @@ const TerminalWorkspace = forwardRef<
       tabsRef.current = tabs;
     }, [tabs]);
     useEffect(() => {
+      diffTabsRef.current = diffTabs;
+    }, [diffTabs]);
+    useEffect(() => {
       activeTabIdRef.current = activeTabId;
     }, [activeTabId]);
     useEffect(() => {
       settingsRef.current = settings;
     }, [settings]);
 
-    const resolvedActiveId = ensureActiveTab(tabs, activeTabId);
+    const resolvedActiveId = ensureActiveWorkspaceTab(
+      tabs,
+      diffTabs,
+      activeTabId,
+    );
 
     useEffect(() => {
       let cancelled = false;
@@ -606,36 +632,93 @@ const TerminalWorkspace = forwardRef<
       setActiveTabId(tab.tabId);
     }, []);
 
+    const spawnReplacementTerminal = useCallback(() => {
+      const slice = settingsRef.current;
+      return createTabState({
+        profileId: slice.defaultProfile,
+        title: profileTitle(slice.defaultProfile, slice.profiles),
+      });
+    }, []);
+
+    const handleOpenDiff = useCallback((request: OpenDiffRequest) => {
+      const existing = findDiffTab(
+        diffTabsRef.current,
+        request.repoRoot,
+        request.path,
+        request.side,
+      );
+      if (existing) {
+        setActiveTabId(existing.tabId);
+        setFindOpen(false);
+        return;
+      }
+      const tab = createDiffTabState(request);
+      setDiffTabs((prev) => [...prev, tab]);
+      setActiveTabId(tab.tabId);
+      setFindOpen(false);
+    }, []);
+
     const handleClose = useCallback((tabId: string) => {
       setTabMenu((menu) => (menu?.tabId === tabId ? null : menu));
       setRenamingTabId((current) => (current === tabId ? null : current));
+      setDiffMeta((prev) => {
+        if (!(tabId in prev)) return prev;
+        const next = { ...prev };
+        delete next[tabId];
+        return next;
+      });
+      gitDiffHandles.current.delete(tabId);
+
+      const isDiff = diffTabsRef.current.some((tab) => tab.tabId === tabId);
+      if (isDiff) {
+        setDiffTabs((prev) => {
+          const next = prev.filter((tab) => tab.tabId !== tabId);
+          const terminals = tabsRef.current;
+          if (next.length === 0 && terminals.length === 0) {
+            const replacement = spawnReplacementTerminal();
+            setTabs([replacement]);
+            setActiveTabId(replacement.tabId);
+            return [];
+          }
+          setActiveTabId((current) => {
+            if (current !== tabId) return current;
+            return terminals[0]?.tabId ?? next[0]?.tabId ?? null;
+          });
+          return next;
+        });
+        return;
+      }
+
       setTabs((prev) => {
         const next = prev.filter((t) => t.tabId !== tabId);
         xtermHandles.current.delete(tabId);
         writeFns.current.delete(tabId);
         lastScrollbacksRef.current.delete(tabId);
         scrollbackReadyRef.current.delete(tabId);
-        if (next.length === 0) {
-          const slice = settingsRef.current;
-          const replacement = createTabState({
-            profileId: slice.defaultProfile,
-            title: profileTitle(slice.defaultProfile, slice.profiles),
-          });
+        const diffs = diffTabsRef.current;
+        if (next.length === 0 && diffs.length === 0) {
+          const replacement = spawnReplacementTerminal();
           setActiveTabId(replacement.tabId);
           return [replacement];
         }
         setActiveTabId((current) =>
-          current === tabId ? (next[0]?.tabId ?? null) : current,
+          current === tabId
+            ? (next[0]?.tabId ?? diffs[0]?.tabId ?? null)
+            : current,
         );
         return next;
       });
-    }, []);
+    }, [spawnReplacementTerminal]);
 
     const handleCloseAllUnpinned = useCallback(() => {
       setTabMenu(null);
+      const closedDiffIds = diffTabsRef.current.map((tab) => tab.tabId);
+      setDiffTabs([]);
+      setDiffMeta({});
+      gitDiffHandles.current.clear();
       setTabs((prev) => {
         const closing = prev.filter((t) => !t.pinned);
-        if (closing.length === 0) return prev;
+        if (closing.length === 0 && closedDiffIds.length === 0) return prev;
 
         for (const tab of closing) {
           xtermHandles.current.delete(tab.tabId);
@@ -644,18 +727,17 @@ const TerminalWorkspace = forwardRef<
           scrollbackReadyRef.current.delete(tab.tabId);
         }
 
-        const closedIds = new Set(closing.map((t) => t.tabId));
+        const closedIds = new Set([
+          ...closing.map((t) => t.tabId),
+          ...closedDiffIds,
+        ]);
         setRenamingTabId((current) =>
           current && closedIds.has(current) ? null : current,
         );
 
         const next = prev.filter((t) => t.pinned);
         if (next.length === 0) {
-          const slice = settingsRef.current;
-          const replacement = createTabState({
-            profileId: slice.defaultProfile,
-            title: profileTitle(slice.defaultProfile, slice.profiles),
-          });
+          const replacement = spawnReplacementTerminal();
           setActiveTabId(replacement.tabId);
           return [replacement];
         }
@@ -667,7 +749,7 @@ const TerminalWorkspace = forwardRef<
         );
         return next;
       });
-    }, []);
+    }, [spawnReplacementTerminal]);
 
     const handleTogglePin = useCallback((tabId: string) => {
       setTabs((prev) =>
@@ -697,24 +779,28 @@ const TerminalWorkspace = forwardRef<
     const handleTabContextMenu = useCallback(
       (tabId: string, x: number, y: number) => {
         const tab = tabs.find((t) => t.tabId === tabId);
-        if (!tab) return;
-        const canCloseAll = tabs.some((t) => !t.pinned);
+        const diff = diffTabs.find((t) => t.tabId === tabId);
+        if (!tab && !diff) return;
+        const tabKind = diff ? "diff" : "terminal";
+        const canCloseAll = tabs.some((t) => !t.pinned) || diffTabs.length > 0;
         void (async () => {
           const opened = await openContextMenuPopup(x, y, {
             kind: "tab",
             tabId,
-            pinned: tab.pinned,
+            pinned: tab?.pinned ?? false,
             canCloseAll,
+            tabKind,
           });
           if (!opened) {
-            setTabMenu({ tabId, x, y });
+            setTabMenu({ tabId, tabKind, x, y });
           }
         })();
       },
-      [tabs],
+      [diffTabs, tabs],
     );
 
     const handleStartRename = useCallback((tabId: string) => {
+      if (diffTabsRef.current.some((tab) => tab.tabId === tabId)) return;
       setActiveTabId(tabId);
       setFindOpen(false);
       setRenamingTabId(tabId);
@@ -876,7 +962,14 @@ const TerminalWorkspace = forwardRef<
           const id = activeTabIdRef.current;
           if (id) handleTogglePin(id);
         },
-        openFind: () => setFindOpen(true),
+        openFind: () => {
+          const id = activeTabIdRef.current;
+          if (id && diffTabsRef.current.some((tab) => tab.tabId === id)) {
+            gitDiffHandles.current.get(id)?.openFind();
+            return;
+          }
+          setFindOpen(true);
+        },
         clearActive: () => {
           const id = activeTabIdRef.current;
           if (!id) return;
@@ -959,20 +1052,41 @@ const TerminalWorkspace = forwardRef<
     );
 
     const tabBarTabs = useMemo(
-      () =>
-        tabs.map((t) => ({
+      () => [
+        ...tabs.map((t) => ({
           tabId: t.tabId,
           title: t.title,
           active: t.tabId === resolvedActiveId,
           pinned: t.pinned,
           status: t.status,
           renaming: t.tabId === renamingTabId,
+          kind: "terminal" as const,
         })),
-      [tabs, resolvedActiveId, renamingTabId],
+        ...diffTabs.map((t) => ({
+          tabId: t.tabId,
+          title: t.title,
+          active: t.tabId === resolvedActiveId,
+          pinned: false,
+          status: "running" as const,
+          kind: "diff" as const,
+          filePath: t.path,
+          changeStatus: t.status,
+        })),
+      ],
+      [tabs, diffTabs, resolvedActiveId, renamingTabId],
     );
 
     const menuTab = tabMenu
       ? tabs.find((t) => t.tabId === tabMenu.tabId)
+      : undefined;
+    const menuDiff = tabMenu
+      ? diffTabs.find((t) => t.tabId === tabMenu.tabId)
+      : undefined;
+    const canCloseAll = tabs.some((t) => !t.pinned) || diffTabs.length > 0;
+    const activeDiff = diffTabs.find((t) => t.tabId === resolvedActiveId);
+    const activeDiffMeta = activeDiff ? diffMeta[activeDiff.tabId] : undefined;
+    const statusInfo = activeDiff
+      ? `${activeDiffMeta?.language ?? languageFromPath(activeDiff.path)} · +${activeDiffMeta?.additions ?? 0} −${activeDiffMeta?.deletions ?? 0}`
       : undefined;
 
     const activeTab = tabs.find((t) => t.tabId === resolvedActiveId);
@@ -1019,6 +1133,7 @@ const TerminalWorkspace = forwardRef<
             onResize={setPanelWidth}
             openInTerminal={openInTerminal}
             agentTerminal={agentTerminal}
+            onOpenDiff={handleOpenDiff}
           />
           <div className="terminal-workspace__center">
             <TabBar
@@ -1058,6 +1173,45 @@ const TerminalWorkspace = forwardRef<
                     }
                   />
                 ))}
+                {diffTabs.map((tab) => (
+                  <div
+                    key={tab.tabId}
+                    className="terminal-workspace__pane-slot"
+                    aria-hidden={tab.tabId !== resolvedActiveId}
+                    data-tab-id={tab.tabId}
+                  >
+                    <Suspense
+                      fallback={
+                        <p className="git-diff-pane__empty">Loading diff…</p>
+                      }
+                    >
+                      <GitDiffPane
+                        repoRoot={tab.repoRoot}
+                        filePath={tab.path}
+                        absolutePath={tab.absolutePath}
+                        side={tab.side}
+                        status={tab.status}
+                        fontFamily={settings.fontFamily}
+                        fontSize={settings.fontSize}
+                        visible={tab.tabId === resolvedActiveId}
+                        onMeta={(meta) => {
+                          setDiffMeta((prev) =>
+                            prev[tab.tabId] === meta
+                              ? prev
+                              : { ...prev, [tab.tabId]: meta },
+                          );
+                        }}
+                        ref={(handle) => {
+                          if (handle) {
+                            gitDiffHandles.current.set(tab.tabId, handle);
+                          } else {
+                            gitDiffHandles.current.delete(tab.tabId);
+                          }
+                        }}
+                      />
+                    </Suspense>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -1068,13 +1222,15 @@ const TerminalWorkspace = forwardRef<
           shellName={shellName}
           cols={terminalSize.cols}
           rows={terminalSize.rows}
+          info={statusInfo}
         />
-        {tabMenu && menuTab && (
+        {tabMenu && (menuTab || menuDiff) && (
           <TabContextMenu
             x={tabMenu.x}
             y={tabMenu.y}
-            pinned={menuTab.pinned}
-            canCloseAll={tabs.some((t) => !t.pinned)}
+            pinned={menuTab?.pinned ?? false}
+            canCloseAll={canCloseAll}
+            tabKind={tabMenu.tabKind}
             onClose={closeTabMenu}
             onRename={() => handleStartRename(tabMenu.tabId)}
             onTogglePin={() => handleTogglePin(tabMenu.tabId)}

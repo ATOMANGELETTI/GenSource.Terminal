@@ -30,7 +30,7 @@ Copy names from [`.env.example`](../../.env.example). Do **not** commit real sec
 | `src/scripts/` | npm runners (`dev`, `tauri:dev` / `tauri:build` logging wrappers, `package`) |
 | `src-tauri/` | Rust backend, capabilities, NSIS hooks |
 | `other/configs/` | Runtime app config shipped beside the installed exe (`appinfo.json`, `settings.json`, `keybindings.json`) |
-| `other/logging/` | App and build log directories |
+| `other/logging/` | App, build, and agent log directories |
 | `tests/` | Unit (`unit/`) and Playwright e2e (`e2e/`); artifacts under `tests/artifacts/` |
 | `.cursor/` | Cursor rules, skills, commands, hooks, and agent instructions |
 

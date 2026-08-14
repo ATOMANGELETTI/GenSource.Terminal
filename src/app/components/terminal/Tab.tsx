@@ -6,8 +6,40 @@ import {
   type MouseEvent,
 } from "react";
 
-import { PinIcon } from "../icons/MenuIcons";
+import type { WorkspaceTabKind } from "../../lib/context-menu-popup";
+import { fileEntryFromPath } from "../../lib/terminal/git-diff";
+import { changeStatusLabel } from "../../lib/terminal/git-scm";
 import type { TabStatus } from "../../lib/terminal/session-manager";
+import type { GitChangeStatus } from "../../types/git-scm";
+import { useFileIconSet } from "../../hooks/useFileIconSet";
+import { renderFileTypeIcon } from "../icons/fileIconSets/renderFileTypeIcon";
+import { PinIcon } from "../icons/MenuIcons";
+
+function DiffTabChrome({
+  filePath,
+  changeStatus,
+}: {
+  filePath: string;
+  changeStatus?: GitChangeStatus;
+}) {
+  const iconSet = useFileIconSet();
+  const fileEntry = fileEntryFromPath(filePath);
+  return (
+    <>
+      <span className="tab-bar__file-icon" aria-hidden>
+        {renderFileTypeIcon(fileEntry, { iconSet })}
+      </span>
+      {changeStatus ? (
+        <span
+          className={`tab-bar__diff-badge scm-change__badge scm-change__badge--${changeStatus}`}
+          aria-hidden
+        >
+          {changeStatusLabel(changeStatus)}
+        </span>
+      ) : null}
+    </>
+  );
+}
 
 export interface TabProps {
   tabId: string;
@@ -16,6 +48,9 @@ export interface TabProps {
   pinned: boolean;
   status: TabStatus;
   renaming?: boolean;
+  kind?: WorkspaceTabKind;
+  filePath?: string;
+  changeStatus?: GitChangeStatus;
   onSelect: (tabId: string) => void;
   onContextMenu: (tabId: string, x: number, y: number) => void;
   onRenameCommit: (tabId: string, title: string) => void;
@@ -29,6 +64,9 @@ export default function Tab({
   pinned,
   status,
   renaming = false,
+  kind = "terminal",
+  filePath,
+  changeStatus,
   onSelect,
   onContextMenu,
   onRenameCommit,
@@ -103,7 +141,8 @@ export default function Tab({
         .filter(Boolean)
         .join(" ")}
       aria-selected={active}
-      data-testid="terminal-tab"
+      data-testid={kind === "diff" ? "diff-tab" : "terminal-tab"}
+      data-tab-kind={kind}
       data-pinned={pinned ? "true" : "false"}
       data-tab-id={tabId}
       onClick={() => {
@@ -118,6 +157,9 @@ export default function Tab({
         }
       }}
     >
+      {kind === "diff" && filePath ? (
+        <DiffTabChrome filePath={filePath} changeStatus={changeStatus} />
+      ) : null}
       {pinned && (
         <span className="tab-bar__pin-badge" aria-hidden title="Pinned">
           <PinIcon className="tab-bar__pin-badge-icon" />

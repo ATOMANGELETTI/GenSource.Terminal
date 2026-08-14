@@ -1,8 +1,30 @@
 {
-  "error": true,
-  "warn": true,
-  "info": true,
-  "debug": true,
-  "trace": true,
-  "fatal": true
+  "app": {
+    "error": true,
+    "warn": true,
+    "info": true,
+    "debug": true,
+    "trace": true,
+    "fatal": true
+  },
+  "build": {
+    "error": true,
+    "warn": true,
+    "info": true,
+    "debug": false,
+    "trace": false,
+    "fatal": true
+  },
+  "agent": {
+    "error": true,
+    "warn": true,
+    "info": true,
+    "debug": false,
+    "trace": false,
+    "fatal": true,
+    "prompts": true,
+    "replies": true,
+    "tools": true,
+    "reasoning": false
+  }
 }

@@ -56,6 +56,11 @@
       "path": "tests/unit/agent-chat.test.ts"
     },
     {
+      "id": "git-diff",
+      "kind": "unit",
+      "path": "tests/unit/git-diff.test.ts"
+    },
+    {
       "id": "smoke",
       "kind": "unit",
       "path": "tests/unit/smoke.test.ts"

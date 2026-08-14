@@ -107,14 +107,29 @@ export interface KeybindingsFile {
   bindings: Keybinding[];
 }
 
-/** On-disk `other/configs/logging.json` shape (`get_logging` / `save_logging`). */
-export interface LoggingSettings {
+/** Per-level include/exclude toggles shared by app, build, and agent logs. */
+export interface LogLevelSettings {
   error: boolean;
   warn: boolean;
   info: boolean;
   debug: boolean;
   trace: boolean;
   fatal: boolean;
+}
+
+/** Agent file log: same levels plus content-category toggles. */
+export interface AgentLoggingSettings extends LogLevelSettings {
+  prompts: boolean;
+  replies: boolean;
+  tools: boolean;
+  reasoning: boolean;
+}
+
+/** On-disk `other/configs/logging.json` shape (`get_logging` / `save_logging`). */
+export interface LoggingSettings {
+  app: LogLevelSettings;
+  build: LogLevelSettings;
+  agent: AgentLoggingSettings;
 }
 
 /** Matches `commands::greet` which returns a bare `String`. */
@@ -146,8 +161,17 @@ export type {
   GitChangeKind,
   GitChangeStatus,
   GitCommitResult,
+  GitDiffHighlight,
+  GitDiffLine,
+  GitDiffLineKind,
+  GitDiffSide,
+  GitFileDiff,
   GitOpenFolderResult,
   GitStatusResult,
+  GitTreeDecoration,
+  GitTreeEntry,
+  GitTreeEntryKind,
   ScmChangedPayload,
+  ScmListSection,
   ScmPanelState,
 } from "./git-scm";

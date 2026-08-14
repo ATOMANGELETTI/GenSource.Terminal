@@ -29,6 +29,7 @@ interface StatusBarProps {
   shellName: string;
   cols: number;
   rows: number;
+  info?: string;
 }
 
 export default function StatusBar({
@@ -37,6 +38,7 @@ export default function StatusBar({
   shellName,
   cols,
   rows,
+  info,
 }: StatusBarProps) {
   const metrics = useSystemMetrics();
   const [metricMode, setMetricMode] = useState<StatusBarMetricMode>(() =>
@@ -86,7 +88,7 @@ export default function StatusBar({
       <div className="status-bar__spacer" />
 
       <div className="status-bar__info" data-testid="status-bar-info">
-        {shellName} · {cols}×{rows}
+        {info ?? `${shellName} · ${cols}×${rows}`}
       </div>
 
       <div

@@ -1,14 +1,16 @@
 @echo off
 setlocal EnableExtensions
 
-rem Archive other/logging/app and other/logging/build into scripts/archive/*.7z via 7zr.exe,
-rem then delete the archived *.log files (keeps .gitkeep).
+rem Archive other/logging/app, other/logging/build, and other/logging/agent
+rem into scripts/archive/*.7z via 7zr.exe, then delete the archived *.log files
+rem (keeps .gitkeep).
 
 pushd "%~dp0" || exit /b 1
 
 set "SEVENZR=%~dp0..\7zr.exe"
 set "APPDIR=%~dp0..\..\logging\app"
 set "BUILDDIR=%~dp0..\..\logging\build"
+set "AGENTDIR=%~dp0..\..\logging\agent"
 set "ARCHIVEDIR=%~dp0archive"
 set "LOGGINGDIR=%~dp0..\..\logging"
 
@@ -30,6 +32,7 @@ if not defined TS (
 set "HASLOGS=0"
 if exist "%APPDIR%\*.log" set "HASLOGS=1"
 if exist "%BUILDDIR%\*.log" set "HASLOGS=1"
+if exist "%AGENTDIR%\*.log" set "HASLOGS=1"
 if "%HASLOGS%"=="0" (
   echo No log files to archive.
   popd
@@ -45,7 +48,7 @@ pushd "%LOGGINGDIR%" || (
   exit /b 1
 )
 
-"%SEVENZR%" a -t7z -y -ssw "%OUT%" "app\*.log" "build\*.log"
+"%SEVENZR%" a -t7z -y -ssw "%OUT%" "app\*.log" "build\*.log" "agent\*.log"
 set "RC=%ERRORLEVEL%"
 popd
 
@@ -57,7 +60,8 @@ if not "%RC%"=="0" (
 
 if exist "%APPDIR%\*.log" del /q "%APPDIR%\*.log"
 if exist "%BUILDDIR%\*.log" del /q "%BUILDDIR%\*.log"
+if exist "%AGENTDIR%\*.log" del /q "%AGENTDIR%\*.log"
 
-echo Archived and cleaned app/ and build/ logs.
+echo Archived and cleaned app/, build/, and agent/ logs.
 popd
 exit /b 0

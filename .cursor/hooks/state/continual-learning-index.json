@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAtUtc": "2026-08-13T08:54:42.143Z",
+  "updatedAtUtc": "2026-08-14T00:12:41.787Z",
   "transcripts": {
     "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\0c632224-d63b-4b2b-8982-b80913559e36\\subagents\\775a7b05-bec1-4a1d-9c81-435a3a6ca114.jsonl": {
       "mtimeMs": 1786514050872
@@ -131,6 +131,9 @@
     "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\2f3ebdc2-e49f-430f-b1b1-6523b5fbf49c\\subagents\\a4b34fb6-416d-4d11-af75-b860946a8a1e.jsonl": {
       "mtimeMs": 1786601628707
     },
+    "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\33af420c-0c6c-445c-bd92-4e7335ab9d79\\33af420c-0c6c-445c-bd92-4e7335ab9d79.jsonl": {
+      "mtimeMs": 1786613749475
+    },
     "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\3d380de6-ac3d-4ce3-b1e2-ac8a2876fbe7\\3d380de6-ac3d-4ce3-b1e2-ac8a2876fbe7.jsonl": {
       "mtimeMs": 1786506212567
     },
@@ -168,10 +171,13 @@
       "mtimeMs": 1786605083898
     },
     "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\51b654a5-7789-4595-9540-e7985efff32b\\51b654a5-7789-4595-9540-e7985efff32b.jsonl": {
-      "mtimeMs": 1786608782514
+      "mtimeMs": 1786666200431
     },
     "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\51b654a5-7789-4595-9540-e7985efff32b\\subagents\\0310e9d8-b83c-437b-adff-854a2304ec5f.jsonl": {
       "mtimeMs": 1786608165704
+    },
+    "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\51b654a5-7789-4595-9540-e7985efff32b\\subagents\\185b1685-ce60-4a3c-9ee3-eebb0a023b29.jsonl": {
+      "mtimeMs": 1786666199000
     },
     "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\51b654a5-7789-4595-9540-e7985efff32b\\subagents\\39258fc6-502d-4627-ba22-b72fd14c8d7d.jsonl": {
       "mtimeMs": 1786604501299
@@ -184,6 +190,9 @@
     },
     "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\51b654a5-7789-4595-9540-e7985efff32b\\subagents\\87d88c88-0e99-4652-a341-2ad872b6d384.jsonl": {
       "mtimeMs": 1786608184244
+    },
+    "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\51b654a5-7789-4595-9540-e7985efff32b\\subagents\\bbabe250-f2fd-4113-810e-f7839305c2d9.jsonl": {
+      "mtimeMs": 1786666197341
     },
     "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\51b654a5-7789-4595-9540-e7985efff32b\\subagents\\c4a36be0-3119-4953-8007-7fb67c3a3c1a.jsonl": {
       "mtimeMs": 1786608571897
@@ -230,6 +239,15 @@
     "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\5ef55ee2-cfab-41da-891c-58a4896dc592\\subagents\\eebb163c-73f4-49e2-a74f-ce32b2ab7fd8.jsonl": {
       "mtimeMs": 1786517521595
     },
+    "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\65a9d27b-7163-447e-b5d9-deceed843321\\65a9d27b-7163-447e-b5d9-deceed843321.jsonl": {
+      "mtimeMs": 1786613407867
+    },
+    "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\65a9d27b-7163-447e-b5d9-deceed843321\\subagents\\76c4fbca-8f04-42a5-a1ae-e729cdb774bb.jsonl": {
+      "mtimeMs": 1786613032235
+    },
+    "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\65a9d27b-7163-447e-b5d9-deceed843321\\subagents\\a76e4fa0-9f01-4e5e-8f02-3ea092bc2b7a.jsonl": {
+      "mtimeMs": 1786612954800
+    },
     "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\6ff40ef3-3906-4334-bae0-4ab425a91261\\6ff40ef3-3906-4334-bae0-4ab425a91261.jsonl": {
       "mtimeMs": 1786608228633
     },
@@ -261,10 +279,13 @@
       "mtimeMs": 1786518755042
     },
     "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\9cd358cc-b282-4e21-8d20-ec740868caa9\\9cd358cc-b282-4e21-8d20-ec740868caa9.jsonl": {
-      "mtimeMs": 1786611010410
+      "mtimeMs": 1786665446393
     },
     "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\9cd358cc-b282-4e21-8d20-ec740868caa9\\subagents\\2da5af80-5993-4cdb-bbe7-a19e39ab9f9c.jsonl": {
       "mtimeMs": 1786608339707
+    },
+    "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\9cd358cc-b282-4e21-8d20-ec740868caa9\\subagents\\33af420c-0c6c-445c-bd92-4e7335ab9d79.jsonl": {
+      "mtimeMs": 1786613717713
     },
     "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\9cd358cc-b282-4e21-8d20-ec740868caa9\\subagents\\4328dd56-1436-476e-b92a-32f2de64b99e.jsonl": {
       "mtimeMs": 1786608481835
@@ -283,6 +304,9 @@
     },
     "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\9cd358cc-b282-4e21-8d20-ec740868caa9\\subagents\\edb30c8e-0571-4249-82c9-0e8b3d3abf24.jsonl": {
       "mtimeMs": 1786610633287
+    },
+    "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\9cd358cc-b282-4e21-8d20-ec740868caa9\\subagents\\eeb595a9-de90-4f8a-951e-21c2ddef09dc.jsonl": {
+      "mtimeMs": 1786665420251
     },
     "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\9cd358cc-b282-4e21-8d20-ec740868caa9\\subagents\\f1f89f66-7094-46d8-bb76-6ec502f57cb2.jsonl": {
       "mtimeMs": 1786611161110
@@ -462,10 +486,13 @@
       "mtimeMs": 1786518451884
     },
     "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\d27186e3-a24d-4352-b580-e11324054e70\\d27186e3-a24d-4352-b580-e11324054e70.jsonl": {
-      "mtimeMs": 1786611063664
+      "mtimeMs": 1786612628655
+    },
+    "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\d27186e3-a24d-4352-b580-e11324054e70\\subagents\\1af7ab89-3003-48d9-94a3-d4b96d4cff47.jsonl": {
+      "mtimeMs": 1786612556447
     },
     "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\d27186e3-a24d-4352-b580-e11324054e70\\subagents\\801f0620-bf26-4e87-b175-a0fb9593b28f.jsonl": {
-      "mtimeMs": 1786611091655
+      "mtimeMs": 1786611298741
     },
     "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\d5c9488a-7b29-437e-9823-0a607e364d9a\\d5c9488a-7b29-437e-9823-0a607e364d9a.jsonl": {
       "mtimeMs": 1786503866577
@@ -494,6 +521,15 @@
     "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\dadd0de0-87fb-442c-8bb5-d1bea4404aa8\\subagents\\ed004a36-290d-4e4d-82ca-308d0806e962.jsonl": {
       "mtimeMs": 1786511173722
     },
+    "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\db4bf5d5-af52-431d-9802-e747a9f31d9f\\db4bf5d5-af52-431d-9802-e747a9f31d9f.jsonl": {
+      "mtimeMs": 1786666168645
+    },
+    "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\db4bf5d5-af52-431d-9802-e747a9f31d9f\\subagents\\012e9c25-5ba9-4110-bfc2-608d66689650.jsonl": {
+      "mtimeMs": 1786666172539
+    },
+    "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\db4bf5d5-af52-431d-9802-e747a9f31d9f\\subagents\\3597dead-23a4-4b44-8e4c-93269a936d92.jsonl": {
+      "mtimeMs": 1786666156652
+    },
     "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\dc659f68-2def-49a7-b01d-e42c36845358\\dc659f68-2def-49a7-b01d-e42c36845358.jsonl": {
       "mtimeMs": 1786608393586
     },
@@ -502,6 +538,9 @@
     },
     "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\dc659f68-2def-49a7-b01d-e42c36845358\\subagents\\edfea924-a20d-46d1-bdf6-e708a51f5195.jsonl": {
       "mtimeMs": 1786608338662
+    },
+    "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\dca1fe3f-ccff-4d44-a8c1-9ce2e03a3416\\dca1fe3f-ccff-4d44-a8c1-9ce2e03a3416.jsonl": {
+      "mtimeMs": 1786613524000
     },
     "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\de5789f6-e7d7-40ba-b658-62259601a58b\\de5789f6-e7d7-40ba-b658-62259601a58b.jsonl": {
       "mtimeMs": 1786603104789
@@ -519,7 +558,13 @@
       "mtimeMs": 1786511240056
     },
     "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\ed22b887-53e0-407a-a9a1-c42a6ecb3955\\ed22b887-53e0-407a-a9a1-c42a6ecb3955.jsonl": {
-      "mtimeMs": 1786610760991
+      "mtimeMs": 1786612017954
+    },
+    "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\ed22b887-53e0-407a-a9a1-c42a6ecb3955\\subagents\\633efa8b-f1a4-45d1-b87d-c6fdb60df18c.jsonl": {
+      "mtimeMs": 1786611963908
+    },
+    "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\ed22b887-53e0-407a-a9a1-c42a6ecb3955\\subagents\\c4ed9c8f-4e23-4129-a347-b06ffd7d6345.jsonl": {
+      "mtimeMs": 1786611804228
     },
     "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\ee095005-dfec-4bcd-b9f0-977a3ea7c256\\ee095005-dfec-4bcd-b9f0-977a3ea7c256.jsonl": {
       "mtimeMs": 1786515188309
@@ -529,6 +574,9 @@
     },
     "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\ee095005-dfec-4bcd-b9f0-977a3ea7c256\\subagents\\c06eb7c7-3647-4fe0-9fe9-997dd23cd3a8.jsonl": {
       "mtimeMs": 1786515188517
+    },
+    "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\eeb595a9-de90-4f8a-951e-21c2ddef09dc\\eeb595a9-de90-4f8a-951e-21c2ddef09dc.jsonl": {
+      "mtimeMs": 1786665437267
     },
     "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\efbc8d9e-7d97-44c8-9058-9b4fdcef490b\\efbc8d9e-7d97-44c8-9058-9b4fdcef490b.jsonl": {
       "mtimeMs": 1786607430336
@@ -552,10 +600,10 @@
       "mtimeMs": 1786597957866
     },
     "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\f483be3f-6acb-4348-9a17-fc09a358573e\\f483be3f-6acb-4348-9a17-fc09a358573e.jsonl": {
-      "mtimeMs": 1786611141517
+      "mtimeMs": 1786613388119
     },
     "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\f483be3f-6acb-4348-9a17-fc09a358573e\\subagents\\65a9d27b-7163-447e-b5d9-deceed843321.jsonl": {
-      "mtimeMs": 1786611094508
+      "mtimeMs": 1786613362172
     },
     "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\f483be3f-6acb-4348-9a17-fc09a358573e\\subagents\\86cfe46a-1c4e-4581-bf8f-331aaa0508d3.jsonl": {
       "mtimeMs": 1786604144514
@@ -568,6 +616,15 @@
     },
     "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\fa331912-9c97-4005-b4db-4221145775f1\\subagents\\d569175f-6a60-4c08-97f0-5e58cd54da72.jsonl": {
       "mtimeMs": 1786510763047
+    },
+    "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\faa8fdac-1c7d-4e6e-98e3-2c0df0673ca0\\faa8fdac-1c7d-4e6e-98e3-2c0df0673ca0.jsonl": {
+      "mtimeMs": 1786666255622
+    },
+    "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\fd71d85c-0464-4a9f-8ce0-9bdb378c4302\\fd71d85c-0464-4a9f-8ce0-9bdb378c4302.jsonl": {
+      "mtimeMs": 1786615737306
+    },
+    "C:\\Users\\DUSTI\\.cursor\\projects\\c-Storage-Development-Projects-Tauri-GenSource-GenSource-Terminal\\agent-transcripts\\fd71d85c-0464-4a9f-8ce0-9bdb378c4302\\subagents\\be5109a6-4508-4723-a671-c94936dd1682.jsonl": {
+      "mtimeMs": 1786615715062
     }
   }
 }

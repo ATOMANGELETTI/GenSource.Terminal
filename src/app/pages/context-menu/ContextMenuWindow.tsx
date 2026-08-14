@@ -181,6 +181,7 @@ export default function ContextMenuWindow() {
           y={0}
           pinned={payload.pinned}
           canCloseAll={payload.canCloseAll}
+          tabKind={payload.tabKind ?? "terminal"}
           onClose={dismiss}
           onRename={runAction("rename", payload)}
           onTogglePin={runAction("togglePin", payload)}
@@ -218,6 +219,7 @@ export default function ContextMenuWindow() {
           onStage={runAction("stage", payload)}
           onUnstage={runAction("unstage", payload)}
           onDiscard={runAction("discard", payload)}
+          onOpenDiff={runAction("openDiff", payload)}
           onOpen={runAction("open", payload)}
           onCopyPath={runAction("copyPath", payload)}
           onReveal={runAction("reveal", payload)}

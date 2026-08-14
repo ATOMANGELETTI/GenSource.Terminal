@@ -3,11 +3,13 @@ import {
   PinIcon,
   RenameIcon,
 } from "../../components/icons/MenuIcons";
+import type { WorkspaceTabKind } from "../../lib/context-menu-popup";
 import type { ContextMenuPosition } from "../../types";
 
 export interface TabContextMenuProps extends ContextMenuPosition {
   pinned: boolean;
   canCloseAll: boolean;
+  tabKind?: WorkspaceTabKind;
   onClose: () => void;
   onRename: () => void;
   onTogglePin: () => void;
@@ -20,6 +22,7 @@ export default function TabContextMenu({
   y,
   pinned,
   canCloseAll,
+  tabKind = "terminal",
   onClose,
   onRename,
   onTogglePin,
@@ -37,28 +40,33 @@ export default function TabContextMenu({
       style={{ left: x, top: y }}
       role="menu"
       data-testid="tab-context-menu"
+      data-tab-kind={tabKind}
       onClick={(event) => event.stopPropagation()}
       onContextMenu={(event) => event.preventDefault()}
     >
-      <button
-        type="button"
-        className="context-menu__item"
-        role="menuitem"
-        onClick={run(onRename)}
-      >
-        <RenameIcon className="context-menu__icon" />
-        <span className="context-menu__label">Rename</span>
-      </button>
-      <button
-        type="button"
-        className="context-menu__item"
-        role="menuitem"
-        onClick={run(onTogglePin)}
-      >
-        <PinIcon className="context-menu__icon" />
-        <span className="context-menu__label">{pinned ? "Unpin" : "Pin"}</span>
-      </button>
-      <div className="context-menu__separator" role="separator" />
+      {tabKind === "terminal" ? (
+        <>
+          <button
+            type="button"
+            className="context-menu__item"
+            role="menuitem"
+            onClick={run(onRename)}
+          >
+            <RenameIcon className="context-menu__icon" />
+            <span className="context-menu__label">Rename</span>
+          </button>
+          <button
+            type="button"
+            className="context-menu__item"
+            role="menuitem"
+            onClick={run(onTogglePin)}
+          >
+            <PinIcon className="context-menu__icon" />
+            <span className="context-menu__label">{pinned ? "Unpin" : "Pin"}</span>
+          </button>
+          <div className="context-menu__separator" role="separator" />
+        </>
+      ) : null}
       <button
         type="button"
         className="context-menu__item"

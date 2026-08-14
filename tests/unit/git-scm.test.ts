@@ -65,8 +65,9 @@ describe("git-scm helpers", () => {
     expect(canCommit("fix", 2)).toBe(true);
   });
 
-  it("changesSectionEntries merges unstaged and untracked", async () => {
-    const { changesSectionEntries, emptyStatus } = await importHelpers();
+  it("splits unstaged vs untracked section entries", async () => {
+    const { changesSectionEntries, emptyStatus, unstagedSectionEntries } =
+      await importHelpers();
     const status: GitStatusResult = {
       ...emptyStatus(),
       unstaged: [
@@ -91,10 +92,9 @@ describe("git-scm helpers", () => {
         },
       ],
     };
-    expect(changesSectionEntries(status).map((e) => e.path)).toEqual([
-      "a.ts",
-      "b.ts",
-    ]);
+    expect(unstagedSectionEntries(status).map((e) => e.path)).toEqual(["a.ts"]);
+    expect(changesSectionEntries(status).map((e) => e.path)).toEqual(["b.ts"]);
+    expect(unstagedSectionEntries(null)).toEqual([]);
     expect(changesSectionEntries(null)).toEqual([]);
   });
 
@@ -148,6 +148,12 @@ describe("git-scm helpers", () => {
     expect(changeStatusLabel("intentToAdd")).toBe("A");
   });
 
+  it("scmRootsEqual ignores trailing slashes and case", async () => {
+    const { scmRootsEqual } = await importHelpers();
+    expect(scmRootsEqual("C:\\work\\repo", "C:/work/repo/")).toBe(true);
+    expect(scmRootsEqual("C:\\work\\repo", "C:\\work\\other")).toBe(false);
+  });
+
   it("emptyStatus uses conflicted bucket", async () => {
     const { emptyStatus } = await importHelpers();
     expect(emptyStatus()).toEqual({
@@ -156,6 +162,82 @@ describe("git-scm helpers", () => {
       untracked: [],
       conflicted: [],
     });
+  });
+
+  it("highestTreeDecoration prefers conflict then dirty then ignored", async () => {
+    const { highestTreeDecoration } = await importHelpers();
+    expect(highestTreeDecoration([])).toBe("unchanged");
+    expect(highestTreeDecoration(["ignored", "untracked", "unchanged"])).toBe(
+      "untracked",
+    );
+    expect(highestTreeDecoration(["unstaged", "staged", "ignored"])).toBe(
+      "staged",
+    );
+    expect(highestTreeDecoration(["untracked", "conflict", "staged"])).toBe(
+      "conflict",
+    );
+  });
+
+  it("tree decoration helpers map badges and sections", async () => {
+    const {
+      treeDecorationLabel,
+      treeSectionForEntry,
+      treeEntryToChangeEntry,
+      gitTreeEntryToFsEntry,
+      treeEntryTooltip,
+      buildGitTreeRows,
+    } = await importHelpers();
+
+    expect(treeDecorationLabel("unchanged")).toBeNull();
+    expect(treeDecorationLabel("ignored")).toBe("I");
+    expect(treeDecorationLabel("untracked")).toBe("U");
+    expect(treeDecorationLabel("conflict")).toBe("!");
+    expect(treeDecorationLabel("unstaged", "modified")).toBe("M");
+    expect(treeDecorationLabel("staged", "deleted")).toBe("D");
+
+    const ignored = {
+      name: "target",
+      path: "src-tauri/target",
+      absolutePath: "C:\\work\\src-tauri\\target",
+      kind: "dir" as const,
+      decoration: "ignored" as const,
+      ignored: true,
+    };
+    const dirty = {
+      name: "mod.rs",
+      path: "src/mod.rs",
+      absolutePath: "C:\\work\\src\\mod.rs",
+      kind: "file" as const,
+      decoration: "unstaged" as const,
+      status: "modified" as const,
+      ignored: false,
+    };
+
+    expect(treeSectionForEntry(ignored)).toBe("clean");
+    expect(treeSectionForEntry(dirty)).toBe("unstaged");
+    expect(treeEntryToChangeEntry(dirty)).toEqual({
+      path: "src/mod.rs",
+      absolutePath: "C:\\work\\src\\mod.rs",
+      status: "modified",
+    });
+    expect(gitTreeEntryToFsEntry(dirty)).toMatchObject({
+      name: "mod.rs",
+      kind: "file",
+      extension: "rs",
+    });
+    expect(treeEntryTooltip(dirty)).toContain("Unstaged");
+    expect(treeEntryTooltip(ignored)).toContain("Ignored");
+
+    const rows = buildGitTreeRows({
+      entries: [ignored, dirty],
+      children: { "src-tauri/target": [] },
+      expanded: new Set(["src-tauri/target"]),
+      loadingPaths: new Set(),
+      errors: {},
+    });
+    expect(rows).toHaveLength(2);
+    expect(rows[0]?.empty).toBe(true);
+    expect(rows[1]?.entry.name).toBe("mod.rs");
   });
 
   it("persists and clears scm folder path", async () => {

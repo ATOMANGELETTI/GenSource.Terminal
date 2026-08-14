@@ -1,0 +1,210 @@
+.git-diff-pane {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.git-diff-pane__header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  height: 2.125rem;
+  padding: 0 0.65rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  min-width: 0;
+}
+
+.git-diff-pane__identity {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.git-diff-pane__file-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+}
+
+.git-diff-pane__file-icon .file-type-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.git-diff-pane__file-icon .file-type-icon--kit svg {
+  width: 14px;
+  height: 14px;
+}
+
+.git-diff-pane__name {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.git-diff-pane__path {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+.git-diff-pane__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.git-diff-pane__pill {
+  display: inline-flex;
+  align-items: center;
+  height: 1.15rem;
+  padding: 0 0.35rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--bg);
+  color: var(--text-muted);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.git-diff-pane__counts {
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+
+.git-diff-pane__counts-add {
+  color: var(--success);
+}
+
+.git-diff-pane__counts-del {
+  color: var(--danger);
+}
+
+.git-diff-pane__nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.05rem;
+}
+
+.git-diff-pane__nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.35rem;
+  height: 1.35rem;
+  padding: 0;
+  border: none;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.git-diff-pane__nav-btn:hover:not(:disabled) {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.git-diff-pane__nav-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.git-diff-pane__nav-btn:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: -1px;
+}
+
+.git-diff-pane__nav-icon--up {
+  transform: rotate(-90deg);
+}
+
+.git-diff-pane__nav-icon--down {
+  transform: rotate(90deg);
+}
+
+.git-diff-pane__banner {
+  flex-shrink: 0;
+  padding: 0.3rem 0.65rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--warning);
+  font-size: 0.6875rem;
+}
+
+.git-diff-pane__banner--danger {
+  color: var(--danger);
+}
+
+.git-diff-pane__body {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  background: var(--bg);
+}
+
+.git-diff-pane__empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  margin: 0;
+  padding: 1.5rem;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  text-align: center;
+}
+
+.git-diff-line--insert {
+  background: color-mix(in srgb, var(--success) 18%, var(--bg));
+}
+
+.git-diff-line--delete {
+  background: color-mix(in srgb, var(--danger) 18%, var(--bg));
+}
+
+.git-diff-gutter--insert,
+.git-diff-gutter--delete {
+  width: 3px !important;
+  margin-left: 3px;
+}
+
+.git-diff-gutter--insert {
+  background: var(--success);
+}
+
+.git-diff-gutter--delete {
+  background: var(--danger);
+}
+
+.git-diff-inline--insert {
+  background: color-mix(in srgb, var(--success) 38%, transparent);
+}
+
+.git-diff-inline--delete {
+  background: color-mix(in srgb, var(--danger) 38%, transparent);
+}
+
+.git-diff-pane .monaco-editor,
+.git-diff-pane .monaco-editor-background,
+.git-diff-pane .monaco-editor .margin {
+  background: var(--bg);
+}
+
+.git-diff-pane .monaco-editor .overflow-guard {
+  background: var(--bg);
+}

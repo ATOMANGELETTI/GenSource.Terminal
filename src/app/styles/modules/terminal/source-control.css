@@ -1,5 +1,107 @@
 /* Source Control — flat Nord-token chrome for Side Panel tab. */
 
+.scm-shell {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  min-height: 0;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.scm-shell--solo {
+  flex-direction: column;
+}
+
+.scm-shell__rail {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  align-items: stretch;
+  width: 2.5rem;
+  padding: 0.35rem 0;
+  gap: 0.1rem;
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.scm-shell__rail-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 2rem;
+  padding: 0;
+  border: none;
+  border-left: 2px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.scm-shell__rail-btn:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.scm-shell__rail-btn--active {
+  color: var(--text);
+  background: var(--bg);
+  border-left-color: var(--accent);
+}
+
+.scm-shell__rail-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.scm-shell__rail-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.scm-shell__main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+.scm-shell__pane {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.scm-shell__pane--hidden {
+  display: none;
+}
+
+.scm-tree {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.scm-tree__body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 0.2rem 0 0.4rem;
+}
+
+.scm-tree-node--ignored {
+  color: var(--text-muted);
+  opacity: 0.55;
+}
+
+.scm-change__badge--ignored {
+  color: var(--text-muted);
+}
+
 .source-control {
   display: flex;
   flex-direction: column;
@@ -502,7 +604,7 @@
   font: inherit;
   font-size: 0.75rem;
   text-align: left;
-  cursor: default;
+  cursor: pointer;
 }
 
 .scm-change__path {

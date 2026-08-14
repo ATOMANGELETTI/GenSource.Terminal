@@ -303,11 +303,10 @@ pub struct KeybindingsFile {
     pub bindings: Vec<Keybinding>,
 }
 
-/// On-disk `other/configs/logging.json` shape — independent per-level toggles
-/// for file logging under `other/logging/app/`.
+/// Per-level include/exclude toggles shared by app, build, and agent logs.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
-pub struct LoggingSettings {
+pub struct LogLevelSettings {
     #[serde(default = "default_true")]
     pub error: bool,
     #[serde(default = "default_true")]
@@ -323,7 +322,7 @@ pub struct LoggingSettings {
     pub fatal: bool,
 }
 
-impl Default for LoggingSettings {
+impl Default for LogLevelSettings {
     fn default() -> Self {
         Self {
             error: true,
@@ -334,6 +333,47 @@ impl Default for LoggingSettings {
             fatal: true,
         }
     }
+}
+
+/// Agent file log: same levels as app/build, plus content-category toggles.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct AgentLoggingSettings {
+    #[serde(flatten)]
+    pub levels: LogLevelSettings,
+    #[serde(default = "default_true")]
+    pub prompts: bool,
+    #[serde(default = "default_true")]
+    pub replies: bool,
+    #[serde(default = "default_true")]
+    pub tools: bool,
+    #[serde(default)]
+    pub reasoning: bool,
+}
+
+impl Default for AgentLoggingSettings {
+    fn default() -> Self {
+        Self {
+            levels: LogLevelSettings::default(),
+            prompts: true,
+            replies: true,
+            tools: true,
+            reasoning: false,
+        }
+    }
+}
+
+/// On-disk `other/configs/logging.json` shape — nested filters for
+/// `other/logging/app/`, `other/logging/build/`, and `other/logging/agent/`.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct LoggingSettings {
+    #[serde(default)]
+    pub app: LogLevelSettings,
+    #[serde(default)]
+    pub build: LogLevelSettings,
+    #[serde(default)]
+    pub agent: AgentLoggingSettings,
 }
 
 /// Files Explorer entry kind (`fs_list_drives` / `fs_list_dir` / `fs_entry_info`).
@@ -439,6 +479,41 @@ pub struct GitStatusResult {
     pub conflicted: Vec<GitStatusEntry>,
 }
 
+/// Decoration for one worktree row in the Source Control file tree.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum GitTreeDecoration {
+    Unchanged,
+    Staged,
+    Unstaged,
+    Untracked,
+    Ignored,
+    Conflict,
+}
+
+/// File vs directory in the Source Control file tree.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum GitTreeEntryKind {
+    File,
+    Dir,
+}
+
+/// One child of a worktree directory for the lazy git tree.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GitTreeEntry {
+    pub name: String,
+    /// Repository-relative path using `/` separators.
+    pub path: String,
+    pub absolute_path: String,
+    pub kind: GitTreeEntryKind,
+    pub decoration: GitTreeDecoration,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub status: Option<GitChangeStatus>,
+    pub ignored: bool,
+}
+
 /// Local branch row for the branch menu.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -452,6 +527,65 @@ pub struct GitBranchInfo {
 #[serde(rename_all = "camelCase")]
 pub struct GitCommitResult {
     pub id: String,
+}
+
+/// Which tree pair `git_file_diff` compares.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum GitDiffSide {
+    /// Index vs HEAD.
+    Staged,
+    /// Worktree vs index (untracked = empty vs file).
+    Unstaged,
+}
+
+/// Unified-diff line kind (no `+`/`-` prefix in `text`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum GitDiffLineKind {
+    Equal,
+    Insert,
+    Delete,
+}
+
+/// Intra-line highlight as half-open Unicode scalar offsets into `text`.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GitDiffHighlight {
+    pub start: u32,
+    pub end: u32,
+}
+
+/// One reconstructed line of a unified file diff.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GitDiffLine {
+    pub kind: GitDiffLineKind,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub old_line: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub new_line: Option<u32>,
+    pub text: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub highlights: Option<Vec<GitDiffHighlight>>,
+}
+
+/// Per-file unified diff from `git_file_diff`.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GitFileDiff {
+    /// Repository-relative path using `/` separators.
+    pub path: String,
+    pub absolute_path: String,
+    pub status: GitChangeStatus,
+    pub side: GitDiffSide,
+    pub binary: bool,
+    pub truncated: bool,
+    pub additions: u32,
+    pub deletions: u32,
+    pub old_label: String,
+    pub new_label: String,
+    pub lines: Vec<GitDiffLine>,
 }
 
 fn default_agent_provider() -> String {

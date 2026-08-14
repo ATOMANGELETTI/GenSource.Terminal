@@ -141,12 +141,24 @@ pub fn resolve_logging_app_dir() -> PathBuf {
     resolve_other_subdir("logging/app")
 }
 
+/// Runtime agent log directory: `other/logging/agent`.
+pub fn resolve_logging_agent_dir() -> PathBuf {
+    resolve_other_subdir("logging/agent")
+}
+
+/// Runtime build log directory: `other/logging/build`.
+pub fn resolve_logging_build_dir() -> PathBuf {
+    resolve_other_subdir("logging/build")
+}
+
 /// Ensure config + logging directories and default files exist.
 pub fn ensure_logging_dirs() -> Result<(), String> {
     let app_dir = resolve_logging_app_dir();
-    let build_dir = resolve_other_subdir("logging/build");
+    let build_dir = resolve_logging_build_dir();
+    let agent_dir = resolve_logging_agent_dir();
     fs::create_dir_all(&app_dir).map_err(|e| format!("create logging app dir: {e}"))?;
     fs::create_dir_all(&build_dir).map_err(|e| format!("create logging build dir: {e}"))?;
+    fs::create_dir_all(&agent_dir).map_err(|e| format!("create logging agent dir: {e}"))?;
     Ok(())
 }
 
@@ -330,13 +342,10 @@ pub fn load_appinfo(dir: &Path) -> Option<AppInfoFile> {
 pub fn load_logging(dir: &Path) -> LoggingSettings {
     let path = dir.join(LOGGING_FILE);
     match fs::read_to_string(&path) {
-        Ok(raw) => match parse_jsonc::<LoggingSettings>(&raw) {
-            Ok(settings) => settings,
-            Err(err) => {
-                warn!("corrupt logging.json ({err}); merging with defaults");
-                merge_logging_partial(&raw).unwrap_or_default()
-            }
-        },
+        Ok(raw) => parse_logging_json(&raw).unwrap_or_else(|| {
+            warn!("corrupt logging.json; using defaults");
+            LoggingSettings::default()
+        }),
         Err(err) => {
             warn!("could not read logging.json ({err}); using defaults");
             LoggingSettings::default()
@@ -344,8 +353,33 @@ pub fn load_logging(dir: &Path) -> LoggingSettings {
     }
 }
 
-fn merge_logging_partial(raw: &str) -> Option<LoggingSettings> {
+fn parse_logging_json(raw: &str) -> Option<LoggingSettings> {
     let value: serde_json::Value = parse_jsonc(raw).ok()?;
+    let migrated = migrate_legacy_logging_value(value);
+    merge_logging_value(migrated)
+}
+
+/// Lift pre-nested `{ error, warn, … }` files into `{ app: { … } }`.
+fn migrate_legacy_logging_value(mut value: serde_json::Value) -> serde_json::Value {
+    let Some(obj) = value.as_object_mut() else {
+        return value;
+    };
+    if obj.contains_key("app") {
+        return value;
+    }
+    let mut app = serde_json::Map::new();
+    for key in ["error", "warn", "info", "debug", "trace", "fatal"] {
+        if let Some(v) = obj.remove(key) {
+            app.insert(key.to_string(), v);
+        }
+    }
+    if !app.is_empty() {
+        obj.insert("app".to_string(), serde_json::Value::Object(app));
+    }
+    value
+}
+
+fn merge_logging_value(value: serde_json::Value) -> Option<LoggingSettings> {
     let defaults = serde_json::to_value(LoggingSettings::default()).ok()?;
     let merged = merge_json(defaults, value);
     serde_json::from_value(merged).ok()
@@ -922,8 +956,11 @@ pub fn start_settings_watcher<R: Runtime>(app: AppHandle<R>, configs_dir: PathBu
                 let state = app.state::<AppState>();
                 let next = reload_logging_settings(&configs_dir, &state.logging);
                 info!(
-                    "reloaded logging.json (error={}, warn={}, info={}, debug={}, trace={}, fatal={})",
-                    next.error, next.warn, next.info, next.debug, next.trace, next.fatal
+                    "reloaded logging.json (app debug={}, build debug={}, agent prompts={}, agent reasoning={})",
+                    next.app.debug,
+                    next.build.debug,
+                    next.agent.prompts,
+                    next.agent.reasoning
                 );
             }
 
@@ -999,12 +1036,32 @@ mod tests {
             .join("other")
             .join("configs");
         let logging = load_logging(&dir);
-        assert!(logging.error);
-        assert!(logging.warn);
-        assert!(logging.info);
-        assert!(!logging.debug);
-        assert!(!logging.trace);
-        assert!(logging.fatal);
+        assert!(logging.app.error);
+        assert!(logging.app.warn);
+        assert!(logging.app.info);
+        assert!(logging.app.debug);
+        assert!(logging.app.trace);
+        assert!(logging.app.fatal);
+        assert!(logging.build.error);
+        assert!(!logging.build.debug);
+        assert!(!logging.build.trace);
+        assert!(logging.agent.prompts);
+        assert!(logging.agent.replies);
+        assert!(logging.agent.tools);
+        assert!(!logging.agent.reasoning);
+    }
+
+    #[test]
+    fn migrates_legacy_top_level_logging_keys_into_app() {
+        let logging = parse_logging_json(
+            r#"{"error":true,"warn":true,"info":true,"debug":true,"trace":false,"fatal":true}"#,
+        )
+        .expect("parse legacy");
+        assert!(logging.app.debug);
+        assert!(!logging.app.trace);
+        assert!(!logging.build.debug);
+        assert!(logging.agent.prompts);
+        assert!(!logging.agent.reasoning);
     }
 
     #[test]
@@ -1054,13 +1111,15 @@ mod tests {
         ));
         let _ = fs::remove_dir_all(&dir);
         fs::create_dir_all(&dir).expect("mkdir");
-        let logging = LoggingSettings {
-            debug: true,
-            ..LoggingSettings::default()
-        };
+        let mut logging = LoggingSettings::default();
+        logging.app.debug = true;
         write_logging(&dir, &logging).expect("write logging");
         let loaded = load_logging(&dir);
-        assert!(loaded.debug);
+        assert!(loaded.app.debug);
+        let raw = fs::read_to_string(dir.join(LOGGING_FILE)).expect("read logging");
+        assert!(raw.contains("\"app\""));
+        assert!(raw.contains("\"build\""));
+        assert!(raw.contains("\"agent\""));
 
         let keys = KeybindingsFile {
             bindings: vec![crate::mdoels::Keybinding {

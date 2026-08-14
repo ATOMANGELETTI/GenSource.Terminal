@@ -25,8 +25,10 @@ test-results/
 *.log
 other/logging/app/*
 other/logging/build/*
+other/logging/agent/*
 !other/logging/app/.gitkeep
 !other/logging/build/.gitkeep
+!other/logging/agent/.gitkeep
 
 # Portable databases + Stronghold vault (runtime; keep empty dirs + README)
 other/database/**/*.db

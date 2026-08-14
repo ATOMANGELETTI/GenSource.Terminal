@@ -339,6 +339,19 @@ export function HistoryIcon(props: IconProps) {
   );
 }
 
+/** Hierarchical tree glyph for Source Control → Git tree. */
+export function GitTreeIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M3 3.2h4.2v3.2H3z" />
+      <path d="M8.2 6.6H13v3.2H8.2z" />
+      <path d="M8.2 11H13v3.2H8.2z" />
+      <path d="M5.1 6.4v6.2h3.1" />
+      <path d="M5.1 8.2h3.1" />
+    </svg>
+  );
+}
+
 /** Flat SCM / git-branch glyph for the Source Control side-panel tab. */
 export function SourceControlIcon(props: IconProps) {
   return (
@@ -375,6 +388,15 @@ export function ChevronRightIcon(props: IconProps) {
   return (
     <svg {...base} {...props}>
       <path d="M6 3.5 10.5 8 6 12.5" />
+    </svg>
+  );
+}
+
+export function DiffIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M3.2 5.2h3.6M5 3.4v3.6" />
+      <path d="M9.2 10.8h3.6" />
     </svg>
   );
 }

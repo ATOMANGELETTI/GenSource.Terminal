@@ -16,6 +16,7 @@
 @import "./modules/terminal/status-bar.css";
 @import "./modules/terminal/metric-tooltip.css";
 @import "./modules/terminal/tabs.css";
+@import "./modules/terminal/git-diff.css";
 @import "./modules/terminal/pane.css";
 @import "./modules/terminal/xterm.css";
 @import "./modules/context-menus/menu-shared.css";

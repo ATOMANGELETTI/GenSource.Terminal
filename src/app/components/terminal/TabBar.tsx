@@ -75,6 +75,9 @@ export default function TabBar({
             pinned={tab.pinned}
             status={tab.status}
             renaming={tab.renaming}
+            kind={tab.kind}
+            filePath={tab.filePath}
+            changeStatus={tab.changeStatus}
             onSelect={onSelect}
             onContextMenu={onContextMenu}
             onRenameCommit={onRenameCommit}

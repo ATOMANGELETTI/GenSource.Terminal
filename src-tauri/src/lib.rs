@@ -68,15 +68,17 @@ pub fn run() {
     // semver segment (e.g. `0.1.0` → `0.1.log`).
     let log_file_name = format!("{}.log", config::format_log_stem(&log_version));
     let app_log_dir = config::resolve_logging_app_dir();
+    logging::init_agent_log(
+        config::resolve_logging_agent_dir().join(&log_file_name),
+        Arc::clone(&logging_settings),
+    );
 
     builder = builder
         .plugin(
             tauri_plugin_log::Builder::new()
-                .level(if cfg!(debug_assertions) {
-                    LevelFilter::Debug
-                } else {
-                    LevelFilter::Info
-                })
+                // logging.json `app` levels decide what is kept; Trace so debug/trace
+                // toggles work in release as well as dev.
+                .level(LevelFilter::Trace)
                 .timezone_strategy(tauri_plugin_log::TimezoneStrategy::UseLocal)
                 .rotation_strategy(tauri_plugin_log::RotationStrategy::KeepOne)
                 .max_file_size(10_000_000)
@@ -177,6 +179,7 @@ pub fn run() {
             commands::git_open_folder,
             commands::git_init,
             commands::git_status,
+            commands::git_list_dir,
             commands::git_stage,
             commands::git_unstage,
             commands::git_discard,
@@ -186,6 +189,7 @@ pub fn run() {
             commands::git_create_branch,
             commands::git_watch_start,
             commands::git_watch_stop,
+            commands::git_file_diff,
             agent::get_agent_config,
             agent::save_agent_config,
             agent::agent_has_api_key,

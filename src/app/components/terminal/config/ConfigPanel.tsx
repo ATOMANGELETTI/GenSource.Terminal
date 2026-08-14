@@ -88,7 +88,7 @@ const CATEGORY_META: Record<
   },
   logging: {
     title: "Logging",
-    subtitle: "Levels written to other/logging/app",
+    subtitle: "App, build, and agent log files",
   },
   keyboard: {
     title: "Keyboard",
@@ -193,8 +193,6 @@ export default function ConfigPanel() {
     };
   }, []);
 
-  }, []);
-
   const persistSettings = useCallback(async (next: AppSettings) => {
     skipExternalSettings.current = true;
     try {
@@ -234,8 +232,6 @@ export default function ConfigPanel() {
       setSaveError(message);
       console.warn("save_keybindings failed", error);
     }
-  }, []);
-
   }, []);
 
   const scheduleSettingsSave = useCallback(

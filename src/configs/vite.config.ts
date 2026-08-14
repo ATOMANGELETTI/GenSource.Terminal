@@ -20,6 +20,9 @@ export default defineConfig({
       '@': path.resolve(repoRoot, 'src/app'),
     },
   },
+  optimizeDeps: {
+    include: ['monaco-editor'],
+  },
   build: {
     outDir: 'dist',
     emptyOutDir: true,

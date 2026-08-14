@@ -66,6 +66,33 @@
   color: var(--danger);
 }
 
+.tab-bar__file-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+}
+
+.tab-bar__file-icon .file-type-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.tab-bar__file-icon .file-type-icon--kit svg {
+  width: 14px;
+  height: 14px;
+}
+
+.tab-bar__diff-badge {
+  flex-shrink: 0;
+  width: 0.75rem;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-align: center;
+}
+
 .tab-bar__pin-badge {
   display: inline-flex;
   align-items: center;

@@ -52,6 +52,18 @@ fn emit_tool(host: &AgentToolHost, name: &str, status: &str, detail: Option<Stri
             detail: detail.clone(),
         },
     );
+    let detail_s = detail.as_deref().unwrap_or("");
+    crate::log_agent!(
+        log::Level::Info,
+        Some(crate::logging::AgentLogKind::Tool),
+        &host.conversation_id,
+        "{name} {status}{}",
+        if detail_s.is_empty() {
+            String::new()
+        } else {
+            format!(" {detail_s}")
+        }
+    );
     let db = host.db.clone();
     let conversation_id = host.conversation_id.clone();
     let name = name.to_string();
@@ -81,11 +93,29 @@ async fn require_confirm(host: &AgentToolHost, tool: &str, summary: &str) -> Res
             summary: summary.into(),
         },
     );
-    let approved = host
-        .sessions
-        .wait_confirm(rx, CONFIRM_TIMEOUT)
-        .await
-        .map_err(ToolErr)?;
+    let approved = match host.sessions.wait_confirm(rx, CONFIRM_TIMEOUT).await {
+        Ok(value) => value,
+        Err(err) => {
+            crate::log_agent!(
+                log::Level::Warn,
+                Some(crate::logging::AgentLogKind::Tool),
+                &host.conversation_id,
+                "confirm {tool} failed: {err}"
+            );
+            return Err(ToolErr(err));
+        }
+    };
+    crate::log_agent!(
+        if approved {
+            log::Level::Info
+        } else {
+            log::Level::Warn
+        },
+        Some(crate::logging::AgentLogKind::Tool),
+        &host.conversation_id,
+        "confirm {tool} {} — {summary}",
+        if approved { "allowed" } else { "denied" }
+    );
     if approved {
         Ok(())
     } else {

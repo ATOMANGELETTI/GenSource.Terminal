@@ -1,14 +1,19 @@
-import type { GitChangeEntry, GitChangeStatus } from "../../../types/git-scm";
+import type {
+  GitChangeEntry,
+  GitChangeStatus,
+  ScmListSection,
+} from "../../../types/git-scm";
 import {
   CopyIcon,
   DeleteIcon,
+  DiffIcon,
   OpenExternalIcon,
   RevealIcon,
 } from "../../icons/MenuIcons";
 import { changeStatusLabel } from "../../../lib/terminal/git-scm";
 import type { ContextMenuPosition } from "../../../types";
 
-export type ChangeListSection = "staged" | "changes" | "conflicted";
+export type ChangeListSection = ScmListSection;
 
 export interface ChangeRowMenuState extends ContextMenuPosition {
   entry: GitChangeEntry;
@@ -17,6 +22,7 @@ export interface ChangeRowMenuState extends ContextMenuPosition {
 
 interface ChangeRowContextMenuProps extends ChangeRowMenuState {
   onClose: () => void;
+  onOpenDiff?: () => void;
   onStage: () => void;
   onUnstage: () => void;
   onDiscard: () => void;
@@ -30,6 +36,7 @@ export default function ChangeRowContextMenu({
   y,
   section,
   onClose,
+  onOpenDiff,
   onStage,
   onUnstage,
   onDiscard,
@@ -42,9 +49,11 @@ export default function ChangeRowContextMenu({
     onClose();
   };
 
-  const canStage = section === "changes" || section === "conflicted";
+  const canStage =
+    section === "changes" || section === "unstaged" || section === "conflicted";
   const canUnstage = section === "staged";
-  const canDiscard = section === "changes" || section === "conflicted";
+  const canDiscard =
+    section === "changes" || section === "unstaged" || section === "conflicted";
 
   return (
     <nav
@@ -58,6 +67,17 @@ export default function ChangeRowContextMenu({
         event.stopPropagation();
       }}
     >
+      {onOpenDiff && section !== "clean" ? (
+        <button
+          type="button"
+          className="context-menu__item"
+          role="menuitem"
+          onClick={run(onOpenDiff)}
+        >
+          <DiffIcon className="context-menu__icon" />
+          <span className="context-menu__label">Open Diff</span>
+        </button>
+      ) : null}
       {canStage ? (
         <button
           type="button"

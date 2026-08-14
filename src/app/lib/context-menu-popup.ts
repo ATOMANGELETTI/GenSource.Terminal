@@ -20,7 +20,12 @@ import { isE2eMode } from "./e2e-window";
 import type { FsEntry } from "../types";
 import type { GitChangeEntry } from "../types/git-scm";
 
-export type ScmChangeListSection = "staged" | "changes" | "conflicted";
+export type ScmChangeListSection =
+  | "staged"
+  | "unstaged"
+  | "changes"
+  | "conflicted"
+  | "clean";
 
 export const CONTEXT_MENU_WINDOW_LABEL = "context-menu";
 
@@ -47,11 +52,14 @@ export interface ContentMenuPayload {
   hasTerminal: boolean;
 }
 
+export type WorkspaceTabKind = "terminal" | "diff";
+
 export interface TabMenuPayload {
   kind: "tab";
   tabId: string;
   pinned: boolean;
   canCloseAll: boolean;
+  tabKind?: WorkspaceTabKind;
 }
 
 export interface FileTreeMenuPayload {

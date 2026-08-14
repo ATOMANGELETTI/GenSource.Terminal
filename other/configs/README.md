@@ -106,16 +106,65 @@ PowerShell sessions automatically load the bundled Nord 2-line powerline prompt 
 
 ## `logging.json`
 
-Controls which log levels are written to `other/logging/app/`. Edit and save — changes apply automatically while the app is running.
+Controls which log levels are written under `other/logging/`. Edit and save — app and agent filters apply while the app is running; build/app tee wrappers read this file when `tauri:dev` / `tauri:build` starts.
 
-Set each level to `true` (include) or `false` (exclude):
+Each of `app`, `build`, and `agent` has the same level keys. Set a level to `true` (include) or `false` (exclude). Console output is never filtered.
+
+| Section | Directory | Notes |
+| --- | --- | --- |
+| `app` | `other/logging/app/` | Rust `log` plugin + `tauri:dev` process tee |
+| `build` | `other/logging/build/` | `tauri:build` process tee. Lines are classified (`error:` / `[WARN]` / …); unmatched lines count as `info`. |
+| `agent` | `other/logging/agent/` | Dedicated agent chat/tool log |
+
+Level keys (`error`, `warn`, `info`, `debug`, `trace`) map to the Rust `log` crate (and classified transcript lines). `fatal` is a separate channel (error-level messages tagged with target `gensource::fatal`).
+
+`agent` also has content toggles. An event is written only when **both** its level and (when it has a category) its category are on:
 
 | Key | Notes |
 | --- | --- |
-| `error`, `warn`, `info`, `debug`, `trace` | Map to the Rust `log` crate levels |
-| `fatal` | Separate channel (error-level messages tagged with target `gensource::fatal`) |
+| `prompts` | User messages sent to the model |
+| `replies` | Final visible assistant text (not every stream chunk) |
+| `tools` | Tool calls, confirm allow/deny, results |
+| `reasoning` | Model thought text (default off) |
 
-Build logs under `other/logging/build/` are full transcripts and ignore this file.
+Failures and cancels use agent **levels** only. API keys and vault passwords are never written. Oversized payloads are truncated.
+
+Legacy files with top-level `error` / `warn` / … (no `app` object) are lifted into `app` on load. The next Config save writes the nested shape.
+
+Shipped default:
+
+```json
+{
+  "app": {
+    "error": true,
+    "warn": true,
+    "info": true,
+    "debug": true,
+    "trace": true,
+    "fatal": true
+  },
+  "build": {
+    "error": true,
+    "warn": true,
+    "info": true,
+    "debug": false,
+    "trace": false,
+    "fatal": true
+  },
+  "agent": {
+    "error": true,
+    "warn": true,
+    "info": true,
+    "debug": false,
+    "trace": false,
+    "fatal": true,
+    "prompts": true,
+    "replies": true,
+    "tools": true,
+    "reasoning": false
+  }
+}
+```
 
 ---
 

@@ -2,11 +2,21 @@
 /**
  * Tee `tauri build` stdout/stderr into other/logging/build/[TIME]_[DATE]_[VERSION].log
  * while still streaming to the console. Exit code matches the child process.
+ *
+ * File contents are filtered by logging.json `build` level toggles. Console is unfiltered.
  */
 import { createWriteStream, mkdirSync, readFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnPackageBin } from "./spawn-bin.js";
+import {
+  allows,
+  anyLevelEnabled,
+  classifyLine,
+  consumeLogChunk,
+  loadLoggingConfig,
+  stripJsonc,
+} from "./logging-config.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, "..", "..");
@@ -16,12 +26,6 @@ const packageJsonPath = join(repoRoot, "package.json");
 
 function toProjectPath(absPath) {
   return relative(repoRoot, absPath).split("\\").join("/");
-}
-
-function stripJsonc(raw) {
-  return raw
-    .replace(/\/\*[\s\S]*?\*\//g, "")
-    .replace(/^\s*\/\/.*$/gm, "");
 }
 
 function readVersion() {
@@ -56,15 +60,54 @@ function formatLogFilename(version) {
   return `${time}_${date}_${safeVersion}.log`;
 }
 
-mkdirSync(buildLogDir, { recursive: true });
+const buildLevels = loadLoggingConfig().build;
+const fileEnabled = anyLevelEnabled(buildLevels);
 
 const version = readVersion();
 const logPath = join(buildLogDir, formatLogFilename(version));
-const logStream = createWriteStream(logPath, { flags: "a" });
 
 const header = `[build] started ${new Date().toISOString()} version=${version}\n[build] log=${toProjectPath(logPath)}\n`;
 process.stdout.write(header);
-logStream.write(header);
+
+let logStream = null;
+function getLogStream() {
+  if (!fileEnabled) {
+    return null;
+  }
+  if (logStream) {
+    return logStream;
+  }
+  mkdirSync(buildLogDir, { recursive: true });
+  logStream = createWriteStream(logPath, { flags: "a" });
+  if (allows(buildLevels, "info")) {
+    logStream.write(header);
+  }
+  return logStream;
+}
+
+function writeFilteredLine(line, level) {
+  if (!allows(buildLevels, level)) {
+    return;
+  }
+  getLogStream()?.write(`${line}\n`);
+}
+
+let carry = "";
+function tee(chunk, dest) {
+  dest.write(chunk);
+  if (!fileEnabled) {
+    return;
+  }
+  carry = consumeLogChunk(carry, chunk, writeFilteredLine);
+}
+
+function flushCarry() {
+  if (!fileEnabled || !carry) {
+    return;
+  }
+  writeFilteredLine(carry, classifyLine(carry));
+  carry = "";
+}
 
 const extraArgs = process.argv.slice(2);
 // Default to Windows x64 so host-arch `target/release` does not grow beside
@@ -88,26 +131,34 @@ const child = spawnPackageBin(
   "tauri",
 );
 
-function tee(chunk, dest) {
-  dest.write(chunk);
-  logStream.write(chunk);
-}
-
 child.stdout.on("data", (chunk) => tee(chunk, process.stdout));
 child.stderr.on("data", (chunk) => tee(chunk, process.stderr));
 
 child.on("error", (err) => {
   const message = `[build] failed to spawn tauri: ${err.message}\n`;
   process.stderr.write(message);
-  logStream.write(message);
-  logStream.end(() => process.exit(1));
+  if (fileEnabled && allows(buildLevels, "error")) {
+    getLogStream()?.write(message);
+  }
+  const done = () => process.exit(1);
+  if (logStream) {
+    logStream.end(done);
+  } else {
+    done();
+  }
 });
 
 child.on("close", (code, signal) => {
+  flushCarry();
   const footer = `[build] finished code=${code ?? "null"} signal=${signal ?? "null"} at ${new Date().toISOString()}\n`;
   process.stdout.write(footer);
-  logStream.write(footer);
-  logStream.end(() => {
-    process.exit(code ?? 1);
-  });
+  if (fileEnabled && allows(buildLevels, "info")) {
+    getLogStream()?.write(footer);
+  }
+  const done = () => process.exit(code ?? 1);
+  if (logStream) {
+    logStream.end(done);
+  } else {
+    done();
+  }
 });

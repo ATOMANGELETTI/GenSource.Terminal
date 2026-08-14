@@ -27,7 +27,8 @@ import type { AgentTerminalContext, ContextMenuPosition } from "../../types";
 import AgentShell from "./agent/AgentShell";
 import ConfigPanel from "./config/ConfigPanel";
 import FilesExplorer, { type OpenInTerminalApi } from "./explorer/FilesExplorer";
-import SourceControlPanel from "./source-control/SourceControlPanel";
+import type { OpenDiffRequest } from "../../lib/terminal/git-diff";
+import SourceControlShell from "./source-control/SourceControlShell";
 import SourceControlTabContextMenu from "./source-control/SourceControlTabContextMenu";
 
 const MIN_WIDTH = 120;
@@ -63,6 +64,7 @@ interface SidePanelProps {
   onResize: (width: number) => void;
   openInTerminal?: OpenInTerminalApi;
   agentTerminal?: AgentTerminalContext | null;
+  onOpenDiff?: (request: OpenDiffRequest) => void;
 }
 
 export default function SidePanel({
@@ -71,6 +73,7 @@ export default function SidePanel({
   onResize,
   openInTerminal,
   agentTerminal,
+  onOpenDiff,
 }: SidePanelProps) {
   const dragRef = useRef<{ startX: number; startWidth: number } | null>(null);
   const [activeTab, setActiveTab] = useState<SidePanelTabId>(readStoredSidePanelTab);
@@ -277,9 +280,10 @@ export default function SidePanel({
               onOpenInSourceControl={handleOpenInSourceControl}
             />
           ) : activeTab === "source" ? (
-            <SourceControlPanel
+            <SourceControlShell
               folderPath={scmFolderPath}
               onFolderPathChange={handleScmFolderPathChange}
+              onOpenDiff={onOpenDiff}
             />
           ) : activeTab === "agent" ? (
             <AgentShell terminal={agentTerminal} />
