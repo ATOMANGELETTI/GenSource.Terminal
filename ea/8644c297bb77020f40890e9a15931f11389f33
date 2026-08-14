@@ -1,0 +1,311 @@
+src/app/styles/modules/terminal/git-diff.css
+  s_be8a6a337827fd::t_ae8cd5fb42ce14 1-210
+src/configs/vite.config.ts
+  s_be8a6a337827fd::t_15864ed15f571e 23-25
+src/configs/.tsbuildinfo-test
+  s_7f89939e55b7e7::t_0300727277f5ed 1
+src/app/components/icons/MenuIcons.tsx
+  s_d00a0272d54bf0::t_a860befc7e9eda 342-354
+  s_be8a6a337827fd::t_6c99fdd44a2762 395-403
+src-tauri/src/git/diff.rs
+  s_bf73ebfbb046ca::t_9f51649a459d6b 620-631
+  s_314c456700010e::t_0e049dc246980e 1-619,632
+src/app/components/terminal/SidePanel.tsx
+  s_be8a6a337827fd::t_8d29fb901bd614 286
+  s_be8a6a337827fd::t_7bdcfdce1c9b0e 30
+  s_d00a0272d54bf0::t_ca33570237f406 283
+  s_be8a6a337827fd::t_d44fd2fe53335e 67
+  s_be8a6a337827fd::t_0dd74abd7f7de1 76
+  s_d00a0272d54bf0::t_6eb9ba390f0ccc 31
+other/utilities/scripts/clean-logs-agent.bat
+  s_7f89939e55b7e7::t_2edc31db69e0f0 1-24
+src/app/components/terminal/source-control/SourceControlPanel.tsx
+  s_d00a0272d54bf0::t_170f92c6b05ee6 853-875
+  s_be8a6a337827fd::t_e5073cfb0dc70b 70
+  s_d00a0272d54bf0::t_7884f5e641a563 114-117
+  s_be8a6a337827fd::t_8d11bc16fd98ec 498
+  s_d00a0272d54bf0::t_adb5a654e1b333 69
+  s_d00a0272d54bf0::t_8834f0e95ed1c0 51
+  s_be8a6a337827fd::t_1541f3ebfd3dfa 80
+  s_d00a0272d54bf0::t_289c775d5199ce 107
+  s_d00a0272d54bf0::t_24721d4be5ed42 26
+  s_d00a0272d54bf0::t_444df536f42bc4 442
+  s_d00a0272d54bf0::t_a42d165d77305c 382-395
+  s_be8a6a337827fd::t_21e24e16108d23 907
+  s_d00a0272d54bf0::t_0065986b78fa2f 79
+  s_be8a6a337827fd::t_530e3cb8d64e32 17-20,43,850-852
+  s_be8a6a337827fd::t_904b0ebe29c0d1 415-417
+src/app/lib/monaco.ts
+  s_be8a6a337827fd::t_af3dcd3d0acae2 1-72
+src/scripts/logging-config.d.ts
+  s_7f89939e55b7e7::t_f1999552c3c5b1 1-43
+other/documents/development.md
+  s_7f89939e55b7e7::t_ffa56fdb5ad507 33
+src/app/types/tauri.ts
+  s_d00a0272d54bf0::t_a4739935a02a23 171-173,175
+  s_be8a6a337827fd::t_540f22f7ebeb28 133-134,164-168
+  s_7f89939e55b7e7::t_46e593c85ef256 110-111,120-132
+src/app/styles/modules/terminal/source-control.css
+  s_d00a0272d54bf0::t_f972c63162f1d6 3-104
+  s_be8a6a337827fd::t_a5b74f0c1c39b0 607
+src/configs/.tsbuildinfo-node
+  s_be8a6a337827fd::t_aef74a8fdb469b 1
+src/app/components/terminal/diff/GitDiffPane.tsx
+  s_be8a6a337827fd::t_80742b9bd72dd7 33-38
+  s_be8a6a337827fd::t_6919d7c84769b7 1-26,28,30-32,39-142,144-185,187-191,194,196-227,234,236-270,272-411,413-429,431-449
+  s_bf73ebfbb046ca::t_2a20ca91a2e2f0 143
+  s_bf73ebfbb046ca::t_d50976dd55825b 228-233,235
+  s_be8a6a337827fd::t_415d17b383c4d3 271
+  s_be8a6a337827fd::t_3d5562f11a4afd 412
+  s_bf73ebfbb046ca::t_797d3bda809283 27,29
+  s_be8a6a337827fd::t_ab1369d4bbb9d9 186,192-193,195
+  s_be8a6a337827fd::t_0331c44099c7b7 430
+other/configs/README.md
+  s_7f89939e55b7e7::t_8553a33f04f4f9 109,111-121,125-167
+src/scripts/log-tauri-app.js
+  s_7f89939e55b7e7::t_24c978568d4fb2 7-8,14-21,65-66,73-112,126,129-137,143-151
+src/app/components/terminal/StatusBar.tsx
+  s_be8a6a337827fd::t_dfcbf7c5d3b6ec 91
+  s_be8a6a337827fd::t_8062a14b8e8cd5 32
+  s_be8a6a337827fd::t_39d2c9d1aa8589 41
+.cursor/hooks/state/continual-learning.json
+  s_314c456700010e::t_0c6617c961f06d 4-6
+  s_314c456700010e::t_38a14eaf2634be 3
+src/app/components/terminal/source-control/ChangeRowContextMenu.tsx
+  s_d00a0272d54bf0::t_3f411ef39c5f3b 1-5
+  s_be8a6a337827fd::t_e36630eddfe817 9
+  s_d00a0272d54bf0::t_bbc74071b7aa19 25
+  s_be8a6a337827fd::t_d52cb3a06ebe15 39
+  s_d00a0272d54bf0::t_75938747ccdbdf 52-53,55-56
+  s_d00a0272d54bf0::t_827d8670cca603 16
+  s_d00a0272d54bf0::t_b0b921d1bd7537 70-80
+src/app/components/terminal/source-control/GitRepoTree.tsx
+  s_d00a0272d54bf0::t_e41d6139c62228 133-143
+  s_d00a0272d54bf0::t_22d65232a93526 1-11,13-73,75-77,79-132,144-492
+  s_d00a0272d54bf0::t_5f053f3416bd0d 12
+  s_d00a0272d54bf0::t_6d6a73f1e68e75 74,78
+src-tauri/permissions/app-commands.toml
+  s_314c456700010e::t_083e21d2fafe89 46
+  s_d00a0272d54bf0::t_63fc935ed8b67c 36
+src-tauri/src/logging.rs
+  s_7f89939e55b7e7::t_184ba836a5c17d 1-6,9,11,16-36,39-43,56-82,107-238,245,252-262,285-327
+.gitignore
+  s_7f89939e55b7e7::t_c4da57b4174612 28,31
+src/app/components/terminal/TabBar.tsx
+  s_be8a6a337827fd::t_674bdaca5c62e8 78-80
+src-tauri/src/commands/git.rs
+  s_314c456700010e::t_6724e31a960d2a 7-8
+  s_d00a0272d54bf0::t_cbe3b024ca1139 29-34
+  s_d00a0272d54bf0::t_19d9506b0b3074 1
+  s_314c456700010e::t_0434b16472b90d 95-104
+src/app/lib/terminal/git-diff.ts
+  s_bf73ebfbb046ca::t_77039feec42cb1 139-174
+  s_d00a0272d54bf0::t_ceae8aecf1d15e 14-19
+  s_be8a6a337827fd::t_1197c5897d931f 1-13,20-138,175-268
+src-tauri/src/config/mod.rs
+  s_7f89939e55b7e7::t_c707da5c8f0fe4 1114-1115,1118-1122
+  s_7f89939e55b7e7::t_fbc4d5f7c24b9d 144-153,157-158,161
+  s_7f89939e55b7e7::t_f3b97933894627 959-963
+  s_7f89939e55b7e7::t_7a808fad7dfc46 345-348,356,358-382,1052
+  s_7f89939e55b7e7::t_22969f04ce9c71 1039-1051
+  s_7f89939e55b7e7::t_d3bd95b6923bf1 1055-1064
+  s_7f89939e55b7e7::t_3cded115f8c521 1053-1054
+src-tauri/src/git/mod.rs
+  s_314c456700010e::t_d1c0e4b1529022 637
+  s_314c456700010e::t_64759effbb1186 841
+  s_314c456700010e::t_64068b4a5c9d12 627
+  s_314c456700010e::t_70b3d9c698a827 922
+  s_314c456700010e::t_b4dcde554e79ee 4,7
+  s_d00a0272d54bf0::t_059029806bb967 10-11,13
+  s_d00a0272d54bf0::t_16d4a05025a788 25
+  s_d00a0272d54bf0::t_65abe2ded7ea32 1462-1542
+  s_d00a0272d54bf0::t_f569edc7e60eb2 926-1294
+  s_d00a0272d54bf0::t_f6b3c8af73557b 132-209
+src/app/pages/context-menu/ContextMenuWindow.tsx
+  s_be8a6a337827fd::t_318103d12eb6ed 184
+  s_be8a6a337827fd::t_c3ff114eaf7af9 222
+tests/surfaces.json
+  s_be8a6a337827fd::t_8ec4726ae5f402 59-62
+  s_314c456700010e::t_d4200d7f3fa125 58
+src-tauri/src/agent/tools.rs
+  s_7f89939e55b7e7::t_b523e05c974d3c 55-66
+  s_7f89939e55b7e7::t_825e1ca0a82257 96-118
+src/app/components/terminal/config/ConfigPanel.tsx
+  s_7f89939e55b7e7::t_458f8261a53fc7 91
+README.md
+  s_7f89939e55b7e7::t_2c80b4ef8c76af 48
+tests/unit/git-diff.test.ts
+  s_bf73ebfbb046ca::t_ecdf33e12b2651 163-186
+  s_be8a6a337827fd::t_c3608fe7a63a5d 1-68,70-162,187-196
+  s_be8a6a337827fd::t_0197010dfead15 69
+tests/unit/logging-config.test.ts
+  s_7f89939e55b7e7::t_eca21ab0e17ef2 1-63,65-70
+  s_7f89939e55b7e7::t_1c78503d2bbc4f 64
+src-tauri/src/lib.rs
+  s_7f89939e55b7e7::t_9b59ac1c7b4abb 71-74,79-81
+  s_d00a0272d54bf0::t_8f4ba49e208b4b 182
+  s_314c456700010e::t_cd3135aece68c7 192
+src-tauri/src/mdoels/models.rs
+  s_7f89939e55b7e7::t_3c5ea9f2a8ea8f 306,309,325,338-361,364-376
+  s_d00a0272d54bf0::t_f8e0b9b514f28f 362-363,377-378,482-516
+  s_314c456700010e::t_662804331d6f25 532-590
+src/app/components/terminal/TerminalWorkspace.tsx
+  s_be8a6a337827fd::t_6f7f3fd557645e 322-325
+  s_be8a6a337827fd::t_3d9bd9912d900a 3-4
+  s_be8a6a337827fd::t_02dc487b9d79f8 359-360
+  s_be8a6a337827fd::t_7a42331f367960 337
+  s_be8a6a337827fd::t_8d9ee036f12ccf 965-972
+  s_be8a6a337827fd::t_4dd495448ff0a6 349
+  s_be8a6a337827fd::t_733b4604642556 1176-1214
+  s_be8a6a337827fd::t_63515b7842e211 19-25
+  s_be8a6a337827fd::t_f5f71e61ac76e1 1055-1056,1063-1073,1075-1076,1082-1090
+  s_be8a6a337827fd::t_8ae4620d86e2ee 60
+  s_be8a6a337827fd::t_dbfc802d0957cb 57
+  s_be8a6a337827fd::t_a80f529977ff86 635-660,664-691,698-700,705-707,711,715-718,721,730-733,740,752
+  s_be8a6a337827fd::t_9225ff10f7c2cc 69
+  s_be8a6a337827fd::t_4f523c3431336b 782-785,790,792,795,799,803
+  s_be8a6a337827fd::t_f4e5c23129d3f1 1225,1227,1231-1233
+  s_be8a6a337827fd::t_f15a8ea7ecd313 368-372
+  s_be8a6a337827fd::t_120bce548e0633 1136
+  s_314c456700010e::t_cd8bf3f64af8c6 18,61,358
+src-tauri/src/agent/mod.rs
+  s_7f89939e55b7e7::t_4b978de96eb849 165-171
+  s_7f89939e55b7e7::t_de310d4e592790 241-247
+  s_7f89939e55b7e7::t_e9a06c2d904ce2 263-268
+  s_7f89939e55b7e7::t_b82db11c90b616 383-391
+tests/unit/git-scm.test.ts
+  s_be8a6a337827fd::t_491c616cdd8159 151-156
+  s_d00a0272d54bf0::t_0234832dc1704a 167-242
+  s_d00a0272d54bf0::t_e175b17da6117e 68-70,95-97
+src/scripts/logging-config.js
+  s_7f89939e55b7e7::t_d47141163f3fbd 1-124
+src/app/lib/terminal/git-scm.ts
+  s_d00a0272d54bf0::t_5ed125513349e2 67-73
+  s_be8a6a337827fd::t_a7508f59afef56 372-377
+  s_d00a0272d54bf0::t_a980fa3d1d6675 7,15-16,18
+  s_d00a0272d54bf0::t_0050a6d8fc23c8 178-186,191,196-366
+src/app/styles/modules/terminal/tabs.css
+  s_be8a6a337827fd::t_46edd7e782496e 69-95
+src/scripts/log-tauri-build.js
+  s_7f89939e55b7e7::t_de8e732d72d1d0 5-6,12-19,63-64,71-110,140-148,152,155-163
+other/documents/features.md
+  s_7f89939e55b7e7::t_d71276615cb7d1 52
+src/app/pages/content-menus/tab-context-menu.tsx
+  s_be8a6a337827fd::t_c827f3a7b26aa7 43,47-69
+  s_be8a6a337827fd::t_aff209a67807fe 6,12,25
+src/app/types/git-scm.ts
+  s_d00a0272d54bf0::t_cad06d0db7c132 44-72
+  s_be8a6a337827fd::t_721a9f726141bb 88-94,96,98-122
+  s_bf73ebfbb046ca::t_276ca81bdb842d 95,97
+other/configs/logging.json
+  s_7f89939e55b7e7::t_bc8154a3f4f690 2-29
+other/utilities/scripts/archive-logs.bat
+  s_7f89939e55b7e7::t_1f02cefda2e43d 63,65
+  s_7f89939e55b7e7::t_08bec3cee56d65 4-6
+  s_7f89939e55b7e7::t_2318ec6ca49863 35
+  s_7f89939e55b7e7::t_8289b6e3fd798f 13
+  s_7f89939e55b7e7::t_ce38f2d62e8fbd 51
+src/configs/.tsbuildinfo-app
+  s_bf73ebfbb046ca::t_cf5940daeae381 1
+package.json
+  s_be8a6a337827fd::t_63516be6f57fb1 33,60
+src/app/styles/index.css
+  s_be8a6a337827fd::t_bfd90fb6945be5 19
+src/app/components/terminal/config/LoggingPage.tsx
+  s_7f89939e55b7e7::t_9d9782b2d74c04 1-5,9,21-34,40-50,52-53,56,58,61-63,70-118
+src/configs/tsconfig.test.json
+  s_7f89939e55b7e7::t_6bb379733236e1 11
+src/app/components/terminal/source-control/SourceControlShell.tsx
+  s_d00a0272d54bf0::t_33f05b88456dd5 1-120
+.cursor/hooks/state/continual-learning-index.json
+  s_5233ddd57794aa::t_b7ff53db8728cf 3,134-136,174,179-181,194-196,242-250,282,287-289,308-310,489-492,495,524-532,542-544,561-567,578-580,603,606,619-627
+.cursor/AGENTS.md
+  s_5233ddd57794aa::t_4d7bcb5aa2b4f5 116
+  s_5233ddd57794aa::t_891943a93f2f49 121
+  s_5233ddd57794aa::t_a5e64aef8c9112 122
+  s_7f89939e55b7e7::t_497177e68900fc 129
+  s_d00a0272d54bf0::t_aa7436af8a1a2f 128
+src-tauri/Cargo.toml
+  s_314c456700010e::t_5e278732b4aae1 57
+src/app/lib/context-menu-popup.ts
+  s_d00a0272d54bf0::t_c62dc644424936 23-28
+  s_be8a6a337827fd::t_5f908ee4e9c872 55-56,62
+src/app/components/terminal/Tab.tsx
+  s_be8a6a337827fd::t_d150442300d9e8 160-161
+  s_be8a6a337827fd::t_6458409ac22254 162
+  s_be8a6a337827fd::t_a3cc6a0bbba43a 9-11,13,15-16,51-53
+  s_be8a6a337827fd::t_7e89581edfbfc3 14,17-42
+  s_be8a6a337827fd::t_a7387dd9ca714d 67-69
+  s_be8a6a337827fd::t_087845c07ffbdc 144-145
+src/app/types/index.ts
+  s_be8a6a337827fd::t_063a7b05d8ca47 47-51
+  s_d00a0272d54bf0::t_140bc0371c0efc 54-56,58
+  s_7f89939e55b7e7::t_a83e5a1f87ce1f 11-12
+package-lock.json
+  s_be8a6a337827fd::t_ad1780f35f7133 14,41,1549-1571,3082-3088,4422-4430,6221-6232,6901-6910,7991-7996
+src-tauri/Cargo.lock
+  s_be8a6a337827fd::t_d71395d12b2070 3735,5340-5349
+src/configs/vite.config.d.ts.map
+  s_d00a0272d54bf0::t_e7e89e3d1a7aee 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "ea8644c297bb77020f40890e9a15931f11389f33",
+  "prompts": {},
+  "humans": {
+    "h_90ad036e211778": {
+      "author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  },
+  "sessions": {
+    "s_314c456700010e": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "185b1685-ce60-4a3c-9ee3-eebb0a023b29",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_5233ddd57794aa": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "012e9c25-5ba9-4110-bfc2-608d66689650",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_7f89939e55b7e7": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "faa8fdac-1c7d-4e6e-98e3-2c0df0673ca0",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_be8a6a337827fd": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "bbabe250-f2fd-4113-810e-f7839305c2d9",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_bf73ebfbb046ca": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "4822e4c9-bdaa-4838-ae9c-d206f1b616db",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_d00a0272d54bf0": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "3597dead-23a4-4b44-8e4c-93269a936d92",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
