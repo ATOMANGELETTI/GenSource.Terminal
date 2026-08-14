@@ -1,0 +1,26 @@
+src-tauri/src/logging.rs
+  s_7f89939e55b7e7::t_449cc46f6de27d 314-317
+  s_7f89939e55b7e7::t_4991a9c0075228 188-267
+  s_7f89939e55b7e7::t_ef66cfa3e98dcc 411-427
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "cbaf5ee1430f433d1000717a313c70d9ed935b47",
+  "prompts": {},
+  "humans": {
+    "h_90ad036e211778": {
+      "author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  },
+  "sessions": {
+    "s_7f89939e55b7e7": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "faa8fdac-1c7d-4e6e-98e3-2c0df0673ca0",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
