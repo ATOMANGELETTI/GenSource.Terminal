@@ -17,6 +17,7 @@ import {
   fetchSettings,
   saveLogging,
   saveSettings,
+  subscribeLoggingChanges,
   subscribeSettingsChanges,
 } from "../../../lib/settings";
 import type {
@@ -24,6 +25,7 @@ import type {
   AppSettings,
   Keybinding,
   LoggingSettings,
+  LoggingSettingsPatch,
 } from "../../../types";
 import AboutPage from "./AboutPage";
 import AppearancePage from "./AppearancePage";
@@ -117,6 +119,7 @@ export default function ConfigPanel() {
   const loggingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const bindingsTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const skipExternalSettings = useRef(false);
+  const skipExternalLogging = useRef(false);
 
   useEffect(() => {
     try {
@@ -161,16 +164,33 @@ export default function ConfigPanel() {
       if (cancelled) return;
       if (skipExternalSettings.current) return;
       setSettings(next);
-      void fetchLogging()
-        .then((value) => {
-          if (!cancelled) setLogging(value);
-        })
-        .catch(() => undefined);
       void fetchKeybindings()
         .then((value) => {
           if (!cancelled) setBindings(value);
         })
         .catch(() => undefined);
+    }).then((fn) => {
+      if (cancelled) {
+        fn();
+        return;
+      }
+      unlisten = fn;
+    });
+
+    return () => {
+      cancelled = true;
+      unlisten?.();
+    };
+  }, []);
+
+  useEffect(() => {
+    let unlisten: (() => void) | undefined;
+    let cancelled = false;
+
+    void subscribeLoggingChanges((next) => {
+      if (cancelled) return;
+      if (skipExternalLogging.current) return;
+      setLogging(next);
     }).then((fn) => {
       if (cancelled) {
         fn();
@@ -211,6 +231,7 @@ export default function ConfigPanel() {
   }, []);
 
   const persistLogging = useCallback(async (next: LoggingSettings) => {
+    skipExternalLogging.current = true;
     try {
       await saveLogging(next);
       setSaveError(null);
@@ -219,6 +240,10 @@ export default function ConfigPanel() {
         error instanceof Error ? error.message : "Failed to save logging";
       setSaveError(message);
       console.warn("save_logging failed", error);
+    } finally {
+      window.setTimeout(() => {
+        skipExternalLogging.current = false;
+      }, 400);
     }
   }, []);
 
@@ -283,10 +308,14 @@ export default function ConfigPanel() {
   );
 
   const patchLogging = useCallback(
-    (patch: Partial<LoggingSettings>) => {
+    (patch: LoggingSettingsPatch) => {
       setLogging((prev) => {
         if (!prev) return prev;
-        const next = { ...prev, ...patch };
+        const next: LoggingSettings = {
+          app: patch.app ? { ...prev.app, ...patch.app } : prev.app,
+          build: patch.build ? { ...prev.build, ...patch.build } : prev.build,
+          agent: patch.agent ? { ...prev.agent, ...patch.agent } : prev.agent,
+        };
         if (deepEqual(prev, next)) return prev;
         scheduleLoggingSave(next);
         return next;

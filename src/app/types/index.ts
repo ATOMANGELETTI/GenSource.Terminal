@@ -11,6 +11,7 @@ export type {
   AgentLoggingSettings,
   LogLevelSettings,
   LoggingSettings,
+  LoggingSettingsPatch,
   ParticleEffect,
   PinnedTabRecord,
   PinnedTabsState,

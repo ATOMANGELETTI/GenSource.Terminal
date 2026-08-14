@@ -2,6 +2,7 @@ import type {
   AgentLoggingSettings,
   LogLevelSettings,
   LoggingSettings,
+  LoggingSettingsPatch,
 } from "../../../types";
 import { ConfigCard, ConfigRow, ConfigSwitch } from "./ConfigField";
 
@@ -27,14 +28,14 @@ const AGENT_EVENTS: {
   hint: string;
 }[] = [
   { key: "prompts", label: "Prompts", hint: "User messages sent to the model" },
-  { key: "replies", label: "Replies", hint: "Final assistant text" },
-  { key: "tools", label: "Tools", hint: "Tool calls and confirmations" },
+  { key: "replies", label: "Replies", hint: "Final assistant text, not stream chunks" },
+  { key: "tools", label: "Tools", hint: "Calls, confirm allow/deny, and results" },
   { key: "reasoning", label: "Reasoning", hint: "Model thought text" },
 ];
 
 interface LoggingPageProps {
   logging: LoggingSettings;
-  onPatch: (patch: Partial<LoggingSettings>) => void;
+  onPatch: (patch: LoggingSettingsPatch) => void;
 }
 
 function LevelCard({
@@ -75,25 +76,19 @@ export default function LoggingPage({ logging, onPatch }: LoggingPageProps) {
         label="App"
         idPrefix="config-log-app"
         levels={logging.app}
-        onChange={(key, checked) =>
-          onPatch({ app: { ...logging.app, [key]: checked } })
-        }
+        onChange={(key, checked) => onPatch({ app: { [key]: checked } })}
       />
       <LevelCard
         label="Build"
         idPrefix="config-log-build"
         levels={logging.build}
-        onChange={(key, checked) =>
-          onPatch({ build: { ...logging.build, [key]: checked } })
-        }
+        onChange={(key, checked) => onPatch({ build: { [key]: checked } })}
       />
       <LevelCard
-        label="Agent levels"
+        label="Agent"
         idPrefix="config-log-agent"
         levels={logging.agent}
-        onChange={(key, checked) =>
-          onPatch({ agent: { ...logging.agent, [key]: checked } })
-        }
+        onChange={(key, checked) => onPatch({ agent: { [key]: checked } })}
       />
       <ConfigCard label="Agent events">
         {AGENT_EVENTS.map(({ key, label, hint }) => (
@@ -101,14 +96,12 @@ export default function LoggingPage({ logging, onPatch }: LoggingPageProps) {
             key={key}
             label={label}
             hint={hint}
-            htmlFor={`config-log-agent-${key}`}
+            htmlFor={`config-log-agent-event-${key}`}
           >
             <ConfigSwitch
-              id={`config-log-agent-${key}`}
+              id={`config-log-agent-event-${key}`}
               checked={logging.agent[key]}
-              onChange={(checked) =>
-                onPatch({ agent: { ...logging.agent, [key]: checked } })
-              }
+              onChange={(checked) => onPatch({ agent: { [key]: checked } })}
             />
           </ConfigRow>
         ))}

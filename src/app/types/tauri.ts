@@ -132,6 +132,13 @@ export interface LoggingSettings {
   agent: AgentLoggingSettings;
 }
 
+/** Shallow nested patch for Config → Logging (merged against live state). */
+export interface LoggingSettingsPatch {
+  app?: Partial<LogLevelSettings>;
+  build?: Partial<LogLevelSettings>;
+  agent?: Partial<AgentLoggingSettings>;
+}
+
 /** Matches `commands::greet` which returns a bare `String`. */
 export type GreetResponse = string;
 

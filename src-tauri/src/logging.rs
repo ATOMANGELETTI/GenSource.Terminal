@@ -200,13 +200,13 @@ fn truncate_msg(msg: &str) -> String {
 pub fn redact_secrets(input: &str) -> String {
     let mut out = input.to_string();
     for needle in [
-        "key=",
-        "api_key=",
-        "apikey=",
+        "gensource_vault_password=",
+        "gemini_api_key=",
         "x-goog-api-key=",
         "x-goog-api-key:",
-        "gemini_api_key=",
-        "gensource_vault_password=",
+        "api_key=",
+        "apikey=",
+        "key=",
     ] {
         out = redact_assignment(&out, needle);
     }
@@ -262,18 +262,6 @@ fn redact_aiza_tokens(input: &str) -> String {
         i += ch.len_utf8();
     }
     out
-}
-
-fn append_agent_line(line: &str) {
-    let trimmed = msg.trim();
-    if trimmed.len() <= MAX_AGENT_LINE_BYTES {
-        return trimmed.to_string();
-    }
-    let mut end = MAX_AGENT_LINE_BYTES;
-    while end > 0 && !trimmed.is_char_boundary(end) {
-        end -= 1;
-    }
-    format!("{}…", &trimmed[..end])
 }
 
 fn append_agent_line(line: &str) {

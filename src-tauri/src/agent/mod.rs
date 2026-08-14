@@ -141,9 +141,16 @@ pub async fn agent_chat_send(
     let provider = agent_cfg.active();
     let api_key = cache.get().unwrap_or_default();
     if api_key.is_empty() {
-        return Err(
-            "Gemini API key missing. Unlock the vault in Agents settings.".into(),
+        let message =
+            "Gemini API key missing. Unlock the vault in Agents settings.".to_string();
+        crate::logging::emit_agent(
+            log::Level::Error,
+            true,
+            None,
+            &conversation_id,
+            &message,
         );
+        return Err(message);
     }
     if agent_cfg.active_provider != "gemini"
         && !agent_cfg
@@ -192,7 +199,17 @@ pub async fn agent_chat_send(
     let mut tool_context = ToolContext::new();
     tool_context.insert(host);
 
-    let client = gemini::Client::new(&api_key).map_err(|e| format!("gemini client: {e}"))?;
+    let client = gemini::Client::new(&api_key).map_err(|e| {
+        let message = crate::logging::redact_secrets(&format!("gemini client: {e}"));
+        crate::logging::emit_agent(
+            log::Level::Error,
+            true,
+            None,
+            &conversation_id,
+            &message,
+        );
+        message
+    })?;
 
     let mut preamble = agent_cfg.system_prompt.clone();
     if let Some(cwd) = args.cwd.as_deref().filter(|s| !s.trim().is_empty()) {
@@ -238,13 +255,6 @@ pub async fn agent_chat_send(
         Ok(reply) => {
             sessions.set_history(&conversation_id, history.clone());
             if !reply.trim().is_empty() {
-                crate::log_agent!(
-                    log::Level::Info,
-                    Some(crate::logging::AgentLogKind::Reply),
-                    &conversation_id,
-                    "{}",
-                    reply.trim()
-                );
                 let _ = db
                     .insert_message(&conversation_id, "assistant", reply.trim(), None, None, None)
                     .await;
@@ -259,7 +269,7 @@ pub async fn agent_chat_send(
             Ok(reply)
         }
         Err(err) => {
-            let message = err;
+            let message = crate::logging::redact_secrets(&err);
             let level = if message == "cancelled" {
                 log::Level::Warn
             } else {
@@ -374,15 +384,24 @@ where
             }
             Ok(_) => {}
             Err(err) => {
-                return Err(err.to_string());
+                return Err(crate::logging::redact_secrets(&err.to_string()));
             }
         }
     }
 
     let visible = visible_agent_reply(&acc, &final_output, &reasoning);
+    let streamed_or_final = !acc.trim().is_empty() || !final_output.trim().is_empty();
+    if streamed_or_final && !visible.is_empty() {
+        crate::log_agent!(
+            log::Level::Info,
+            Some(crate::logging::AgentLogKind::Reply),
+            conversation_id,
+            "{visible}"
+        );
+    }
     if !reasoning.trim().is_empty() {
         crate::log_agent!(
-            log::Level::Debug,
+            log::Level::Info,
             Some(crate::logging::AgentLogKind::Reasoning),
             conversation_id,
             "{}",

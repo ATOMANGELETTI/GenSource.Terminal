@@ -83,6 +83,7 @@ pub fn save_settings(app: AppHandle, settings: AppSettings) -> Result<AppSetting
 /// Writes pretty `logging.json` and re-applies the live log filter.
 #[tauri::command]
 pub fn save_logging(
+    app: AppHandle,
     state: State<'_, AppState>,
     settings: LoggingSettings,
 ) -> Result<LoggingSettings, String> {
@@ -93,7 +94,7 @@ pub fn save_logging(
         .clone()
         .ok_or_else(|| "configs dir not initialized".to_string())?;
 
-    config::save_and_apply_logging(&configs_dir, &state.logging, settings)
+    config::save_and_apply_logging(&app, &configs_dir, &state.logging, settings)
 }
 
 /// Writes pretty `keybindings.json`. Global shortcuts still need an app restart;

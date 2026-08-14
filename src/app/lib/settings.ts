@@ -10,6 +10,7 @@ import {
 } from "./theme";
 
 const SETTINGS_CHANGED_EVENT = "settings-changed";
+const LOGGING_CHANGED_EVENT = "logging-changed";
 
 // Tracks the last-applied settings so the system-theme watcher (registered
 // once, for the lifetime of the window) can re-resolve without a stale
@@ -109,5 +110,13 @@ export async function subscribeSettingsChanges(
   return listen<AppSettings>(SETTINGS_CHANGED_EVENT, (event) => {
     applySettingsToDom(event.payload);
     onChange?.(event.payload);
+  });
+}
+
+export async function subscribeLoggingChanges(
+  onChange: (logging: LoggingSettings) => void,
+): Promise<UnlistenFn> {
+  return listen<LoggingSettings>(LOGGING_CHANGED_EVENT, (event) => {
+    onChange(event.payload);
   });
 }

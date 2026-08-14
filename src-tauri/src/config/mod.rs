@@ -31,6 +31,7 @@ static LOGGING_SELF_WRITE_UNTIL: Mutex<Option<Instant>> = Mutex::new(None);
 static AGENT_SELF_WRITE_UNTIL: Mutex<Option<Instant>> = Mutex::new(None);
 
 pub const SETTINGS_CHANGED_EVENT: &str = "settings-changed";
+pub const LOGGING_CHANGED_EVENT: &str = "logging-changed";
 pub const AGENT_CHANGED_EVENT: &str = "agent-changed";
 
 const SETTINGS_FILE: &str = "settings.json";
@@ -591,7 +592,8 @@ pub fn save_and_apply_settings<R: Runtime>(
 }
 
 /// Persist `logging.json` and re-apply the live log filter (same path as watcher).
-pub fn save_and_apply_logging(
+pub fn save_and_apply_logging<R: Runtime>(
+    app: &AppHandle<R>,
     configs_dir: &Path,
     logging: &Arc<RwLock<LoggingSettings>>,
     next: LoggingSettings,
@@ -599,6 +601,7 @@ pub fn save_and_apply_logging(
     note_logging_self_write();
     write_logging(configs_dir, &next)?;
     apply_logging_settings(logging, next.clone());
+    emit_logging_changed(app, &next);
     Ok(next)
 }
 
@@ -648,6 +651,12 @@ pub fn app_info_from_package<R: Runtime>(app: &AppHandle<R>) -> AppInfo {
 pub fn emit_settings_changed<R: Runtime>(app: &AppHandle<R>, settings: &AppSettings) {
     if let Err(err) = app.emit(SETTINGS_CHANGED_EVENT, settings) {
         warn!("failed to emit {SETTINGS_CHANGED_EVENT}: {err}");
+    }
+}
+
+pub fn emit_logging_changed<R: Runtime>(app: &AppHandle<R>, logging: &LoggingSettings) {
+    if let Err(err) = app.emit(LOGGING_CHANGED_EVENT, logging) {
+        warn!("failed to emit {LOGGING_CHANGED_EVENT}: {err}");
     }
 }
 
@@ -955,6 +964,7 @@ pub fn start_settings_watcher<R: Runtime>(app: AppHandle<R>, configs_dir: PathBu
                 thread::sleep(Duration::from_millis(80));
                 let state = app.state::<AppState>();
                 let next = reload_logging_settings(&configs_dir, &state.logging);
+                emit_logging_changed(&app, &next);
                 info!(
                     "reloaded logging.json (app debug={}, build debug={}, agent prompts={}, agent reasoning={})",
                     next.app.debug,
